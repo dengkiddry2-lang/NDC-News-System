@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPC Intelligence Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,7 +19,7 @@
   --blue: #0071e3; --must: #ff3b30;
 }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); font-family: -apple-system,'SF Pro Display','Helvetica Neue','Noto Sans TC',sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; color: var(--tb); }
+body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display','Helvetica Neue','Noto Sans TC',sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; color: var(--tb); }
 
 /* ── GLOBAL NAV ── */
 #gnav {
@@ -98,10 +98,22 @@ body { background: var(--bg); font-family: -apple-system,'SF Pro Display','Helve
 
 .brick-must-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--must); border-radius: 22px 22px 0 0; }
 .brick-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
-.brick-title { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; color: var(--tw); margin-bottom: 10px; }
-.brick-full .brick-title { font-size: 34px; }
+.brick-title {
+  font-size: 22px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.25;
+  color: var(--tw); margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.brick-full .brick-title { font-size: 28px; -webkit-line-clamp: 2; }
 .brick-light .brick-title { color: var(--tb); }
-.brick-summary { font-size: 15px; color: var(--tw2); line-height: 1.6; margin-bottom: 24px; }
+.brick-summary {
+  font-size: 15px; color: var(--tw2); line-height: 1.65; margin-bottom: 20px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.brick-full .brick-summary { -webkit-line-clamp: 4; }
+.brick-source { font-size: 12px; color: var(--tw3); }
+.brick-light .brick-source { color: var(--tb3); }
+.brick-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.badge-must { background: var(--must); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
 .brick-light .brick-summary { color: var(--tb2); }
 .brick-cta-row { display: flex; gap: 24px; align-items: center; }
 .brick-cta { font-size: 17px; color: var(--blue); font-weight: 400; letter-spacing: -0.01em; }
@@ -326,33 +338,36 @@ function buildHighlights(){
 }
 
 // ── CATEGORY BRICKS (home) ──
-function renderBricks(){
+function renderBricks(cat){
   const grid = document.getElementById('brick-grid');
   grid.innerHTML = '';
-  // 每個分類一塊 brick，交替深/淺
-  const activeCats = CAT_ORDER.filter(c=>DATA.some(i=>i.cat===c));
-  activeCats.forEach((cat, idx)=>{
-    const items = DATA.filter(i=>i.cat===cat);
-    const mustCnt = items.filter(i=>i.priority===1).length;
-    const topItem = items.find(i=>i.priority===1) || items[0];
-    const dept = DEPTS[cat] || {};
-    const isLight = idx%2===1;
-    const isFull = idx===0;
-
+  // 直接放新聞，按優先級排序，必看在前
+  const items = (cat&&cat!=='all') ? DATA.filter(i=>i.cat===cat) : DATA;
+  if(!items.length){
+    grid.innerHTML = '<div class="empty-brick">目前無資料</div>';
+    return;
+  }
+  items.forEach((item, idx)=>{
+    const dataIdx = DATA.indexOf(item);
+    const dept = DEPTS[item.cat] || {};
+    // 版型：第一則全寬，之後兩欄交替；每5則一個淺色卡（呼吸感）
+    const isFull = idx === 0;
+    const isLight = !isFull && idx % 5 === 3;
     const brick = document.createElement('div');
-    brick.className = 'brick' + (isFull?' brick-full':'') + (isLight?' brick-light':' brick-dark');
+    brick.className = 'brick'
+      + (isFull ? ' brick-full' : '')
+      + (isLight ? ' brick-light' : ' brick-dark');
 
     let inner = '';
-    if(mustCnt>0) inner += '<div class="brick-must-bar"></div>';
-    inner += '<div class="brick-eyebrow">'+(dept.icon||'')+' '+esc(cat)+'</div>';
-    inner += '<div class="brick-title">'+esc(topItem.title)+'</div>';
-    const summaryText = 'Today '+items.length+' 則' + (mustCnt?'，其中 '+mustCnt+' 則必看。':'');
-    inner += '<div class="brick-summary">'+summaryText+'</div>';
-    inner += '<div class="brick-cta-row"><span class="brick-cta">進一步了解 ›</span><span class="brick-cta2">查看全部 ›</span></div>';
+    if(item.priority===1) inner += '<div class="brick-must-bar"></div>';
+    inner += '<div class="brick-eyebrow">'+(dept.icon||'')+' '+esc(item.cat)+'</div>';
+    inner += '<div class="brick-title">'+esc(item.title)+'</div>';
+    inner += '<div class="brick-summary">'+esc(item.summary)+'</div>';
+    inner += '<div class="brick-meta"><span class="brick-source">'+esc(item.source)+'</span>'
+      +(item.priority===1?'<span class="badge-must">必看</span>':'')+'</div>';
+    inner += '<div class="brick-cta">閱讀全文 ›</div>';
     brick.innerHTML = inner;
-    brick.querySelector('.brick-cta').onclick=(e)=>{ e.stopPropagation(); openArticle(DATA.indexOf(topItem)); };
-    brick.querySelector('.brick-cta2').onclick=(e)=>{ e.stopPropagation(); openCatView(cat); };
-    brick.onclick=()=>openCatView(cat);
+    brick.onclick = ()=>openArticle(dataIdx);
     grid.appendChild(brick);
   });
 }
@@ -446,7 +461,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape'){
 // ── INIT ──
 buildGnavTabs();
 buildHighlights();
-renderBricks();
+renderBricks('all');
 showView('home-view');
 </script>
 </body>
