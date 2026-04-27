@@ -207,6 +207,81 @@ def build_article_index(pdf):
         index[key] = clean_text_blocks(text_list)
     return index
 
+# ── 圖片擷取 ──────────────────────────────────────────────────────
+def build_image_index(pdf, output_dir="images"):
+    """
+    掃描所有分隔頁（sep），擷取新聞截圖，
+    存成 images/{title_key_short}.jpg，回傳 title_key -> 相對路徑 的字典。
+
+    結構：內文首頁(start) 的 title_key → 緊接的分隔頁(sep) 上的圖片
+    """
+    try:
+        from PIL import Image
+        import io as _io
+    except ImportError:
+        print("⚠️  PIL 未安裝，跳過圖片擷取 (pip install pillow)")
+        return {}
+
+    os.makedirs(output_dir, exist_ok=True)
+    img_index = {}   # title_key -> 檔案路徑
+    last_title_key = None
+
+    results = []
+    for page in pdf.pages:
+        text = page.extract_text() or ""
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
+        char_count = len("".join(lines))
+        if has_source:
+            cat = "start"
+        elif page.extract_table():
+            cat = "toc"
+        elif char_count < 30:
+            cat = "sep"
+        else:
+            cat = "cont"
+        results.append((cat, lines, page))
+
+    for cat, lines, page in results:
+        if cat == "start":
+            src_idx = next(
+                (j for j, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源：")),
+                None
+            )
+            if src_idx is not None:
+                last_title_key = "".join(lines[:src_idx]).replace(" ", "")
+        elif cat == "sep" and last_title_key:
+            imgs = page.images
+            if imgs:
+                try:
+                    data = imgs[0]["stream"].get_data()
+                    if data[:2] == b"\xff\xd8":  # JPEG
+                        img = Image.open(_io.BytesIO(data))
+                        # 縮至最寬 640px，quality=55
+                        max_w = 640
+                        if img.width > max_w:
+                            ratio = max_w / img.width
+                            img = img.resize(
+                                (max_w, int(img.height * ratio)),
+                                Image.LANCZOS
+                            )
+                        # 用 title_key 前 40 字當檔名（去除特殊字元）
+                        import re as _re
+                        safe_name = _re.sub(r"[^\w\u4e00-\u9fff]", "_", last_title_key[:40])
+                        fname = os.path.join(output_dir, safe_name + ".jpg")
+                        img.save(fname, format="JPEG", quality=55, optimize=True)
+                        img_index[last_title_key] = fname
+                except Exception as e:
+                    pass  # 單張失敗不中斷
+            last_title_key = None
+        else:
+            if cat not in ("start", "cont"):
+                last_title_key = None
+
+    print(f"擷取圖片 {len(img_index)} 張 → {output_dir}/")
+    return img_index
+
+
 
 # ── 4. 執行解析 ──────────────────────────────────────────────────────
 
@@ -225,6 +300,7 @@ def run_dashboard():
 
         with pdfplumber.open(latest_pdf) as pdf:
             article_index = build_article_index(pdf)
+            img_index = build_image_index(pdf)
             for page in pdf.pages[:15]:
                 table = page.extract_table()
                 if not table:
@@ -254,13 +330,21 @@ def run_dashboard():
                         continue
 
                     content = find_article(article_index, title)
+                    # 找對應圖片
+                    title_key = title.replace(" ", "")
+                    img_path = ""
+                    for ik, iv in img_index.items():
+                        if title_key[:10] and title_key[:10] in ik:
+                            img_path = iv
+                            break
                     all_items.append({
                         "title": title,
                         "source": source,
                         "cat": found_cat,
                         "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
                         "summary": extract_summary(content),
-                        "full_text": content
+                        "full_text": content,
+                        "img_path": img_path
                     })
 
     print(f"保留 {len(all_items)} 則，略過 {skipped} 則非經濟新聞")
@@ -364,11 +448,13 @@ def build_js(data_json, dept_json, cat_order_json):
         "function showFull(idx){",
         "  const item=DATA[idx];",
         "  const contentHtml=item.full_text?esc(item.full_text):'\u5c1a\u672a\u64f7\u53d6\u5230\u5167\u6587\u5167\u5bb9';",
+        "  const imgHtml=item.img_path?'<div class=\"modal-img-wrap\"><img class=\"modal-img\" src=\"'+item.img_path+'\" alt=\"'+esc(item.title)+'\"></div>':'';",
         "  document.getElementById('modal-content').innerHTML=",
         "    '<div class=\"modal-article\">'+",
         "      '<div class=\"modal-cat\">'+esc(item.cat)+'</div>'+",
         "      '<h1 class=\"modal-title\">'+esc(item.title)+'</h1>'+",
         "      '<div class=\"modal-source\">\u4f86\u6e90\uff1a'+esc(item.source)+'</div>'+",
+        "      imgHtml+",
         "      '<div class=\"article-content\">'+contentHtml+'</div>'+",
         "    '</div>';",
         "  document.getElementById('modal').style.display='block';",
@@ -680,6 +766,8 @@ body {
 }
 .modal-source { font-size:13px; color:var(--text-m); font-weight:600; padding-bottom:24px; border-bottom:1px solid var(--border); margin-bottom:32px; }
 .article-content { font-size:17px; line-height:2.0; color:var(--text-s); white-space:pre-line; text-align:justify; }
+.modal-img-wrap { margin-bottom:28px; border:1px solid var(--border); overflow:hidden; }
+.modal-img { width:100%; display:block; }
 
 @media(max-width:900px){
   .main-layout{grid-template-columns:1fr;padding:0 24px;}
