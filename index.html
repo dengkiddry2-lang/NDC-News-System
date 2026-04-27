@@ -3,313 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新聞情報儀表板</title>
+<title>國發會經濟規劃科 · 每日新聞重點</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Reset & Root ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --white: #ffffff;
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --border: #e5e3de;
+  --border-hover: #cbc8c1;
+  --text-primary: #18171a;
+  --text-secondary: #5c5a57;
+  --text-muted: #9e9c98;
+  --accent: #1d4ed8;
+  --accent-light: #eef2ff;
 
-  :root {
-    --white: #ffffff;
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --border: #e8e6e1;
-    --border-hover: #c8c5be;
-    --text-primary: #1a1917;
-    --text-secondary: #6b6860;
-    --text-muted: #a09e99;
-    --accent: #2563eb;
-    --accent-light: #eff6ff;
-    --tag-bg: #f0efeb;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-    --radius: 10px;
-    --radius-sm: 6px;
-  }
+  /* 優先級色 */
+  --must-bg: #fef2f2;
+  --must-border: #fca5a5;
+  --must-text: #b91c1c;
+  --must-tag-bg: #fee2e2;
 
-  body {
-    background-color: var(--bg);
-    color: var(--text-primary);
-    font-family: 'DM Sans', 'Noto Serif TC', sans-serif;
-    min-height: 100vh;
-    line-height: 1.6;
-  }
+  --watch-bg: #fffbeb;
+  --watch-border: #fcd34d;
+  --watch-text: #92400e;
+  --watch-tag-bg: #fef3c7;
 
-  /* Header */
-  .header {
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: baseline; gap: 14px; }
-  .header-title {
-    font-family: 'Noto Serif TC', serif;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: 0.02em;
-  }
-  .header-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .live-indicator {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-  .live-dot {
-    width: 7px; height: 7px;
-    background: #22c55e;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.85); }
-  }
+  --normal-bg: #ffffff;
+  --normal-border: #e5e3de;
+  --normal-text: #5c5a57;
 
-  /* Layout */
-  .main {
-    padding: 32px 40px;
-    max-width: 1600px;
-    margin: 0 auto;
-  }
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
+  --radius: 8px;
+  --radius-sm: 5px;
+}
 
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 28px;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 5px;
-    width: fit-content;
-  }
-  .tab-btn {
-    padding: 8px 20px;
-    border: none;
-    background: transparent;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-family: inherit;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-  }
-  .tab-btn:hover { background: var(--bg); color: var(--text-primary); }
-  .tab-btn.active {
-    background: var(--text-primary);
-    color: white;
-    font-weight: 500;
-  }
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100vh;
+  line-height: 1.65;
+}
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 16px;
-  }
+/* ── Header ── */
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.header-left { display: flex; flex-direction: column; gap: 2px; }
+.header-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 17px; font-weight: 600;
+  color: var(--text-primary); letter-spacing: 0.04em;
+}
+.header-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.header-date { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
-  /* News Card */
-  .news-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-  }
-  .news-card:hover {
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-md);
-  }
-  .news-card.open {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-md);
-  }
+.btn-copy {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: var(--text-primary); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 12px; font-family: inherit; font-weight: 500;
+  cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.03em;
+}
+.btn-copy:hover { opacity: 0.85; }
+.btn-copy.copied { background: #16a34a; }
 
-  .card-header {
-    padding: 18px 20px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .cat-tag {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--accent);
-    background: var(--accent-light);
-    padding: 2px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.03em;
-  }
-  .related-count {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-  .card-title {
-    font-family: 'Noto Serif TC', serif;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.55;
-    color: var(--text-primary);
-  }
+.btn-print {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 12px; font-family: inherit;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-print:hover { border-color: var(--border-hover); color: var(--text-primary); }
 
-  .source-row {
-    padding: 0 20px 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  .source-tag {
-    font-size: 11px;
-    color: var(--text-muted);
-    background: var(--tag-bg);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
+/* ── Layout ── */
+.main { padding: 28px 40px; max-width: 1100px; margin: 0 auto; }
 
-  .expand-btn {
-    width: 100%;
-    border: none;
-    border-top: 1px solid var(--border);
-    background: transparent;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .expand-btn:hover { background: var(--bg); }
-  .expand-icon {
-    font-size: 14px;
-    transition: transform 0.25s ease;
-    color: var(--text-muted);
-  }
-  .open .expand-icon { transform: rotate(180deg); }
+/* ── Legend ── */
+.legend {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 20px; font-size: 12px; color: var(--text-muted);
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.prio-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.prio-dot.must { background: #ef4444; }
+.prio-dot.watch { background: #f59e0b; }
+.prio-dot.normal { background: #d1d5db; }
 
-  /* Expanded panel */
-  .card-detail {
-    display: none;
-    border-top: 1px solid var(--border);
-    animation: slideDown 0.22s ease;
-  }
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .open .card-detail { display: block; }
+/* ── Tabs ── */
+.tabs {
+  display: flex; gap: 2px; margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 22px; border: none; background: transparent;
+  font-size: 13px; font-family: inherit; color: var(--text-muted);
+  cursor: pointer; transition: all 0.15s; border-bottom: 2px solid transparent;
+  margin-bottom: -2px; white-space: nowrap; font-weight: 500;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  .related-section {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .related-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-  .related-item {
-    font-size: 13px;
-    color: var(--text-secondary);
-    padding: 5px 0;
-    border-bottom: 1px dashed var(--border);
-    line-height: 1.5;
-  }
-  .related-item:last-child { border-bottom: none; }
+/* ── News List (single column) ── */
+.news-list { display: flex; flex-direction: column; gap: 10px; }
 
-  .analysis-section {
-    padding: 18px 20px;
-    background: #fafaf8;
-  }
-  .analysis-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .analysis-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-  .analysis-text {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-    line-height: 1.85;
-    font-family: 'Noto Serif TC', serif;
-    outline: none;
-  }
+/* ── Card ── */
+.news-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: var(--radius);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  overflow: hidden;
+}
+.news-card:hover { box-shadow: var(--shadow-md); }
+.news-card.priority-must {
+  border-left-color: var(--must-border);
+  background: var(--must-bg);
+}
+.news-card.priority-watch {
+  border-left-color: var(--watch-border);
+  background: var(--watch-bg);
+}
 
-  /* Empty state */
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
+.card-main {
+  padding: 16px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+  cursor: pointer;
+}
+.card-main:hover .card-title { color: var(--accent); }
 
-  /* All tab grid = 4 columns */
-  .grid.all-view {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.card-left { flex-shrink: 0; padding-top: 2px; }
+.prio-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 7px;
+  border-radius: 3px; letter-spacing: 0.05em; white-space: nowrap;
+}
+.prio-badge.must {
+  background: var(--must-tag-bg); color: var(--must-text);
+}
+.prio-badge.watch {
+  background: var(--watch-tag-bg); color: var(--watch-text);
+}
+.prio-badge.normal {
+  background: var(--bg); color: var(--text-muted); border: 1px solid var(--border);
+}
 
-  @media (max-width: 1200px) {
-    .grid.all-view { grid-template-columns: repeat(2, 1fr); }
-    .main { padding: 24px; }
-  }
-  @media (max-width: 640px) {
-    .grid, .grid.all-view { grid-template-columns: 1fr; }
-    .header { padding: 16px 20px; }
-    .main { padding: 16px; }
-  }
+.card-body { flex: 1; min-width: 0; }
+.card-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px; font-weight: 600; line-height: 1.55;
+  color: var(--text-primary); margin-bottom: 5px;
+  transition: color 0.15s;
+}
+.card-lead {
+  font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 8px; line-height: 1.5;
+}
+.card-meta-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.source-tag {
+  font-size: 11px; color: var(--text-muted);
+  background: var(--bg); padding: 1px 7px;
+  border-radius: 3px; border: 1px solid var(--border);
+}
+.related-badge {
+  font-size: 11px; color: var(--text-muted);
+}
+.card-arrow {
+  font-size: 16px; color: var(--text-muted); flex-shrink: 0;
+  transition: transform 0.25s, color 0.15s; padding-top: 2px;
+  align-self: flex-start;
+}
+.news-card.open .card-arrow { transform: rotate(90deg); color: var(--accent); }
+
+/* ── Expand Panel ── */
+.card-detail {
+  display: none; border-top: 1px solid var(--border);
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.news-card.open .card-detail { display: block; }
+
+.detail-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--bg); padding: 0 20px;
+}
+.detail-tab {
+  padding: 9px 16px; border: none; background: transparent;
+  font-size: 12px; font-family: inherit; color: var(--text-muted);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all 0.15s; font-weight: 500;
+}
+.detail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.detail-tab:hover:not(.active) { color: var(--text-primary); }
+
+.detail-panel { display: none; padding: 20px; }
+.detail-panel.active { display: block; }
+
+/* 判讀摘要 */
+.analysis-block {
+  font-size: 13.5px; color: var(--text-secondary);
+  line-height: 1.9; font-family: 'Noto Serif TC', serif;
+  white-space: pre-line; outline: none;
+}
+.analysis-block:focus { background: #fffef9; border-radius: 4px; padding: 4px; margin: -4px; }
+
+/* 全文區 */
+.fulltext-body {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 2; font-family: 'Noto Serif TC', serif;
+  white-space: pre-wrap; outline: none;
+}
+.fulltext-body:focus { background: #fffef9; padding: 4px; margin: -4px; border-radius: 4px; }
+.fulltext-empty {
+  font-size: 13px; color: var(--text-muted); text-align: center;
+  padding: 16px; background: var(--bg); border-radius: var(--radius-sm);
+  border: 1px dashed var(--border); margin-bottom: 12px;
+}
+.fulltext-input {
+  width: 100%; min-height: 120px; padding: 12px;
+  border: 1px dashed var(--border); border-radius: var(--radius-sm);
+  font-family: 'Noto Serif TC', serif; font-size: 14px;
+  color: var(--text-secondary); background: #fafaf8;
+  resize: vertical; outline: none; line-height: 1.9;
+}
+.fulltext-input:focus { border-color: var(--accent); background: white; }
+
+/* 相關報導小列表 */
+.related-list { margin-top: 12px; }
+.related-row {
+  font-size: 13px; color: var(--text-secondary);
+  padding: 6px 0; border-bottom: 1px dashed var(--border);
+  display: flex; align-items: flex-start; gap: 6px;
+}
+.related-row:last-child { border-bottom: none; }
+.related-row-bullet { color: var(--text-muted); flex-shrink: 0; }
+
+/* Empty */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted); font-size: 14px;
+}
+
+/* ── Print ── */
+@media print {
+  .header { position: static; box-shadow: none; }
+  .btn-copy, .btn-print, .tabs { display: none !important; }
+  .news-card { break-inside: avoid; border-left-width: 3px; }
+  .card-detail { display: block !important; }
+  .detail-panel { display: block !important; }
+  .detail-tabs { display: none; }
+  .fulltext-input, .fulltext-empty { display: none; }
+}
+
+@media (max-width: 640px) {
+  .header { padding: 14px 16px; }
+  .main { padding: 16px; }
+  .btn-print span { display: none; }
+}
 </style>
 </head>
 <body>
 
 <header class="header">
   <div class="header-left">
-    <span class="header-title">新聞情報儀表板</span>
-    <span class="header-sub">Economic Intelligence · NDCP</span>
+    <span class="header-title">國家發展委員會 · 經濟規劃科</span>
+    <span class="header-sub">每日新聞重點整理 · Economic Intelligence Briefing</span>
   </div>
-  <div class="live-indicator">
-    <span class="live-dot"></span>
-    <span id="date-label"></span>
+  <div class="header-right">
+    <span class="header-date" id="date-label"></span>
+    <button class="btn-print" onclick="window.print()">
+      <span>🖨</span><span>列印 / 匯出PDF</span>
+    </button>
+    <button class="btn-copy" id="btn-copy">
+      <span>📋</span><span>複製今日摘要</span>
+    </button>
   </div>
 </header>
 
 <main class="main">
+  <div class="legend">
+    <span>優先級：</span>
+    <div class="legend-item"><span class="prio-dot must"></span>必看</div>
+    <div class="legend-item"><span class="prio-dot watch"></span>關注</div>
+    <div class="legend-item"><span class="prio-dot normal"></span>一般</div>
+  </div>
   <div class="tabs" id="tabs"></div>
-  <div class="grid" id="card-grid"></div>
+  <div class="news-list" id="news-list"></div>
 </main>
 
 <script>
@@ -319,92 +320,17 @@ const DATA = {
     "label": "Risk Monitor",
     "items": [
       {
-        "main_title": "白宮記協晚宴 驚傳槍響",
-        "related_titles": [],
-        "sources": [
-          "經濟日報 A01 要聞"
-        ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
-      },
-      {
         "main_title": "取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案",
         "related_titles": [],
         "sources": [
           "經濟日報 A01 要聞"
         ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "川普出席 白宮記協晚宴傳槍響",
-        "related_titles": [],
-        "sources": [
-          "自由時報 A01 焦點新聞"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈",
-        "related_titles": [],
-        "sources": [
-          "聯合報 A01 要聞"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮",
-        "related_titles": [],
-        "sources": [
-          "中國時報 A01 要聞"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "川普取消特使：伊朗想談可打電話",
-        "related_titles": [],
-        "sources": [
-          "工商時報 A02 火線焦點"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判",
-        "related_titles": [],
-        "sources": [
-          "聯合報 A10 國際"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "美伊各認占上風 談判卡關",
-        "related_titles": [],
-        "sources": [
-          "聯合報 A10 國際"
-        ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
-      },
-      {
-        "main_title": "川普取消特使赴巴 美伊談判停擺",
-        "related_titles": [],
-        "sources": [
-          "中國時報 AA02 焦點新聞"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
-      },
-      {
-        "main_title": "伊朗：荷莫茲不恢復戰前狀態",
-        "related_titles": [],
-        "sources": [
-          "中國時報 AA02 焦點新聞"
-        ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
-      },
-      {
-        "main_title": "全球超級央行周 利率料全數按兵不動",
-        "related_titles": [],
-        "sources": [
-          "工商時報 A02 火線焦點"
-        ],
-        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
+        "full_texts": {
+          "取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案": "聞\n3 台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12"
+        },
+        "priority": "must",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
       },
       {
         "main_title": "美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了",
@@ -412,7 +338,12 @@ const DATA = {
         "sources": [
           "工商時報 A02 火線焦點"
         ],
-        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
+        "full_texts": {
+          "美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了": "6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "must",
+        "lead": "貨幣政策路徑，影響台美利差與資金流向",
+        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。\n\n若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。\n\n台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
       },
       {
         "main_title": "Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高",
@@ -420,15 +351,12 @@ const DATA = {
         "sources": [
           "經濟日報 A02 話題"
         ],
-        "analysis": "本則新聞涉及物價或通膨走勢，供給端成本壓力仍是現階段不確定因素之一。若通膨持續超出目標區間，將對貨幣政策路徑產生制約，影響央行是否調整利率決策。建議同步觀察核心 CPI 與生產者物價指數（PPI），以判斷成本壓力是否向下游消費端傳導。"
-      },
-      {
-        "main_title": "超級央行週 美英歐日料利率不變",
-        "related_titles": [],
-        "sources": [
-          "自由時報 A02 焦點新聞"
-        ],
-        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
+        "full_texts": {
+          "Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高": "0)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "must",
+        "lead": "供給端成本壓力，制約民間消費（C）空間",
+        "analysis": "本則新聞涉及物價或通膨走勢，供給端成本壓力仍是現階段不確定因素之一。\n\n若通膨持續超出目標區間，將對貨幣政策路徑產生制約，影響央行是否調整利率決策。\n\n建議同步觀察核心 CPI 與生產者物價指數（PPI），以判斷成本壓力是否向下游消費端傳導。"
       },
       {
         "main_title": "緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變",
@@ -436,7 +364,129 @@ const DATA = {
         "sources": [
           "聯合報 A06 話題"
         ],
-        "analysis": "本則新聞涉及物價或通膨走勢，供給端成本壓力仍是現階段不確定因素之一。若通膨持續超出目標區間，將對貨幣政策路徑產生制約，影響央行是否調整利率決策。建議同步觀察核心 CPI 與生產者物價指數（PPI），以判斷成本壓力是否向下游消費端傳導。"
+        "full_texts": {
+          "緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變": "率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "must",
+        "lead": "供給端成本壓力，制約民間消費（C）空間",
+        "analysis": "本則新聞涉及物價或通膨走勢，供給端成本壓力仍是現階段不確定因素之一。\n\n若通膨持續超出目標區間，將對貨幣政策路徑產生制約，影響央行是否調整利率決策。\n\n建議同步觀察核心 CPI 與生產者物價指數（PPI），以判斷成本壓力是否向下游消費端傳導。"
+      },
+      {
+        "main_title": "動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成",
+        "related_titles": [],
+        "sources": [
+          "聯合報 A11 兩岸"
+        ],
+        "full_texts": {
+          "動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成": "凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "must",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "川普出席 白宮記協晚宴傳槍響",
+        "related_titles": [],
+        "sources": [
+          "自由時報 A01 焦點新聞"
+        ],
+        "full_texts": {
+          "川普出席 白宮記協晚宴傳槍響": "01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈",
+        "related_titles": [],
+        "sources": [
+          "聯合報 A01 要聞"
+        ],
+        "full_texts": {
+          "孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈": "界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮",
+        "related_titles": [],
+        "sources": [
+          "中國時報 A01 要聞"
+        ],
+        "full_texts": {
+          "又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮": "梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "川普取消特使：伊朗想談可打電話",
+        "related_titles": [],
+        "sources": [
+          "工商時報 A02 火線焦點"
+        ],
+        "full_texts": {
+          "川普取消特使：伊朗想談可打電話": "死胡同 交易額度下降 嚴審開戶 中國時報 A07 生活理財\n市場飽和\n14 純網銀助攻 延續數位帳戶熱潮 中國時報 A07 生活理財\n05-國際要聞(6)\n1 川普取消特使：伊朗想談可打電話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判",
+        "related_titles": [],
+        "sources": [
+          "聯合報 A10 國際"
+        ],
+        "full_texts": {
+          "和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判": "岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "美伊各認占上風 談判卡關",
+        "related_titles": [],
+        "sources": [
+          "聯合報 A10 國際"
+        ],
+        "full_texts": {
+          "美伊各認占上風 談判卡關": "話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "川普取消特使赴巴 美伊談判停擺",
+        "related_titles": [],
+        "sources": [
+          "中國時報 AA02 焦點新聞"
+        ],
+        "full_texts": {
+          "川普取消特使赴巴 美伊談判停擺": "死胡同 交易額度下降 嚴審開戶 中國時報 A07 生活理財\n市場飽和\n14 純網銀助攻 延續數位帳戶熱潮 中國時報 A07 生活理財\n05-國際要聞(6)\n1 川普取消特使：伊朗想談可打電話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "系統性風險訊號，需調高不確定性溢價",
+        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。\n\n地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。\n\n建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+      },
+      {
+        "main_title": "荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機從美中到非洲都不能倖免",
+        "related_titles": [],
+        "sources": [
+          "聯合報 A09 全球瞭望"
+        ],
+        "full_texts": {
+          "荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機從美中到非洲都不能倖免": "歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "供給端成本壓力，制約民間消費（C）空間",
+        "analysis": "本則新聞涉及物價或通膨走勢，供給端成本壓力仍是現階段不確定因素之一。\n\n若通膨持續超出目標區間，將對貨幣政策路徑產生制約，影響央行是否調整利率決策。\n\n建議同步觀察核心 CPI 與生產者物價指數（PPI），以判斷成本壓力是否向下游消費端傳導。"
       },
       {
         "main_title": "美伊戰事未解 衝擊AI發展前景",
@@ -444,7 +494,77 @@ const DATA = {
         "sources": [
           "聯合報 A09 全球瞭望"
         ],
-        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對於人工智慧硬體基礎建設需求持續擴張。從總體面觀察，此類資本支出的增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
+        "full_texts": {
+          "美伊戰事未解 衝擊AI發展前景": "合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "民間投資（I）上行動能，支撐 GDP 成長",
+        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對人工智慧硬體基礎建設需求持續擴張。\n\n從總體面觀察，此類資本支出增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。\n\n建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
+      },
+      {
+        "main_title": "聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨",
+        "related_titles": [],
+        "sources": [
+          "工商時報 A01 要聞"
+        ],
+        "full_texts": {
+          "聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨": "體\n號\n01-頭版新聞(14)\n1 美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭 工商時報 A01 要聞\n曉，投資人關注資本支出是否轉化為獲利成長\n2 聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨 工商時報 A01 要聞\n3 台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保"
+        },
+        "priority": "normal",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "白宮記協晚宴 驚傳槍響",
+        "related_titles": [],
+        "sources": [
+          "經濟日報 A01 要聞"
+        ],
+        "full_texts": {
+          "白宮記協晚宴 驚傳槍響": "t專案ASIC傳捷報 供應鏈嗨 工商時報 A01 要聞\n3 台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營"
+        },
+        "priority": "normal",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "伊朗：荷莫茲不恢復戰前狀態",
+        "related_titles": [],
+        "sources": [
+          "中國時報 AA02 焦點新聞"
+        ],
+        "full_texts": {
+          "伊朗：荷莫茲不恢復戰前狀態": "代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "normal",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "全球超級央行周 利率料全數按兵不動",
+        "related_titles": [],
+        "sources": [
+          "工商時報 A02 火線焦點"
+        ],
+        "full_texts": {
+          "全球超級央行周 利率料全數按兵不動": "岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "normal",
+        "lead": "貨幣政策路徑，影響台美利差與資金流向",
+        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。\n\n若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。\n\n台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
+      },
+      {
+        "main_title": "超級央行週 美英歐日料利率不變",
+        "related_titles": [],
+        "sources": [
+          "自由時報 A02 焦點新聞"
+        ],
+        "full_texts": {
+          "超級央行週 美英歐日料利率不變": "5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "normal",
+        "lead": "貨幣政策路徑，影響台美利差與資金流向",
+        "analysis": "本則新聞聚焦貨幣政策走向，Fed 或各國央行的利率決策對全球資金流向與匯率具有直接影響。\n\n若市場預期利率維持高檔，將壓抑資產評價並影響企業融資成本；反之，降息訊號有助於刺激需求。\n\n台灣央行的決策通常與 Fed 方向保持一定連動，建議同步追蹤台美利率差對新台幣匯率的傳導效果。"
       }
     ]
   },
@@ -458,7 +578,12 @@ const DATA = {
         "sources": [
           "工商時報 A01 要聞"
         ],
-        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對於人工智慧硬體基礎建設需求持續擴張。從總體面觀察，此類資本支出的增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
+        "full_texts": {
+          "美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭曉，投資人關注資本支出是否轉化為獲利成長": "目錄\n編 新聞議題 報導媒體\n號\n01-頭版新聞(14)\n1 美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭 工商時報 A01 要聞\n曉，投資人關注資本支出是否轉化為獲利成長\n2 聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨 工商時報 A01 要聞\n3 台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7"
+        },
+        "priority": "watch",
+        "lead": "民間投資（I）上行動能，支撐 GDP 成長",
+        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對人工智慧硬體基礎建設需求持續擴張。\n\n從總體面觀察，此類資本支出增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。\n\n建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
       },
       {
         "main_title": "＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長",
@@ -466,7 +591,12 @@ const DATA = {
         "sources": [
           "自由時報 A09 財經週報"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長": "協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "總體景氣指標，影響整體成長預測校準",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       },
       {
         "main_title": "公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4%兆豐、一銀成長最多 彰銀也揚升4.25%",
@@ -474,15 +604,12 @@ const DATA = {
         "sources": [
           "經濟日報 A10 金融"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
-      },
-      {
-        "main_title": "動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成",
-        "related_titles": [],
-        "sources": [
-          "聯合報 A11 兩岸"
-        ],
-        "analysis": "本則新聞屬地緣政治或國際情勢範疇，屬於系統性風險訊號，對金融市場與貿易流向均可能產生非線性衝擊。地緣風險升溫通常導致風險資產承壓，並推升能源與避險資產（黃金、美元）價格。建議在預測模型中調高不確定性溢價，並規劃情境分析（基準、樂觀、悲觀）以覆蓋尾部風險。"
+        "full_texts": {
+          "公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4%兆豐、一銀成長最多 彰銀也揚升4.25%": "報 A09 金融市場\n7 亞資中心業務 拚全台落地 金管會7月起開放部分項目全 經濟日報 A02 話題\n國適用 市場看好家族辦公室、境外私募基金銷售先放行\n8 公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4% 經濟日報 A10 金融\n兆豐、一銀成長最多 彰銀也揚升4.25%\n9 台日產業政策鏈結 聚焦5領域合作 自由時報 A02 焦點新聞\n10 打敗大盤 台股熱 主動式ETF規模狂飆 擁有主動選股優 聯合報 A06 話題\n勢 第一季整體規模達2982億元、季增72%\n11 金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪 中國時報 A05 財經綜合\n12 財經會客室 跨境支付 讓世界更易走進台灣 中國時報 A07 生活理財\n13 數位帳戶十年 走入打詐死胡同 交易額度下降 嚴審開戶 中國時報 A07 生活理財\n市場飽和\n14 純網銀助攻 延續數位帳戶熱潮 中國時報 A07 生活理財\n05-國際要聞(6)\n1 川普取消特使：伊朗想談可打電話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n1"
+        },
+        "priority": "normal",
+        "lead": "總體景氣指標，影響整體成長預測校準",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       }
     ]
   },
@@ -496,7 +623,12 @@ const DATA = {
         "sources": [
           "經濟日報 A01 要聞"
         ],
-        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對於人工智慧硬體基礎建設需求持續擴張。從總體面觀察，此類資本支出的增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
+        "full_texts": {
+          "創業之星選秀 快來報名 創投產業推手跨境跨域整合實力，催動創新生態系升級 開發資本助新創搶AI先機": "置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n1"
+        },
+        "priority": "watch",
+        "lead": "民間投資（I）上行動能，支撐 GDP 成長",
+        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對人工智慧硬體基礎建設需求持續擴張。\n\n從總體面觀察，此類資本支出增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。\n\n建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
       },
       {
         "main_title": "國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元",
@@ -504,7 +636,12 @@ const DATA = {
         "sources": [
           "工商時報 A06 綜合要聞"
         ],
-        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對於人工智慧硬體基礎建設需求持續擴張。從總體面觀察，此類資本支出的增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
+        "full_texts": {
+          "國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元": "1 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "民間投資（I）上行動能，支撐 GDP 成長",
+        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對人工智慧硬體基礎建設需求持續擴張。\n\n從總體面觀察，此類資本支出增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。\n\n建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
       },
       {
         "main_title": "AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產",
@@ -512,15 +649,12 @@ const DATA = {
         "sources": [
           "工商時報 A06 綜合要聞"
         ],
-        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對於人工智慧硬體基礎建設需求持續擴張。從總體面觀察，此類資本支出的增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
-      },
-      {
-        "main_title": "台積先進製程 神速擴產 法人推估今年底2、3奈米月產能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全拿」",
-        "related_titles": [],
-        "sources": [
-          "經濟日報 A03 話題"
-        ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產": "檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "民間投資（I）上行動能，支撐 GDP 成長",
+        "analysis": "本則新聞涉及 AI 相關資本支出與供應鏈投資動向，顯示市場對人工智慧硬體基礎建設需求持續擴張。\n\n從總體面觀察，此類資本支出增加將拉抬民間投資（I）分項，有助於支撐 GDP 成長動能。\n\n建議持續追蹤台灣 AI 伺服器出口訂單及相關供應商接單狀況，以評估實際需求是否符合預期。"
       },
       {
         "main_title": "金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪",
@@ -528,7 +662,25 @@ const DATA = {
         "sources": [
           "中國時報 A05 財經綜合"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪": "時報 A02 焦點新聞\n10 打敗大盤 台股熱 主動式ETF規模狂飆 擁有主動選股優 聯合報 A06 話題\n勢 第一季整體規模達2982億元、季增72%\n11 金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪 中國時報 A05 財經綜合\n12 財經會客室 跨境支付 讓世界更易走進台灣 中國時報 A07 生活理財\n13 數位帳戶十年 走入打詐死胡同 交易額度下降 嚴審開戶 中國時報 A07 生活理財\n市場飽和\n14 純網銀助攻 延續數位帳戶熱潮 中國時報 A07 生活理財\n05-國際要聞(6)\n1 川普取消特使：伊朗想談可打電話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "供應鏈核心動向，影響出口與民間投資預測",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "台積先進製程 神速擴產 法人推估今年底2、3奈米月產能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全拿」",
+        "related_titles": [],
+        "sources": [
+          "經濟日報 A03 話題"
+        ],
+        "full_texts": {
+          "台積先進製程 神速擴產 法人推估今年底2、3奈米月產能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全拿」": "廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "normal",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       }
     ]
   },
@@ -542,7 +694,12 @@ const DATA = {
         "sources": [
           "工商時報 A01 要聞"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～6GW設置容量": "時報 A01 要聞\n曉，投資人關注資本支出是否轉化為獲利成長\n2 聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨 工商時報 A01 要聞\n3 台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～ 工商時報 A01 要聞\n6GW設置容量\n4 白宮記協晚宴 驚傳槍響 經濟日報 A01 要聞\n5 取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收 經濟日報 A01 要聞\n到伊朗新提案\n6 創業之星選秀 快來報名 創投產業推手跨境跨域整合實 經濟日報 A01 要聞\n力，催動創新生態系升級 開發資本助新創搶AI先機\n7 川普出席 白宮記協晚宴傳槍響 自由時報 A01 焦點新聞\n8 錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴： 自由時報 A01 焦點新聞\n2300萬台灣人有權走向世界\n9 春雨助攻 高雄農業旱情解除 自由時報 A01 焦點新聞\n10 10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年 自由時報 A01 焦點新聞\n11 孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤 聯合報 A01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小"
+        },
+        "priority": "watch",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       },
       {
         "main_title": "經長挺高雄設算力園區",
@@ -550,7 +707,12 @@ const DATA = {
         "sources": [
           "經濟日報 A05 焦點"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "經長挺高雄設算力園區": "經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       },
       {
         "main_title": "淨零承諾 企業的能源硬仗",
@@ -558,47 +720,12 @@ const DATA = {
         "sources": [
           "經濟日報 A13 經營管理"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
-      },
-      {
-        "main_title": "台灣國是會議》司徒文呼籲立院通過增加國防預算",
-        "related_titles": [],
-        "sources": [
-          "自由時報 A03 焦點新聞"
-        ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
-      },
-      {
-        "main_title": "藍又要普發現金？》綠：擋預算又要發錢 讓國家失能",
-        "related_titles": [],
-        "sources": [
-          "自由時報 A04 政治新聞"
-        ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
-      },
-      {
-        "main_title": "司徒文促台增國防預算 吳志中籲結盟美日嚇阻",
-        "related_titles": [],
-        "sources": [
-          "中國時報 A02 焦點新聞"
-        ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
-      },
-      {
-        "main_title": "無人機納國防特別預算 嚇阻力最快速",
-        "related_titles": [],
-        "sources": [
-          "中國時報 A03 焦點新聞"
-        ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
-      },
-      {
-        "main_title": "台日產業政策鏈結 聚焦5領域合作",
-        "related_titles": [],
-        "sources": [
-          "自由時報 A02 焦點新聞"
-        ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+        "full_texts": {
+          "淨零承諾 企業的能源硬仗": "經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "watch",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
       },
       {
         "main_title": "數位ｘ淨零的綠色整合方案",
@@ -606,7 +733,77 @@ const DATA = {
         "sources": [
           "經濟日報 A04 焦點"
         ],
-        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+        "full_texts": {
+          "數位ｘ淨零的綠色整合方案": "「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1 數位ｘ淨零的綠色整合方案 經濟日報 A04 焦點\n2 石油期貨價格是騙人的？ 經濟日報 A06 國際\n3 華許不蕭規曹隨，但動作空間有限 經濟日報 A14 台股熱點\n3"
+        },
+        "priority": "watch",
+        "lead": "一般經濟資訊，建議維持現行預測參數",
+        "analysis": "本則新聞為一般性經濟資訊，目前不具明顯的高度風險或重大政策意涵。\n\n建議維持現行預測模型參數，持續追蹤後續相關數據發布，以確認訊號方向是否一致。\n\n若後續出現相關新聞佐證，可考慮對應調整預測假設或情境設定。"
+      },
+      {
+        "main_title": "台灣國是會議》司徒文呼籲立院通過增加國防預算",
+        "related_titles": [],
+        "sources": [
+          "自由時報 A03 焦點新聞"
+        ],
+        "full_texts": {
+          "台灣國是會議》司徒文呼籲立院通過增加國防預算": "03-國內要聞(27)\n1 台灣國是會議》司徒文呼籲立院通過增加國防預算 自由時報 A03 焦點新聞\n2 又要普發現金？》藍再提稅收超徵修法 強調「還稅於 自由時報 A04 政治新聞\n民」制度化\n3 藍又要普發現金？》綠：擋預算又要發錢 讓國家失能 自由時報 A04 政治新聞\n4 兒托法訂定20項子法／教團反對監管雲 石崇良：不能隨 自由時報 A06 生活新聞\n時調閱\n5 專家：軍購不能成「無菜單料理」 聯合報 A02 焦點\n6 軍購協商 韓國瑜：今挑燈夜戰 額度爭議大 藍指民進黨 聯合報 A02 焦點\n團死守1.25兆 如何協商\n7 灰色地帶操作 削弱旅客保障 聯合報 A07 民生\n8 「合法做不了、違規又不敢明做」 多輸局面 赴陸變形團 聯合報 A07 民生\n政府續埋沙堆？\n9 2024年3月原已要解禁 賴當選後生變… 禁團令一禁6 聯合報 A07 民生\n年 旅行業氣煞\n10 甘肅翻車 國台辦：全力協助 死者家屬抵當地 3人留院 聯合報 A07 民生\n5月1日全團返台\n11 徒具形式 禁團令 旅遊業者：剩政治宣示意義 赴陸人數 聯合報 A07 民生\n年年增 去年已達疫前8成 李奇嶽：市場需求難逆轉 不\n如實質納管\n12 石崇良：安樂死有疑慮 不考慮推動 安寧照護「8成在醫 聯合報 A12 司法\n院」 健保擬加碼給付鼓勵在宅安寧\n13 制度補強 為失智者阻詐 民間促立法 台灣失智症協會擬 聯合報 A12 司法\n定失智症基本法草案 盼患者面對財務法律問題不再孤立\n無援\n14 充滿變數 申請卡關 金門今赴廈考察降級 副縣長遭駁回 聯合報 A13 北部生活圈\n縣府緊急調整名單\n15 司徒文促台增國防預算 吳志中籲結盟美日嚇阻 中國時報 A02 焦點新聞\n16 支持國防不等於放棄監督 應考量實際防衛需求 專家：特 中國時報 A02 焦點新聞\n別軍購不能成為無菜單料理\n17 軍購民調 年輕族群態度保留 中國時報 A02 焦點新聞\n18 通過國防特別條例 有助鄭訪美氛圍 谷立言肯定親美友日 中國時報 A03 焦點新聞\n和陸路線 稱嚇阻與對話並重 可維護區域安全\n19 無人機納國防特別預算 嚇阻力最快速 中國時報 A03 焦點新聞\n20 翻轉經濟學人「地球上最危險的地方」看法 谷立言稱台 中國時報 A03 焦點新聞\n是最重要的地方之一\n21 看好無人機產業 雙方致力履行ART條款 谷立言：台美進 中國時報"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+      },
+      {
+        "main_title": "藍又要普發現金？》綠：擋預算又要發錢 讓國家失能",
+        "related_titles": [],
+        "sources": [
+          "自由時報 A04 政治新聞"
+        ],
+        "full_texts": {
+          "藍又要普發現金？》綠：擋預算又要發錢 讓國家失能": "》司徒文呼籲立院通過增加國防預算 自由時報 A03 焦點新聞\n2 又要普發現金？》藍再提稅收超徵修法 強調「還稅於 自由時報 A04 政治新聞\n民」制度化\n3 藍又要普發現金？》綠：擋預算又要發錢 讓國家失能 自由時報 A04 政治新聞\n4 兒托法訂定20項子法／教團反對監管雲 石崇良：不能隨 自由時報 A06 生活新聞\n時調閱\n5 專家：軍購不能成「無菜單料理」 聯合報 A02 焦點\n6 軍購協商 韓國瑜：今挑燈夜戰 額度爭議大 藍指民進黨 聯合報 A02 焦點\n團死守1.25兆 如何協商\n7 灰色地帶操作 削弱旅客保障 聯合報 A07 民生\n8 「合法做不了、違規又不敢明做」 多輸局面 赴陸變形團 聯合報 A07 民生\n政府續埋沙堆？\n9 2024年3月原已要解禁 賴當選後生變… 禁團令一禁6 聯合報 A07 民生\n年 旅行業氣煞\n10 甘肅翻車 國台辦：全力協助 死者家屬抵當地 3人留院 聯合報 A07 民生\n5月1日全團返台\n11 徒具形式 禁團令 旅遊業者：剩政治宣示意義 赴陸人數 聯合報 A07 民生\n年年增 去年已達疫前8成 李奇嶽：市場需求難逆轉 不\n如實質納管\n12 石崇良：安樂死有疑慮 不考慮推動 安寧照護「8成在醫 聯合報 A12 司法\n院」 健保擬加碼給付鼓勵在宅安寧\n13 制度補強 為失智者阻詐 民間促立法 台灣失智症協會擬 聯合報 A12 司法\n定失智症基本法草案 盼患者面對財務法律問題不再孤立\n無援\n14 充滿變數 申請卡關 金門今赴廈考察降級 副縣長遭駁回 聯合報 A13 北部生活圈\n縣府緊急調整名單\n15 司徒文促台增國防預算 吳志中籲結盟美日嚇阻 中國時報 A02 焦點新聞\n16 支持國防不等於放棄監督 應考量實際防衛需求 專家：特 中國時報 A02 焦點新聞\n別軍購不能成為無菜單料理\n17 軍購民調 年輕族群態度保留 中國時報 A02 焦點新聞\n18 通過國防特別條例 有助鄭訪美氛圍 谷立言肯定親美友日 中國時報 A03 焦點新聞\n和陸路線 稱嚇阻與對話並重 可維護區域安全\n19 無人機納國防特別預算 嚇阻力最快速 中國時報 A03 焦點新聞\n20 翻轉經濟學人「地球上最危險的地方」看法 谷立言稱台 中國時報 A03 焦點新聞\n是最重要的地方之一\n21 看好無人機產業 雙方致力履行ART條款 谷立言：台美進 中國時報 A03 焦點新聞\n入經濟合作黃金年代\n22 中選會今復活 藍白各推公投 安樂死受矚目 國民黨鎖定 中國時報 A04 生活綜合\n鞭刑 民眾黨提善終法草案 外界預期挑戰敏感生"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+      },
+      {
+        "main_title": "司徒文促台增國防預算 吳志中籲結盟美日嚇阻",
+        "related_titles": [],
+        "sources": [
+          "中國時報 A02 焦點新聞"
+        ],
+        "full_texts": {
+          "司徒文促台增國防預算 吳志中籲結盟美日嚇阻": "本法草案 盼患者面對財務法律問題不再孤立\n無援\n14 充滿變數 申請卡關 金門今赴廈考察降級 副縣長遭駁回 聯合報 A13 北部生活圈\n縣府緊急調整名單\n15 司徒文促台增國防預算 吳志中籲結盟美日嚇阻 中國時報 A02 焦點新聞\n16 支持國防不等於放棄監督 應考量實際防衛需求 專家：特 中國時報 A02 焦點新聞\n別軍購不能成為無菜單料理\n17 軍購民調 年輕族群態度保留 中國時報 A02 焦點新聞\n18 通過國防特別條例 有助鄭訪美氛圍 谷立言肯定親美友日 中國時報 A03 焦點新聞\n和陸路線 稱嚇阻與對話並重 可維護區域安全\n19 無人機納國防特別預算 嚇阻力最快速 中國時報 A03 焦點新聞\n20 翻轉經濟學人「地球上最危險的地方」看法 谷立言稱台 中國時報 A03 焦點新聞\n是最重要的地方之一\n21 看好無人機產業 雙方致力履行ART條款 谷立言：台美進 中國時報 A03 焦點新聞\n入經濟合作黃金年代\n22 中選會今復活 藍白各推公投 安樂死受矚目 國民黨鎖定 中國時報 A04 生活綜合\n鞭刑 民眾黨提善終法草案 外界預期挑戰敏感生死議題\n23 8成安寧患者死在醫院 提倡在家善終 獎勵加碼至30% 中國時報 A04 生活綜合\n24 官方看法 加工死有違醫生使命 衛福部不支持多數決 中國時報 A04 生活綜合\n25 抗議監管雲 教團嗆石部長家先裝 中國時報 A04 生活綜合\n26 變形團興起 禁團令剩政治宣示 中國時報 A05 財經綜合\n27 假網購無卡提款詐騙 暴增4倍 僅需序號或掃二維碼就可 中國時報 A06 社會綜合／專輯\n秒領 立委籲調降額度 警盼禁網銀截圖降外洩風險\n04-國內財經(14)\n1 未理賠可退保費 金管會要查 憂心健康險變儲蓄險，將偏 工商時報 A05 綜合要聞\n2"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+      },
+      {
+        "main_title": "無人機納國防特別預算 嚇阻力最快速",
+        "related_titles": [],
+        "sources": [
+          "中國時報 A03 焦點新聞"
+        ],
+        "full_texts": {
+          "無人機納國防特別預算 嚇阻力最快速": "01 要聞\n人員中彈\n12 供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年 聯合報 A01 要聞\n梅爾茨指全面廢核電是戰略錯誤\n13 獨家專訪／促台速通過國防特別條例 釋出強化自我防衛 中國時報 A01 要聞\n信號 谷立言：嚇阻力 維護和平最佳途徑\n14 又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教 中國時報 A01 要聞\n師闖安檢站開火遭逮\n02-本會相關新聞(13)\n1 台積鉅額交易 創2,285元新高 總成交金額逾1.37億元 工商時報 B05 集中市場 期貨\n2 國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年 工商時報 A06 綜合要聞\n每案最高補貼3,000萬元、大專院校則為500萬元\n3 AI中央廚房補助計畫地方美食IP化策略 讓特色料理變 工商時報 A06 綜合要聞\n成數位資產\n4 Q1信義房價指數房價有撐短期難大跌 工商時報 A10 產業‧科技\n5 台積先進製程 神速擴產 法人推估今年底2、3奈米月產 經濟日報 A03 話題\n能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全\n拿」\n6 考量用電需求… 經部：強化資料中心審議機制 經濟日報 A05 焦點\n7 經長挺高雄設算力園區 經濟日報 A05 焦點\n8 環評總體檢 啟動雞尾酒療法 經濟日報 A05 焦點\n9 失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護 經濟日報 A11 保險\n補足缺口 業者推出多元保單 協助小資族解決痛點\n10 淨零承諾 企業的能源硬仗 經濟日報 A13 經營管理\n11 廚餘養豬明年退場 營養午餐清運費恐大漲 自由時報 A06 生活新聞\n12 ＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙 自由時報 A09 財經週報\n位數成長\n13 時評 台灣淪先禁國家 中國時報 A10 時論廣場\n1"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+      },
+      {
+        "main_title": "台日產業政策鏈結 聚焦5領域合作",
+        "related_titles": [],
+        "sources": [
+          "自由時報 A02 焦點新聞"
+        ],
+        "full_texts": {
+          "台日產業政策鏈結 聚焦5領域合作": "、境外私募基金銷售先放行\n8 公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4% 經濟日報 A10 金融\n兆豐、一銀成長最多 彰銀也揚升4.25%\n9 台日產業政策鏈結 聚焦5領域合作 自由時報 A02 焦點新聞\n10 打敗大盤 台股熱 主動式ETF規模狂飆 擁有主動選股優 聯合報 A06 話題\n勢 第一季整體規模達2982億元、季增72%\n11 金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪 中國時報 A05 財經綜合\n12 財經會客室 跨境支付 讓世界更易走進台灣 中國時報 A07 生活理財\n13 數位帳戶十年 走入打詐死胡同 交易額度下降 嚴審開戶 中國時報 A07 生活理財\n市場飽和\n14 純網銀助攻 延續數位帳戶熱潮 中國時報 A07 生活理財\n05-國際要聞(6)\n1 川普取消特使：伊朗想談可打電話 工商時報 A02 火線焦點\n2 和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴 聯合報 A10 國際\n基斯坦 伊朗外長又重返巴國：不在施壓下談判\n3 美伊各認占上風 談判卡關 聯合報 A10 國際\n4 陸前談判代表：中美有分歧 也尋共同利益 聯合報 A11 兩岸\n5 川普取消特使赴巴 美伊談判停擺 中國時報 AA02 焦點新聞\n6 伊朗：荷莫茲不恢復戰前狀態 中國時報 AA02 焦點新聞\n06-國際財經(10)\n1 全球超級央行周 利率料全數按兵不動 工商時報 A02 火線焦點\n2 美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了 工商時報 A02 火線焦點\n3 Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示 經濟日報 A02 話題\n降息門檻高\n4 荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新 經濟日報 A06 國際\n評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易\n5 超級央行週 美英歐日料利率不變 自由時報 A02 焦點新聞\n6 緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周 聯合報 A06 話題\n舉行決策會議 預料利率不變\n7 荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機 聯合報 A09 全球瞭望\n從美中到非洲都不能倖免\n8 美伊戰事未解 衝擊AI發展前景 聯合報 A09 全球瞭望\n9 動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政 聯合報 A11 兩岸\n治風險上升之際 看好人民幣資產由「可選配置」轉向重\n要組成\n10 科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最 中國時報 A05 財經綜合\n後談話成焦點\n07-觀點與評論(18)\n1"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
       },
       {
         "main_title": "當政策只是回應壓力 難解醫護流失",
@@ -614,7 +811,12 @@ const DATA = {
         "sources": [
           "聯合報 B01 健康"
         ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+        "full_texts": {
+          "當政策只是回應壓力 難解醫護流失": "國安修法防敵對動員 也要嚴守法治邊界 自由時報 A14 自由廣場\n6 自由廣場》併購案的國安盲點 外送大軍淪中共免費探路 自由時報 A14 自由廣場\n人？\n7 當政策只是回應壓力 難解醫護流失 聯合報 B01 健康\n8 新四通不是政策想像 是逼近的現實 聯合報 A13 北部生活圈\n9 科技競爭的本質在於功能與使用者體驗 而非產地標籤 從 聯合報 A14 論壇\n「高德地圖」看新媒體時代的理性判讀\n10 不能對美說不vs.不能對中說好 聯合報 A15 民意\n11 英國也成美「菜單」 吳志中怎能不怕 聯合報 A15 民意\n12 台灣關係法與九二共識的保台藝術 九二共識曾讓台灣海 聯合報 A15 民意\n峽有了一九四九年之後最和平的時光 以模糊定位保台，\n就是台灣關係法與九二共識的共同智慧 說不清但可運作\n的空間，維繫了美國與我們斷交後的關係\n13 組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴 聯合報 A15 民意\n的赴陸禁團令\n14 軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰 中國時報 A02 焦點新聞\n拚送院會表決 在野準備加碼 設發價書才編預算但書\n15 榮景或台灣病？政府治理應如履薄冰 天堂不撤守／專欄 中國時報 A10 時論廣場\n16 從荷莫茲到馬六甲 縱橫天下／專欄 中國時報 A10 時論廣場\n17 社會觀察 接下大陸的橄欖枝 中國時報 A10 時論廣場\n18 東升西降 壓縮賴政府國際空間 中國時報 A10 時論廣場\n08-各報社論(6)\n1 《社論》大陸經濟仍未擺脫「供強需弱」困境 工商時報 A02 火線焦點\n2 社論/從採購到投資：ART架構下的戰略轉型 經濟日報 A02 話題\n3 社論》中國人認同為台灣帶來的災難 自由時報 A02 焦點新聞\n4 社論/可教化與鞭刑之辯，反映人民憂懼社安破漏 聯合報 A02 焦點\n5 奔馳大地 翱翔天空 航向宇宙 社評／今日大陸系列八 中國時報 AA01 要聞\n〈交通篇〉\n6 社論／四重壓力下 賴總統破局關鍵 中國時報 A02 焦點新聞\n4"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
       },
       {
         "main_title": "新四通不是政策想像 是逼近的現實",
@@ -622,7 +824,12 @@ const DATA = {
         "sources": [
           "聯合報 A13 北部生活圈"
         ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+        "full_texts": {
+          "新四通不是政策想像 是逼近的現實": "廣場\n6 自由廣場》併購案的國安盲點 外送大軍淪中共免費探路 自由時報 A14 自由廣場\n人？\n7 當政策只是回應壓力 難解醫護流失 聯合報 B01 健康\n8 新四通不是政策想像 是逼近的現實 聯合報 A13 北部生活圈\n9 科技競爭的本質在於功能與使用者體驗 而非產地標籤 從 聯合報 A14 論壇\n「高德地圖」看新媒體時代的理性判讀\n10 不能對美說不vs.不能對中說好 聯合報 A15 民意\n11 英國也成美「菜單」 吳志中怎能不怕 聯合報 A15 民意\n12 台灣關係法與九二共識的保台藝術 九二共識曾讓台灣海 聯合報 A15 民意\n峽有了一九四九年之後最和平的時光 以模糊定位保台，\n就是台灣關係法與九二共識的共同智慧 說不清但可運作\n的空間，維繫了美國與我們斷交後的關係\n13 組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴 聯合報 A15 民意\n的赴陸禁團令\n14 軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰 中國時報 A02 焦點新聞\n拚送院會表決 在野準備加碼 設發價書才編預算但書\n15 榮景或台灣病？政府治理應如履薄冰 天堂不撤守／專欄 中國時報 A10 時論廣場\n16 從荷莫茲到馬六甲 縱橫天下／專欄 中國時報 A10 時論廣場\n17 社會觀察 接下大陸的橄欖枝 中國時報 A10 時論廣場\n18 東升西降 壓縮賴政府國際空間 中國時報 A10 時論廣場\n08-各報社論(6)\n1 《社論》大陸經濟仍未擺脫「供強需弱」困境 工商時報 A02 火線焦點\n2 社論/從採購到投資：ART架構下的戰略轉型 經濟日報 A02 話題\n3 社論》中國人認同為台灣帶來的災難 自由時報 A02 焦點新聞\n4 社論/可教化與鞭刑之辯，反映人民憂懼社安破漏 聯合報 A02 焦點\n5 奔馳大地 翱翔天空 航向宇宙 社評／今日大陸系列八 中國時報 AA01 要聞\n〈交通篇〉\n6 社論／四重壓力下 賴總統破局關鍵 中國時報 A02 焦點新聞\n4"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
       },
       {
         "main_title": "組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴的赴陸禁團令",
@@ -630,7 +837,12 @@ const DATA = {
         "sources": [
           "聯合報 A15 民意"
         ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+        "full_texts": {
+          "組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴的赴陸禁團令": "15 民意\n峽有了一九四九年之後最和平的時光 以模糊定位保台，\n就是台灣關係法與九二共識的共同智慧 說不清但可運作\n的空間，維繫了美國與我們斷交後的關係\n13 組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴 聯合報 A15 民意\n的赴陸禁團令\n14 軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰 中國時報 A02 焦點新聞\n拚送院會表決 在野準備加碼 設發價書才編預算但書\n15 榮景或台灣病？政府治理應如履薄冰 天堂不撤守／專欄 中國時報 A10 時論廣場\n16 從荷莫茲到馬六甲 縱橫天下／專欄 中國時報 A10 時論廣場\n17 社會觀察 接下大陸的橄欖枝 中國時報 A10 時論廣場\n18 東升西降 壓縮賴政府國際空間 中國時報 A10 時論廣場\n08-各報社論(6)\n1 《社論》大陸經濟仍未擺脫「供強需弱」困境 工商時報 A02 火線焦點\n2 社論/從採購到投資：ART架構下的戰略轉型 經濟日報 A02 話題\n3 社論》中國人認同為台灣帶來的災難 自由時報 A02 焦點新聞\n4 社論/可教化與鞭刑之辯，反映人民憂懼社安破漏 聯合報 A02 焦點\n5 奔馳大地 翱翔天空 航向宇宙 社評／今日大陸系列八 中國時報 AA01 要聞\n〈交通篇〉\n6 社論／四重壓力下 賴總統破局關鍵 中國時報 A02 焦點新聞\n4"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
       },
       {
         "main_title": "軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰拚送院會表決 在野準備加碼 設發價書才編預算但書",
@@ -638,127 +850,242 @@ const DATA = {
         "sources": [
           "中國時報 A02 焦點新聞"
         ],
-        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
+        "full_texts": {
+          "軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰拚送院會表決 在野準備加碼 設發價書才編預算但書": "慧 說不清但可運作\n的空間，維繫了美國與我們斷交後的關係\n13 組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴 聯合報 A15 民意\n的赴陸禁團令\n14 軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰 中國時報 A02 焦點新聞\n拚送院會表決 在野準備加碼 設發價書才編預算但書\n15 榮景或台灣病？政府治理應如履薄冰 天堂不撤守／專欄 中國時報 A10 時論廣場\n16 從荷莫茲到馬六甲 縱橫天下／專欄 中國時報 A10 時論廣場\n17 社會觀察 接下大陸的橄欖枝 中國時報 A10 時論廣場\n18 東升西降 壓縮賴政府國際空間 中國時報 A10 時論廣場\n08-各報社論(6)\n1 《社論》大陸經濟仍未擺脫「供強需弱」困境 工商時報 A02 火線焦點\n2 社論/從採購到投資：ART架構下的戰略轉型 經濟日報 A02 話題\n3 社論》中國人認同為台灣帶來的災難 自由時報 A02 焦點新聞\n4 社論/可教化與鞭刑之辯，反映人民憂懼社安破漏 聯合報 A02 焦點\n5 奔馳大地 翱翔天空 航向宇宙 社評／今日大陸系列八 中國時報 AA01 要聞\n〈交通篇〉\n6 社論／四重壓力下 賴總統破局關鍵 中國時報 A02 焦點新聞\n4"
+        },
+        "priority": "normal",
+        "lead": "政府支出（G）結構調整，牽動公共投資預期",
+        "analysis": "本則新聞涉及政府政策規畫或預算配置，為經濟預測的重要結構性變數。\n\n政府支出（G）是 GDP 支出面的直接構成要素，預算執行進度與新政策方向將影響公共投資與民間信心。\n\n建議追蹤政策落地時程，評估對相關產業鏈（如綠能、數位基礎建設）的乘數效果。"
       }
     ]
   }
 };
-
 const CATS = Object.keys(DATA);
 let currentTab = 'all';
+const userTexts = {};
 
+const PRIO_LABEL = { must: '必看', watch: '關注', normal: '一般' };
+
+// ── Tabs ──
 function renderTabs() {
   const tabs = document.getElementById('tabs');
-  const allBtn = document.createElement('button');
-  allBtn.className = 'tab-btn active';
-  allBtn.textContent = '全部';
-  allBtn.dataset.tab = 'all';
-  allBtn.onclick = () => switchTab('all');
-  tabs.appendChild(allBtn);
-
+  tabs.appendChild(mkTab('全部', 'all', true));
   CATS.forEach(cat => {
     const d = DATA[cat];
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn';
-    btn.dataset.tab = cat;
-    btn.textContent = d.icon + ' ' + cat + ' (' + d.items.length + ')';
-    btn.onclick = () => switchTab(cat);
-    tabs.appendChild(btn);
+    const count = d.items.length;
+    const mustCount = d.items.filter(i => i.priority === 'must').length;
+    const label = d.icon + ' ' + cat + ' (' + count + (mustCount ? ' ⚑' + mustCount : '') + ')';
+    tabs.appendChild(mkTab(label, cat, false));
   });
 }
-
+function mkTab(label, tab, active) {
+  const b = document.createElement('button');
+  b.className = 'tab-btn' + (active ? ' active' : '');
+  b.dataset.tab = tab;
+  b.textContent = label;
+  b.onclick = () => switchTab(tab);
+  return b;
+}
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.tab === tab);
-  });
-  renderCards();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  renderList();
 }
 
-function renderCards() {
-  const grid = document.getElementById('card-grid');
-  grid.innerHTML = '';
-  grid.className = currentTab === 'all' ? 'grid all-view' : 'grid';
-
+// ── List ──
+function renderList() {
+  const list = document.getElementById('news-list');
+  list.innerHTML = '';
   const targets = currentTab === 'all' ? CATS : [currentTab];
   let total = 0;
-
   targets.forEach(cat => {
-    const d = DATA[cat];
-    d.items.forEach(item => {
-      grid.appendChild(makeCard(item, cat, d));
+    DATA[cat].items.forEach(item => {
+      list.appendChild(makeCard(item, cat, DATA[cat]));
       total++;
     });
   });
-
-  if (total === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = '目前無相關新聞資料';
-    grid.appendChild(empty);
+  if (!total) {
+    const e = document.createElement('div');
+    e.className = 'empty-state';
+    e.textContent = '目前無相關新聞資料';
+    list.appendChild(e);
   }
 }
 
+// ── Card ──
 function makeCard(item, cat, dept) {
   const card = document.createElement('div');
-  card.className = 'news-card';
+  card.className = 'news-card priority-' + item.priority;
 
+  const sourcesHtml = item.sources.map(s => `<span class="source-tag">${s}</span>`).join('');
   const hasRelated = item.related_titles && item.related_titles.length > 0;
 
-  const sourcesHtml = item.sources.map(s =>
-    `<span class="source-tag">${s}</span>`
-  ).join('');
-
-  const relatedSection = hasRelated ? `
-    <div class="related-section">
-      <div class="related-label">相關報導 (${item.related_titles.length})</div>
-      ${item.related_titles.map(t => `<div class="related-item">${t}</div>`).join('')}
-    </div>
-  ` : '';
-
   card.innerHTML = `
-    <div class="card-header">
-      <div class="card-meta">
-        <span class="cat-tag">${dept.icon} ${cat}</span>
-        ${hasRelated ? `<span class="related-count">+${item.related_titles.length} 則相關</span>` : ''}
+    <div class="card-main">
+      <div class="card-left">
+        <span class="prio-badge ${item.priority}">${PRIO_LABEL[item.priority]}</span>
       </div>
-      <div class="card-title">${item.main_title}</div>
-    </div>
-    <div class="source-row">${sourcesHtml}</div>
-    <button class="expand-btn">
-      <span>展開分析與彙整</span>
-      <span class="expand-icon">▾</span>
-    </button>
-    <div class="card-detail">
-      ${relatedSection}
-      <div class="analysis-section">
-        <div class="analysis-label">判讀摘要</div>
-        <div class="analysis-text" contenteditable="true">${item.analysis}</div>
+      <div class="card-body">
+        <div class="card-title">${item.main_title}</div>
+        <div class="card-lead">→ ${item.lead}</div>
+        <div class="card-meta-row">
+          ${sourcesHtml}
+          ${hasRelated ? `<span class="related-badge">＋${item.related_titles.length} 則相關</span>` : ''}
+        </div>
       </div>
+      <span class="card-arrow">›</span>
     </div>
-  `;
+    <div class="card-detail" id="detail-${encodeURIComponent(item.main_title)}"></div>`;
 
-  card.querySelector('.expand-btn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    card.classList.toggle('open');
-  });
-
-  card.addEventListener('click', () => {
+  card.querySelector('.card-main').addEventListener('click', () => {
+    const isOpen = card.classList.contains('open');
+    if (!isOpen) buildDetail(card, item, cat, dept);
     card.classList.toggle('open');
   });
 
   return card;
 }
 
-// Date display
+// ── Build detail on first open ──
+function buildDetail(card, item, cat, dept) {
+  const detail = card.querySelector('.card-detail');
+  if (detail.dataset.built) return;
+  detail.dataset.built = '1';
+
+  const allTitles = [item.main_title, ...item.related_titles];
+  const fullTexts = item.full_texts || {};
+
+  // 內部 tab bar（判讀 / 全文 / 相關）
+  const tabBar = document.createElement('div');
+  tabBar.className = 'detail-tabs';
+
+  const panels = {};
+
+  function addTab(key, label) {
+    const t = document.createElement('button');
+    t.className = 'detail-tab';
+    t.textContent = label;
+    t.dataset.key = key;
+    t.onclick = () => {
+      detail.querySelectorAll('.detail-tab').forEach(x => x.classList.remove('active'));
+      detail.querySelectorAll('.detail-panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      panels[key].classList.add('active');
+    };
+    tabBar.appendChild(t);
+    return t;
+  }
+
+  // 1. 判讀摘要
+  const t1 = addTab('analysis', '判讀摘要');
+  const p1 = document.createElement('div');
+  p1.className = 'detail-panel active';
+  p1.innerHTML = `<div class="analysis-block" contenteditable="true">${item.analysis}</div>`;
+  panels['analysis'] = p1;
+
+  // 2. 全文（主文）
+  const t2 = addTab('fulltext', '新聞全文');
+  const storageKey = item.main_title + '__0';
+  const savedText = userTexts[storageKey] || '';
+  const originalText = fullTexts[item.main_title] || '';
+  const displayText = savedText || originalText;
+  const p2 = document.createElement('div');
+  p2.className = 'detail-panel';
+  if (displayText) {
+    p2.innerHTML = `<div class="fulltext-body" contenteditable="true">${displayText}</div>`;
+    p2.querySelector('.fulltext-body').addEventListener('input', e => { userTexts[storageKey] = e.target.innerText; });
+  } else {
+    p2.innerHTML = `
+      <div class="fulltext-empty">📋 尚無全文資料，請在下方貼入新聞內容</div>
+      <textarea class="fulltext-input" placeholder="在此貼入全文...">${savedText}</textarea>`;
+    p2.querySelector('.fulltext-input').addEventListener('input', e => { userTexts[storageKey] = e.target.value; });
+  }
+  panels['fulltext'] = p2;
+
+  // 3. 相關報導（若有）
+  if (item.related_titles && item.related_titles.length > 0) {
+    const t3 = addTab('related', '相關報導 (' + item.related_titles.length + ')');
+    const p3 = document.createElement('div');
+    p3.className = 'detail-panel';
+    p3.innerHTML = `<div class="related-list">` +
+      item.related_titles.map((t, i) => {
+        const rKey = item.main_title + '__' + (i+1);
+        const rText = userTexts[rKey] || fullTexts[t] || '';
+        return `<div class="related-row">
+          <span class="related-row-bullet">▸</span>
+          <span>${t}</span>
+        </div>` +
+        (rText ? `<div style="padding:0 0 10px 16px; font-size:13px; color:var(--text-secondary); font-family:'Noto Serif TC',serif; line-height:1.8; white-space:pre-wrap;">${rText}</div>` : '');
+      }).join('') +
+    `</div>`;
+    panels['related'] = p3;
+  }
+
+  // 啟動第一個 tab
+  t1.classList.add('active');
+  detail.appendChild(tabBar);
+  Object.values(panels).forEach(p => detail.appendChild(p));
+}
+
+// ── 複製今日摘要 ──
+document.getElementById('btn-copy').addEventListener('click', () => {
+  const now = new Date();
+  const dateStr = now.getFullYear() + '.' +
+    String(now.getMonth()+1).padStart(2,'0') + '.' +
+    String(now.getDate()).padStart(2,'0');
+
+  let text = `【${dateStr} 經濟規劃科 · 每日新聞重點】
+`;
+  text += `═══════════════════════════
+
+`;
+
+  const targets = currentTab === 'all' ? CATS : [currentTab];
+  targets.forEach(cat => {
+    const d = DATA[cat];
+    text += `${d.icon} ${cat}
+`;
+    text += `───────────────────────────
+`;
+    d.items.forEach(item => {
+      const label = PRIO_LABEL[item.priority];
+      text += `▌ [${label}] ${item.main_title}
+`;
+      text += `  來源：${item.sources.join('、')}
+`;
+      text += `  → ${item.lead}
+`;
+      if (item.related_titles.length > 0) {
+        text += `  相關：${item.related_titles.join('；')}
+`;
+      }
+      text += `
+`;
+    });
+    text += `
+`;
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.classList.add('copied');
+    btn.querySelector('span:last-child').textContent = '已複製！';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.querySelector('span:last-child').textContent = '複製今日摘要';
+    }, 2000);
+  });
+});
+
+// ── Date ──
 const now = new Date();
 document.getElementById('date-label').textContent =
-  now.getFullYear() + '/' +
-  String(now.getMonth()+1).padStart(2,'0') + '/' +
-  String(now.getDate()).padStart(2,'0');
+  now.getFullYear() + ' 年 ' +
+  String(now.getMonth()+1) + ' 月 ' +
+  String(now.getDate()) + ' 日';
 
 renderTabs();
-renderCards();
+renderList();
 </script>
 </body>
 </html>
