@@ -3,193 +3,476 @@ import os
 import json
 import re
 
-# ── 1. 核心邏輯 (保持穩定) ──────────────────────────────────────────
+# ── 1. 分類與核心定義 ──────────────────────────────────────────────
 DEPARTMENTS = {
-    "社論觀點": {"icon": "📝", "keywords": ["社論", "時評", "專欄"]},
-    "國際智庫": {"icon": "📘", "keywords": ["IMF", "OECD", "智庫"]},
-    "地緣政治": {"icon": "🌏", "keywords": ["戰爭", "衝突", "俄烏"]},
-    "金融政策": {"icon": "🌐", "keywords": ["Fed", "利率", "通膨"]},
-    "台灣總體": {"icon": "📊", "keywords": ["GDP", "景氣", "出口"]},
-    "產業投資": {"icon": "🏭", "keywords": ["AI", "半導體", "台積電"]},
-    "政府政策": {"icon": "🏛️", "keywords": ["國發會", "政策", "法案"]},
+    "社論與評論觀點": {"icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家", "經濟教室", "縱橫天下", "自由廣場"]},
+    "國際機構與智庫報告": {"icon": "📘", "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "Brookings", "PIIE", "BIS", "ADB", "WEF", "聯合國", "世界銀行", "國際貨幣"]},
+    "地緣政治與國際衝突": {"icon": "🌏", "keywords": ["戰爭", "衝突", "制裁", "美伊", "俄烏", "荷莫茲", "伊朗", "烏克蘭", "關稅", "川普", "貿易戰", "地緣", "槍響", "槍擊", "遇襲", "外交"]},
+    "國際金融與貨幣政策": {"icon": "🌐", "keywords": ["Fed", "FOMC", "聯準會", "利率決策", "升息", "降息", "鮑爾", "ECB", "BOJ", "英格蘭銀行", "央行週", "超級央行", "美債", "美元指數", "非農", "CPI", "核心通膨", "PMI", "ISM", "人民幣", "日圓", "歐元", "英鎊", "匯率"]},
+    "台灣總體經濟與數據": {"icon": "📊", "keywords": ["主計", "主計總處", "GDP", "景氣燈號", "景氣", "物價", "通膨", "失業率", "薪資", "外銷訂單", "出口統計", "進口統計", "海關", "貿易統計", "稅收", "超徵", "出生率", "少子化", "高齡化", "人口統計", "消費者信心", "製造業PMI", "非製造業"]},
+    "台灣政府與政策訊息": {"icon": "🏛️", "keywords": ["國發會", "行政院", "總統府", "經濟部", "財政部", "金管會", "國科會", "央行", "衛福部", "內政部", "院會", "政院", "法案", "預算", "補助", "政策", "施政", "法規", "條例", "立法院", "立委", "修法"]},
+    "台灣產業與投資動向": {"icon": "🏭", "keywords": ["AI", "半導體", "台積電", "台積", "聯發科", "聯電", "鴻海", "台達電", "廣達", "緯創", "英業達", "資本支出", "供應鏈", "算力", "伺服器", "CoWoS", "先進封裝", "製程", "晶片", "離岸風電", "綠能", "電動車", "ASIC", "TPU", "GPU"]},
 }
 
-# ── 2. Apple 風格 CSS ──────────────────────────────────────────────
-# 重點：加入漸層背景、側邊欄、以及更細緻的卡片陰影
-APPLE_STYLE_CSS = """
+MUST_READ_KEYS = ["Fed", "FOMC", "鮑爾", "主計", "GDP", "景氣燈號", "衝突", "戰爭", "利率決議", "升息", "降息", "外銷訂單", "超徵"]
+
+# ── 2. Apple 台灣首頁風格 CSS ──────────────────────────────────────────
+
+APPLE_CSS = """
 :root {
-  --app-bg: #f5f5f7;
-  --app-white: #ffffff;
-  --app-gray: #86868b;
-  --app-black: #1d1d1f;
-  --app-blue: #0066cc;
-  --app-blur: rgba(251, 251, 253, 0.72);
+    --bg: #f5f5f7;
+    --panel: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --link: #0066cc;
+    --danger: #d70015;
+    --border: rgba(0,0,0,.12);
+    --font: "SF Pro TC","SF Pro Display","SF Pro Text","PingFang TC","Helvetica Neue",Arial,sans-serif;
 }
 
-* { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Noto Sans TC", sans-serif;
-  background-color: var(--app-bg);
-  color: var(--app-black);
-  margin: 0; padding: 0;
-  line-height: 1.5;
+    margin: 0;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.022em;
 }
 
-/* 頂部毛玻璃導航 */
-.nav-glass {
-  background: var(--app-blur);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  position: fixed; top: 0; width: 100%; height: 44px;
-  z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.08);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 500;
+.global-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 44px;
+    z-index: 999;
+    background: rgba(255,255,255,.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,.08);
 }
 
-/* Hero 沉浸區 */
-.hero-section {
-  padding: 120px 20px 60px;
-  text-align: center;
-  background: #fff;
-}
-.hero-tag { color: #f56300; font-size: 19px; font-weight: 600; margin-bottom: 10px; }
-.hero-title { 
-  font-size: 64px; font-weight: 700; letter-spacing: -0.015em; 
-  background: linear-gradient(180deg, #1d1d1f 0%, #434344 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-
-/* 佈局架構：側邊欄 + 主內容 */
-.main-content {
-  max-width: 1200px; margin: 40px auto;
-  display: flex; gap: 40px; padding: 0 40px;
+.nav-container {
+    max-width: 1024px;
+    height: 44px;
+    margin: 0 auto;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #333336;
 }
 
-.sidebar {
-  width: 240px; position: sticky; top: 80px; height: fit-content;
+.nav-links {
+    display: flex;
+    gap: 28px;
 }
-.sidebar-title { font-size: 12px; font-weight: 600; color: var(--app-gray); margin-bottom: 20px; }
-.filter-item {
-  padding: 12px 0; font-size: 14px; border-bottom: 1px solid rgba(0,0,0,0.05);
-  cursor: pointer; transition: all 0.2s; display: flex; align-items: center;
+
+.nav-links span {
+    cursor: default;
+    opacity: .88;
 }
-.filter-item:hover { color: var(--app-blue); }
-.filter-item.active { color: var(--app-blue); font-weight: 600; }
 
-/* Apple 風格網格卡片 */
-.grid-container { flex: 1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-
-.news-card {
-  background: var(--app-white);
-  border-radius: 20px; padding: 30px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  display: flex; flex-direction: column; cursor: pointer;
+.hero {
+    min-height: 520px;
+    padding: 104px 22px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #fff;
 }
-.news-card:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
-.news-card.must-read { border-left: 5px solid #d70015; }
 
-.card-cat { font-size: 12px; color: var(--app-gray); font-weight: 600; margin-bottom: 12px; }
-.card-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; line-height: 1.2; }
-.card-desc { font-size: 16px; color: var(--app-gray); line-height: 1.5; margin-bottom: 20px; }
-
-/* 彈窗優化 */
-.apple-modal {
-  display:none; position:fixed; inset:0; z-index:9999;
-  background: rgba(255,255,255,0.8); backdrop-filter: blur(20px);
-  animation: fadeIn 0.3s ease;
+.hero-kicker {
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--danger);
+    margin-bottom: 12px;
 }
-.modal-body {
-  max-width: 800px; margin: 100px auto; background: #fff;
-  border-radius: 30px; padding: 60px; box-shadow: 0 40px 100px rgba(0,0,0,0.1);
-  position: relative; max-height: 80vh; overflow-y: auto;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-@media (max-width: 900px) {
-  .main-content { flex-direction: column; padding: 0 20px; }
-  .grid-container { grid-template-columns: 1fr; }
-  .hero-title { font-size: 40px; }
+.hero-headline {
+    font-size: 64px;
+    line-height: 1.05;
+    font-weight: 700;
+    margin: 0 0 14px;
+}
+
+.hero-subhead {
+    font-size: 28px;
+    line-height: 1.18;
+    color: var(--text);
+    margin-bottom: 18px;
+}
+
+.hero-date {
+    font-size: 17px;
+    color: var(--muted);
+}
+
+.main-wrapper {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 12px 80px;
+}
+
+.category-nav {
+    position: sticky;
+    top: 44px;
+    z-index: 20;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 14px 10px;
+    margin-bottom: 12px;
+    background: rgba(245,245,247,.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* 隱藏捲軸 */
+.category-nav::-webkit-scrollbar { display: none; }
+
+.cat-link {
+    flex: 0 0 auto;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid transparent;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.cat-link:hover {
+    color: var(--link);
+}
+
+.cat-link.active {
+    border-color: var(--text);
+    font-weight: 600;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.apple-card {
+    min-height: 430px;
+    border-radius: 28px;
+    background: var(--panel);
+    padding: 42px 36px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.apple-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.08);
+}
+
+.apple-card.urgent {
+    background: linear-gradient(180deg, #fff 0%, #fff2f2 100%);
+}
+
+.card-tag {
+    min-height: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 10px;
+}
+
+.card-title {
+    font-size: 36px;
+    line-height: 1.08;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.card-summary {
+    font-size: 19px;
+    line-height: 1.42;
+    color: var(--muted);
+    max-width: 92%;
+}
+
+.card-more {
+    position: absolute;
+    left: 36px;
+    bottom: 34px;
+    font-size: 17px;
+    color: var(--link);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,.42);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.modal-inner {
+    width: min(880px, calc(100% - 32px));
+    max-height: 86vh;
+    margin: 7vh auto;
+    padding: 58px 64px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 30px;
+    position: relative;
+}
+
+.close-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #e8e8ed;
+    color: #6e6e73;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.modal-cat {
+    color: var(--link);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.modal-title {
+    font-size: 46px;
+    line-height: 1.08;
+    font-weight: 700;
+    margin: 0 0 28px;
+}
+
+.modal-body p {
+    font-size: 19px;
+    line-height: 1.72;
+    color: #333336;
+    margin: 0 0 1.35em;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    font-size: 20px;
+}
+
+@media (max-width: 734px) {
+    .nav-links { display: none; }
+    .hero { min-height: 420px; padding-top: 90px; }
+    .hero-headline { font-size: 44px; }
+    .hero-subhead { font-size: 22px; }
+    .news-grid { grid-template-columns: 1fr; }
+    .apple-card { min-height: 340px; padding: 34px 28px; }
+    .card-title { font-size: 30px; }
+    .modal-inner {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        margin: 0;
+        border-radius: 0;
+        padding: 34px 26px;
+    }
+    .modal-title { font-size: 34px; }
 }
 """
 
+# ── 3. 文本解析與輔助邏輯 ────────────────────────────────────────────
+
+def clean_text_blocks(text_list):
+    if not text_list: return ""
+    merged = ""
+    for line in text_list:
+        line = line.strip()
+        if not line or any(k in line for k in ["回到目錄", "來源:", "來源：", "版面", "作者", "日期", "頁次"]):
+            continue
+        if re.search(r'報導】$|記者.{0,10}報導', line): continue
+        if line.isdigit(): continue
+        
+        if not merged: merged = line
+        elif merged[-1] in ("。", "！", "？", "；", "」", "…"):
+            merged += "\n" + line
+        else: merged += line
+
+    # 格式化為段落
+    paragraphs = []
+    lines = merged.split('\n')
+    current_p = ""
+    for l in lines:
+        current_p += l
+        if len(current_p) > 100 or l.endswith("。"):
+            paragraphs.append(current_p.strip())
+            current_p = ""
+    if current_p: paragraphs.append(current_p.strip())
+    
+    return "\n\n".join(paragraphs)
+
+def build_article_index(pdf):
+    index = {}
+    last_key = None
+    raw_content_map = {}
+    for page in pdf.pages:
+        text = page.extract_text() or ""
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
+        if has_source:
+            src_idx = next(i for i, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源："))
+            title_key = "".join(lines[:src_idx]).replace(" ", "")
+            raw_content_map[title_key] = lines[src_idx+1:]
+            last_key = title_key
+        elif last_key:
+            raw_content_map[last_key].extend(lines)
+    for key, text_list in raw_content_map.items():
+        index[key] = clean_text_blocks(text_list)
+    return index
+
+# ── 4. HTML 生成 ───────────────────────────────────────────────────
+
 def generate_html(data):
-    # 這裡將資料與 HTML 模板結合
     data_json = json.dumps(data, ensure_ascii=False)
     cats = list(DEPARTMENTS.keys())
-    
-    html = f"""
+    cat_html = ''.join([
+        f'<button class="cat-link" onclick="renderNews(\'{c}\', this)">{c}</button>'
+        for c in cats
+    ])
+
+    html_template = f"""
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>EPC Intelligence | National Development Council</title>
-    <style>{APPLE_STYLE_CSS}</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>經濟規劃科 | Intelligence Hub</title>
+    <style>{APPLE_CSS}</style>
 </head>
 <body>
-    <div class="nav-glass">EPC Intelligence Hub</div>
+    <nav class="global-nav">
+        <div class="nav-container">
+            <strong>Intelligence Hub</strong>
+            <div class="nav-links">
+                <span>總經</span>
+                <span>產業</span>
+                <span>政策</span>
+                <span>國際</span>
+                <span>社論</span>
+            </div>
+        </div>
+    </nav>
 
-    <header class="hero-section">
-        <div class="hero-tag">國家發展委員會</div>
-        <h1 class="hero-title">今日經濟情報。</h1>
-        <p style="font-size:24px; color:#86868b;" id="today-text"></p>
+    <header class="hero">
+        <div>
+            <div class="hero-kicker">EPC Newsroom</div>
+            <h1 class="hero-headline">今日重點消息。</h1>
+            <div class="hero-subhead">掌握總體經濟、產業動態與政策訊號。</div>
+            <div class="hero-date" id="date-display"></div>
+        </div>
     </header>
 
-    <main class="main-content">
-        <aside class="sidebar">
-            <div class="sidebar-title">分類瀏覽</div>
-            <div class="filter-item active" onclick="render('all', this)">全部消息</div>
-            {" ".join([f'<div class="filter-item" onclick="render(\'{c}\', this)">{c}</div>' for c in cats])}
-        </aside>
+    <main class="main-wrapper">
+        <nav class="category-nav">
+            <button class="cat-link active" onclick="renderNews('all', this)">全部</button>
+            {cat_html}
+        </nav>
 
-        <section class="grid-container" id="main-grid"></section>
+        <section class="news-grid" id="grid"></section>
     </main>
 
-    <div id="modal" class="apple-modal" onclick="closeModal()">
-        <div class="modal-body" onclick="event.stopPropagation()">
+    <div id="modal" class="modal" onclick="closeModal()">
+        <article class="modal-inner" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">×</button>
             <div id="modal-content"></div>
-        </div>
+        </article>
     </div>
 
     <script>
-        const newsData = {data_json};
-        
-        function render(filter, el) {{
-            // 更新 UI 狀態
-            document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
-            if(el) el.classList.add('active');
+        const news = {data_json};
 
-            const grid = document.getElementById('main-grid');
+        function escapeHtml(value) {{
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }}
+
+        function renderNews(cat, el) {{
+            if (el) {{
+                document.querySelectorAll('.cat-link').forEach(link => link.classList.remove('active'));
+                el.classList.add('active');
+            }}
+
+            const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            
-            const filtered = filter === 'all' ? newsData : newsData.filter(d => d.cat === filter);
-            
+
+            const filtered = cat === 'all' ? news : news.filter(item => item.cat === cat);
+
+            if (!filtered.length) {{
+                grid.innerHTML = '<div class="empty-state">此分類目前沒有新聞。</div>';
+                return;
+            }}
+
             filtered.forEach(item => {{
-                const card = document.createElement('div');
-                card.className = `news-card ${{item.priority ? 'must-read' : ''}}`;
-                card.onclick = () => showDetail(item);
+                const card = document.createElement('article');
+                card.className = 'apple-card' + (item.priority ? ' urgent' : '');
+                card.onclick = () => openModal(item);
+
                 card.innerHTML = `
-                    <div class="card-cat">${{item.cat}}</div>
-                    <div class="card-title">${{item.title}}</div>
-                    <div class="card-desc">${{item.summary}}</div>
-                    <div style="margin-top:auto; font-size:14px; font-weight:600; color:#0066cc;">深入閱讀 →</div>
+                    <div class="card-tag">${{item.priority ? '必讀重點' : '&nbsp;'}}</div>
+                    <div class="card-title">${{escapeHtml(item.title)}}</div>
+                    <div class="card-summary">${{escapeHtml(item.summary)}}</div>
+                    <div class="card-more">進一步了解 ›</div>
                 `;
+
                 grid.appendChild(card);
             }});
         }}
 
-        function showDetail(item) {{
-            const modal = document.getElementById('modal');
+        function openModal(item) {{
             const content = document.getElementById('modal-content');
+
+            const paragraphs = String(item.full_text || '')
+                .replace(/\\\\r\\\\n/g, '\\\\n')
+                .split(/\\\\n\\\\s*\\\\n/)
+                .filter(p => p.trim().length > 0);
+
+            const bodyHtml = paragraphs
+                .map(p => `<p>${{escapeHtml(p.trim())}}</p>`)
+                .join('');
+
             content.innerHTML = `
-                <div style="font-size:14px; color:#0066cc; font-weight:600; margin-bottom:10px;">${{item.cat}}</div>
-                <h2 style="font-size:36px; margin-bottom:30px;">${{item.title}}</h2>
-                <div style="font-size:18px; line-height:1.6; color:#1d1d1f;">
-                    ${{item.full_text.split('\\n\\n').map(p => `<p>${{p}}</p>`).join('')}}
-                </div>
+                <div class="modal-cat">${{escapeHtml(item.cat)}}</div>
+                <h2 class="modal-title">${{escapeHtml(item.title)}}</h2>
+                <div class="modal-body">${{bodyHtml || '<p>目前沒有全文內容。</p>'}}</div>
             `;
-            modal.style.display = 'block';
+
+            document.getElementById('modal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }}
 
@@ -198,25 +481,70 @@ def generate_html(data):
             document.body.style.overflow = 'auto';
         }}
 
-        document.getElementById('today-text').textContent = new Date().toLocaleDateString('zh-TW', {{ year:'numeric', month:'long', day:'numeric', weekday:'long' }});
-        render('all');
+        document.addEventListener('keydown', e => {{
+            if (e.key === 'Escape') closeModal();
+        }});
+
+        document.getElementById('date-display').textContent =
+            new Date().toLocaleDateString('zh-TW', {{
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            }});
+
+        renderNews('all');
     </script>
 </body>
 </html>
 """
     with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(html_template)
+
+# ── 5. 執行程序 ─────────────────────────────────────────────────────
 
 def run_dashboard():
-    # 這裡與您原有的數據處理 logic 銜接
-    # (省略部分重複的 PDF 解析 logic，確保執行時會產出 data 給 generate_html)
-    # 範例數據測試
-    test_data = [
-        {"title": "聯準會維持利率不變，鮑爾釋放降息訊號", "cat": "金融政策", "priority": 1, "summary": "Fed 主席鮑爾在會後記者會表示...", "full_text": "內文第一段。\\n\\n內文第二段。"},
-        {"title": "台積電先進封裝擴產，供應鏈全面啟動", "cat": "產業投資", "priority": 0, "summary": "隨著 AI 需求暴增，台積電決定...", "full_text": "內文內容。"}
-    ]
-    generate_html(test_data)
-    print("Apple 風格網頁已重新設計完成。")
+    data_folder = "data"
+    if not os.path.exists(data_folder): os.makedirs(data_folder)
+    pdf_files = [f for f in os.listdir(data_folder) if f.lower().endswith(".pdf")]
+
+    all_items = []
+    if pdf_files:
+        latest_pdf = os.path.join(data_folder, sorted(pdf_files)[-1])
+        with pdfplumber.open(latest_pdf) as pdf:
+            article_index = build_article_index(pdf)
+            for page in pdf.pages:
+                table = page.extract_table()
+                if not table: continue
+                for row in table[1:]:
+                    if not row or len(row) < 2 or not row[1]: continue
+                    title = str(row[1]).replace("\n", "").strip()
+                    source = str(row[2]).strip() if len(row) > 2 else "EPC"
+                    
+                    found_cat = None
+                    for cat, meta in DEPARTMENTS.items():
+                        if any(k in title for k in meta["keywords"]):
+                            found_cat = cat; break
+                    if not found_cat: continue
+
+                    # 內文匹配
+                    content = ""
+                    clean_title = title.replace(" ", "")
+                    for k, v in article_index.items():
+                        if clean_title[:8] in k:
+                            content = v; break
+
+                    all_items.append({
+                        "title": title,
+                        "source": source,
+                        "cat": found_cat,
+                        "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
+                        "summary": content[:110] + "..." if content else "點擊深入了解更多細節。",
+                        "full_text": content
+                    })
+
+    generate_html(all_items)
+    print(f"✅ 成功處理 {len(all_items)} 則情報，已生成 Apple 風格 index.html")
 
 if __name__ == "__main__":
     run_dashboard()
