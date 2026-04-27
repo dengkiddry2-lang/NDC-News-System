@@ -95,11 +95,19 @@ def clean_text_blocks(text_list):
     for line in text_list:
         line = line.strip()
         if not line or is_noise_line(line): continue
-        if re.search(r'報導】$|記者.{0,10}報導', line): continue
+        # 過濾作者行殘留（跨行後的尾段）
+        if re.search(r'報導[〕】]$|^[／/].{0,10}報導[〕】]|^[合綜]\w*報導[〕】]|^記者.{0,15}報導', line): continue
+        if len(line) <= 10 and re.search(r'[〕】報導]', line): continue
         if line.isdigit(): continue
         if not merged:
             merged = line
-        elif merged[-1] in ("。","！","？","；","」","\u201d","…"):
+        elif (
+            # 真正的句子結束：句尾標點
+            merged[-1] in ("。","！","？","；","…") or
+            # 句尾標點 + 引號（如：好。」、完！」）
+            (len(merged) >= 2 and merged[-1] in ("」","\u201d","'","\u2019") and
+             merged[-2] in ("。","！","？","；","…"))
+        ):
             merged += "\n" + line
         else:
             merged += line
@@ -125,7 +133,12 @@ def clean_text_blocks(text_list):
         p = re.sub(r"([\u4e00-\u9fff\uff00-\uffef]) ([\u4e00-\u9fff\uff00-\uffef（「\u300e\u300c])", r"\1\2", p)
         p = p.strip()
         if p: cleaned.append(p)
-    return "\n\n".join(cleaned)
+    result = "\n\n".join(cleaned)
+    # 段落以 」』等收尾引號開頭，代表是上一段被切斷的引號尾
+    # 直接合併回前一段（去除兩段間的換行）
+    result = re.sub(r'\n\n([」』\u201d\u2019])', r'\1', result)
+    # 同樣處理段落內的殘留：「提案說明 → 緊接前文
+    return result
 
 def find_article(article_index, title):
     key = title.replace(" ", "")
@@ -158,9 +171,20 @@ def build_article_index(pdf):
             title_key = "".join(lines[:src_idx]).replace(" ","")
             body_start = src_idx + 1
             while body_start < len(lines):
-                if re.search(r'[報導綜合外電]+】\s*$|^\w+\/\w+報導】', lines[body_start]):
+                l = lines[body_start]
+                # 跳過作者行跨行殘留：
+                # 條件：行長 <= 15 字 且 符合以下任一模式
+                is_author_tail = (
+                    len(l) <= 15 and (
+                        re.search(r'[報導〕】]\s*$', l) or   # 以報導/〕/】結尾
+                        re.search(r'^[／/].{0,10}報導[〕】]', l) or  # /台北報導】
+                        re.search(r'^[合綜]\w*報導[〕】]', l)   # 合報導/綜合報導
+                    )
+                )
+                if is_author_tail:
                     body_start += 1
-                else: break
+                else:
+                    break
             raw_map[title_key] = lines[body_start:]
             last_key = title_key
         elif page.extract_table():
