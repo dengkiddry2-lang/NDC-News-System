@@ -5,85 +5,105 @@ import re
 from collections import Counter
 
 # ── 1. 分類定義 ──────────────────────────────────────────────
+# ── 分類定義 ────────────────────────────────────────────────
+# 策略：先用 PDF 原始分類標題做第一層，再用關鍵字做第二層細分
+# PDF 原始分類：01頭版 02本會 03國內要聞 04國內財經 05國際要聞 06國際財經 07觀點評論 08各報社論
+
 DEPARTMENTS = {
     "社論與評論觀點": {
         "icon": "📝", "short": "社論",
-        "keywords": ["社論","時評","社評","專欄","論壇","觀點","評論","名家","經濟教室","縱橫天下","自由廣場"]
+        # 08-各報社論：直接對應，不需關鍵字
+        # 07-觀點與評論：用版面名稱篩選（社論/社評/時評版）
+        "keywords": ["社論","社評","時評","縱橫天下"],
+        "pdf_sections": ["08", "07"],
+        "source_keywords": ["社論","社評","時評","時論廣場","論壇","廣場"],
     },
-    "國際機構與智庫報告": {
-        "icon": "📘", "short": "智庫",
-        "keywords": ["IMF","OECD","World Bank","WTO","智庫","Brookings","PIIE","BIS","ADB","WEF","聯合國","世界銀行","國際貨幣"]
-    },
-    "地緣政治與國際衝突": {
-        "icon": "🌏", "short": "地緣",
-        "keywords": ["戰爭","衝突","制裁","美伊","俄烏","荷莫茲","伊朗","烏克蘭","關稅","川普","貿易戰","地緣","槍響","槍擊","遇襲","外交"]
-    },
-    "國際金融與貨幣政策": {
-        "icon": "🌐", "short": "金融",
-        "keywords": ["Fed","FOMC","聯準會","利率決策","升息","降息","鮑爾","ECB","BOJ","英格蘭銀行","央行週","超級央行","美債","美元指數","非農","CPI","核心通膨","PMI","ISM","人民幣","日圓","歐元","英鎊","匯率"]
+    "國際經濟情勢": {
+        "icon": "🌐", "short": "國際",
+        # 對應 PDF 05-國際要聞 + 06-國際財經
+        # 涵蓋：美陸經濟數據、Fed/ECB/BOJ、地緣衝突、國際貿易
+        "keywords": [],
+        "pdf_sections": ["05", "06"],
     },
     "台灣總體經濟與數據": {
         "icon": "📊", "short": "總經",
-        "keywords": ["主計","主計總處","GDP","景氣燈號","景氣","物價","通膨","失業率","薪資","外銷訂單","出口統計","進口統計","海關","貿易統計","稅收","超徵","出生率","少子化","高齡化","人口統計","消費者信心","製造業PMI","非製造業"]
+        # 對應 PDF 04-國內財經 中的總體數據類
+        "keywords": [
+            "GDP","景氣燈號","景氣","物價","通膨","CPI","失業率","薪資",
+            "外銷訂單","出口統計","進口統計","貿易統計","稅收","超徵",
+            "出生率","少子化","高齡化","消費者信心","PMI","非製造業",
+            "淨零","碳排","再生能源","能源轉型",
+        ],
+        "pdf_sections": ["04"],
     },
     "台灣產業與投資動向": {
         "icon": "🏭", "short": "產業",
-        "keywords": ["AI","半導體","台積電","台積","聯發科","聯電","鴻海","台達電","廣達","緯創","英業達","資本支出","供應鏈","算力","伺服器","CoWoS","先進封裝","製程","晶片","離岸風電","綠能","電動車","ASIC","TPU","GPU"]
+        # 對應 PDF 02-本會相關新聞 + 04-國內財經 中的產業類
+        "keywords": [
+            "AI","半導體","台積電","台積","聯發科","聯電","鴻海",
+            "台達電","廣達","緯創","英業達","資本支出","供應鏈",
+            "算力","伺服器","CoWoS","先進封裝","製程","晶片",
+            "離岸風電","綠能","電動車","ASIC","TPU","GPU",
+            "新創","新興產業","科技業","數位","資料中心",
+            "數位帳戶","純網銀","金融科技","FinTech","網銀",
+            "金管會","台股","股市","基金","ETF",
+        ],
+        "pdf_sections": ["02", "04"],
     },
     "台灣政府與政策訊息": {
         "icon": "🏛️", "short": "政策",
-        "keywords": ["國發會","行政院","總統府","經濟部","財政部","金管會","國科會","央行","衛福部","內政部","院會","政院","法案","預算","補助","政策","施政","法規","條例","立法院","立委","修法"]
+        # 對應 PDF 03-國內要聞 + 04-國內財經 中的政策類
+        "keywords": [
+            "國發會","行政院","總統府","經濟部","財政部","金管會",
+            "國科會","央行","院會","法案","預算","政策","施政",
+            "法規","條例","立法院","立委","修法","補助","國防",
+            "軍購","軍事預算","特別條例",
+        ],
+        "pdf_sections": ["03", "04"],
+        # 負向過濾：這些詞出現時排除（即使有政府機關關鍵字）
+        "exclude_keywords": [
+            "安樂死","安寧","失智","醫護","廚餘","豬","旅遊",
+            "禁團令","詐騙","甘肅","鞭刑","兒托","監管雲",
+        ],
     },
 }
 
 CATEGORY_ORDER = [
-    "社論與評論觀點","國際機構與智庫報告","地緣政治與國際衝突",
-    "國際金融與貨幣政策","台灣總體經濟與數據","台灣產業與投資動向","台灣政府與政策訊息",
+    "社論與評論觀點",
+    "國際經濟情勢",
+    "台灣總體經濟與數據",
+    "台灣產業與投資動向",
+    "台灣政府與政策訊息",
 ]
 
-MUST_READ_KEYS = ["Fed","FOMC","鮑爾","主計","GDP","景氣燈號","衝突","戰爭","利率決議","升息","降息","外銷訂單","超徵","荷莫茲"]
 
-# 頭版版面識別（各報 A01 / AA01 等）
+NOISE_PREFIXES = ["來源","作者","版面","日期","出處","記者","編輯","回到目錄","本報訊"]
+
 FRONT_PAGE_PATTERNS = ["A01", "AA01"]
-
-
-
-# 頭版版面識別（各報 A01 / AA01 等）
-FRONT_PAGE_PATTERNS = ["A01", "AA01"]
-
-def is_front_page(source):
-    """判斷是否為各報頭版"""
-    return any(p in source for p in FRONT_PAGE_PATTERNS)
-
-# 頭版新聞（A01）若符合分類關鍵字自動升必看，但排除這些社會事件詞
 
 def is_frontpage(source):
-    """判斷是否為頭版新聞"""
-    return "A01" in source or "AA01" in source
+    return any(p in source for p in FRONT_PAGE_PATTERNS)
 
-def get_priority(title, source, found_cat):
-    """必看 = A01 頭版 且 符合分類，其他一律為一般"""
-    if is_frontpage(source) and found_cat is not None:
-        return 1
-    return 0
 
-NON_ECON_TITLE_KEYS = ["大麻","毒品","詐騙","竊盜","農業","旱情","廚餘","豬","漁業","失智","長照","安樂死","安寧","防癌","觀光旅遊","演唱會","房價指數","租屋"]
-NON_ECON_SECTIONS = ["焦點新聞","社會","地方","體育","娛樂","影視","生活","健康","農業","司法","法庭","影劇","副刊","旅遊","美食","寵物","星座"]
-ALL_ECON_KEYS = set()
-for dept in DEPARTMENTS.values():
-    ALL_ECON_KEYS.update(dept["keywords"])
-ALL_ECON_KEYS.update(MUST_READ_KEYS)
+# 即使在目錄裡，這些標題一定排除（與經濟完全無關）
+HARD_EXCLUDE = [
+    "大麻","毒品","農業旱","廚餘養豬","安樂死","安寧照護",
+    "失智","長照","石崇良","監管雲","甘肅翻車","鞭刑",
+    "兒托法","禁團令","旅行業","赴陸禁","旅遊業者",
+]
 
-def should_skip(title, source):
-    if any(k in title for k in NON_ECON_TITLE_KEYS):
+def should_skip(title, source, pdf_section):
+    """判斷是否排除這則新聞"""
+    # 硬性排除
+    if any(k in title for k in HARD_EXCLUDE):
         return True
-    if any(sec in source for sec in NON_ECON_SECTIONS):
-        if not any(k in title for k in ALL_ECON_KEYS):
+    # 政策類的負向過濾
+    dept = DEPARTMENTS.get("台灣政府與政策訊息", {})
+    if dept.get("exclude_keywords"):
+        if any(k in title for k in dept["exclude_keywords"]):
             return True
     return False
 
-# ── 2. PDF 解析 ──────────────────────────────────────────────
-NOISE_PREFIXES = ["來源","作者","版面","日期","出處","記者","編輯","回到目錄","本報訊"]
 
 def is_noise_line(line):
     if line.isdigit(): return True
@@ -210,34 +230,92 @@ def run_dashboard():
     all_items, skipped = [], 0
     with pdfplumber.open(latest_pdf) as pdf:
         article_index = build_article_index(pdf)
+        current_section = ""
+        import re as _re2
+
+        def is_toc_table(t):
+            news_sources = ['時報','日報','聯合','自由','中時','工商','蘋果','鏡','報']
+            for r in t:
+                if not r or len(r) < 2: continue
+                col2 = str(r[1] or '').strip()
+                col3 = str(r[2] or '').strip() if len(r) > 2 else ''
+                if len(col2) > 5 and any(s in col3 for s in news_sources): return True
+            return False
+
         for page in pdf.pages:
             table = page.extract_table()
             if not table: continue
-            def is_toc_table(t):
-                news_sources = ['時報','日報','聯合','自由','中時','工商','蘋果','鏡','報']
-                for r in t:
-                    if not r or len(r) < 2: continue
-                    col2 = str(r[1] or '').strip()
-                    col3 = str(r[2] or '').strip() if len(r) > 2 else ''
-                    if len(col2) > 5 and any(s in col3 for s in news_sources): return True
-                return False
             if not is_toc_table(table): continue
-            for row in table[1:]:
-                if not row or len(row) < 2 or not row[1]: continue
-                title = str(row[1]).replace("\n","").strip()
-                source = str(row[2]).replace("\n"," ").strip() if len(row) > 2 and row[2] else "EPC彙整"
-                if len(title) < 5 or any(k in title for k in ["新聞議題","報導媒體","目錄","頁次"]): continue
-                if should_skip(title, source): skipped += 1; continue
-                classify_text = title + " " + source
+
+            for row in table:
+                if not row: continue
+                c1 = str(row[0] or '').strip()
+                c2 = str(row[1] or '').strip() if len(row) > 1 else ''
+                c3 = str(row[2] or '').strip() if len(row) > 2 else ''
+
+                # 偵測分類標題行（如 "01-頭版新聞(14)"）
+                if _re2.match(r'^\d{2}-', c1) and not c2:
+                    current_section = c1
+                    continue
+
+                # 一般新聞行
+                if not c2 or len(c2) < 5: continue
+                if any(k in c2 for k in ["新聞議題","報導媒體","目錄","頁次"]): continue
+                title = c2.replace("\n","").strip()
+                source = c3.replace("\n"," ").strip() if c3 else "EPC彙整"
+                if len(title) < 5: continue
+
+                if should_skip(title, source, current_section): skipped += 1; continue
+
+                # ── 兩層分類邏輯 ──
                 found_cat = None
+                sec_num = current_section[:2] if current_section else ""
+
                 for cat in CATEGORY_ORDER:
-                    if any(k in classify_text for k in DEPARTMENTS[cat]["keywords"]):
+                    dept = DEPARTMENTS[cat]
+                    in_section = sec_num in dept.get("pdf_sections", [])
+
+                    # 第一層：直接對應（社論08/國際，keywords 為空）
+                    if in_section and not dept["keywords"] and "source_keywords" not in dept:
                         found_cat = cat; break
+                    # 社論07：版面名稱篩選
+                    if in_section and dept.get("source_keywords"):
+                        if (any(k in source for k in dept["source_keywords"]) or
+                            any(k in title for k in dept.get("keywords", []))):
+                            found_cat = cat; break
+
+                    # 第二層：section 內用關鍵字細分
+                    if in_section and dept["keywords"]:
+                        if any(k in title + " " + source for k in dept["keywords"]):
+                            found_cat = cat; break
+
+                # 頭版（01）：關鍵字未命中時，嘗試所有分類
+                if not found_cat and sec_num == "01":
+                    classify_text = title + " " + source
+                    # 版面含國際字眼，或標題明顯是境外事件 → 歸國際
+                    intl_src = ["國際","兩岸","全球","外電"]
+                    intl_title = ["德國","法國","日本","韓國","美國","英國","歐洲",
+                                  "中國","大陸","北京","上海","俄羅斯","以色列",
+                                  "核能","核電","車諾比"]
+                    if (any(k in source for k in intl_src) or
+                            any(k in title for k in intl_title)):
+                        found_cat = "國際經濟情勢"
+                    else:
+                        for cat in CATEGORY_ORDER:
+                            if DEPARTMENTS[cat]["keywords"] and any(
+                                k in classify_text for k in DEPARTMENTS[cat]["keywords"]
+                            ):
+                                found_cat = cat; break
+                        if not found_cat:
+                            found_cat = "國際經濟情勢"
+
                 if not found_cat: skipped += 1; continue
+
                 content = find_article(article_index, title)
+                is_must = is_frontpage(source) and found_cat is not None
                 all_items.append({
                     "title": title, "source": source, "cat": found_cat,
-                    "priority": get_priority(title, source, found_cat),
+                    "priority": 1 if is_must else 0,
                     "summary": extract_summary(content), "full_text": content
                 })
 
