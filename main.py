@@ -3,7 +3,7 @@ import os
 import json
 import re
 
-# ── 1. 分類定義與固定優先序 ──────────────────────────────────────────────
+# ── 1. 分類定義與固定優先序 (已根據邏輯優化) ──────────────────────────────────
 DEPARTMENTS = {
     "社論與評論觀點": {
         "icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家", "經濟教室"]
@@ -11,14 +11,20 @@ DEPARTMENTS = {
     "國際機構與智庫報告": {
         "icon": "📘", "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "Brookings", "PIIE", "BIS", "ADB", "WEF", "UN", "聯合國", "世界銀行"]
     },
+    "國際經濟與金融情勢": {
+        "icon": "🌐", "keywords": [
+            "Fed", "FOMC", "聯準會", "利率", "升息", "降息", "美元", "匯率", "地緣", "美中", "貿易戰",
+            "人民幣", "日圓", "歐元", "英鎊", "美債", "美國", "中國", "日本", "歐洲", "ECB", "BOJ", "英格蘭銀行"
+        ]
+    },
     "台灣總體經濟與人口數據": {
-        "icon": "📊", "keywords": ["主計", "GDP", "CPI", "物價", "通膨", "失業率", "薪資", "景氣", "經濟成長率", "統計", "公布", "年增", "月增", "數據", "指數", "外銷訂單", "出口", "進口", "進出口", "貿易統計", "出生率", "死亡率", "人口統計", "少子化", "高齡化"]
+        "icon": "📊", "keywords": [
+            "主計", "主計總處", "GDP", "CPI", "物價", "通膨", "失業率", "薪資", "景氣", "經濟成長率", 
+            "外銷訂單", "出口統計", "進口統計", "海關", "貿易統計", "出生率", "死亡率", "人口統計", "少子化", "高齡化", "稅收"
+        ]
     },
     "台灣產業與投資動向": {
         "icon": "🏭", "keywords": ["AI", "半導體", "台積電", "聯發科", "資本支出", "投資", "供應鏈", "算力", "伺服器", "離岸風電"]
-    },
-    "國際經濟與金融情勢": {
-        "icon": "🌐", "keywords": ["Fed", "FOMC", "聯準會", "利率", "升息", "降息", "美元", "匯率", "地緣", "美中", "貿易戰"]
     },
     "台灣政府與政策訊息": {
         "icon": "🏛️", "keywords": ["總統府", "行政院", "國發會", "經濟部", "財政部", "法案", "行政院會", "施政報告", "補助"]
@@ -28,7 +34,17 @@ DEPARTMENTS = {
     }
 }
 
-CATEGORY_ORDER = ["社論與評論觀點", "國際機構與智庫報告", "台灣總體經濟與人口數據", "台灣產業與投資動向", "國際經濟與金融情勢", "台灣政府與政策訊息", "其他重要國內外事件"]
+# 優先序：國際金融必須排在台灣總體之前，以防泛用詞攔截
+CATEGORY_ORDER = [
+    "社論與評論觀點", 
+    "國際機構與智庫報告", 
+    "國際經濟與金融情勢", 
+    "台灣總體經濟與人口數據", 
+    "台灣產業與投資動向", 
+    "台灣政府與政策訊息", 
+    "其他重要國內外事件"
+]
+
 MUST_READ_KEYS = ["Fed", "國發會", "主計", "GDP", "利率", "槍響", "衝突", "戰爭", "下修", "調升"]
 
 # ── 2. 文本解析邏輯 ────────────────────────────────────────────────────
@@ -109,7 +125,8 @@ def build_article_index(pdf):
             and not page.extract_table() 
             and not any("回到目錄" in l for l in lines[:5])
         ):
-            raw_content_map[last_key].extend(lines)
+            if last_key in raw_content_map:
+                raw_content_map[last_key].extend(lines)
         else:
             last_key = None
             
@@ -174,9 +191,10 @@ def generate_html(data):
     .carousel-slide { position: absolute; inset: 0 60px; background: var(--imf-navy); color: #fff; padding: 45px; display: none; flex-direction: column; justify-content: center; border-top: 8px solid var(--imf-accent); opacity: 0; transition: opacity 0.8s ease; }
     .carousel-slide.active { display: flex; opacity: 1; }
     .carousel-slide h2 { font-size: 40px; margin: 0 0 20px 0; font-family: 'Noto Serif TC', serif; line-height: 1.2; cursor: pointer; }
+    .news-item { margin-bottom: 40px; border-bottom: 1px solid #f0f0f0; padding-bottom: 25px; }
     .modal { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; overflow-y: auto; padding: 50px; }
-    .modal-header { padding: 20px 60px; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; display: flex; justify-content: space-between; }
-    .article-content { font-size: 19px; line-height: 2.1; white-space: pre-line; text-align: justify; word-break: break-word; color: #222; }
+    .modal-header { padding: 20px 60px; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; }
+    .article-content { font-size: 19px; line-height: 2.1; white-space: pre-line; text-align: justify; word-break: break-word; color: #222; max-width: 900px; margin: 0 auto; }
     """
 
     html = f"""
@@ -206,7 +224,7 @@ def generate_html(data):
     </div>
     <div id="modal" class="modal">
         <div class="modal-header"><div style="font-weight:900;">EPC REPORT</div><button onclick="closeModal()" style="background:var(--imf-navy); color:#fff; border:none; padding:8px 20px; cursor:pointer;">關閉</button></div>
-        <div class="modal-body" id="modal-content"></div>
+        <div class="modal-body" id="modal-content" style="padding: 40px 0;"></div>
     </div>
     <script>
         const DATA = {data_json};
@@ -221,7 +239,9 @@ def generate_html(data):
             document.getElementById('roc-year').textContent = '民國 ' + (yr - 1911) + ' 年';
             document.getElementById('today-date').textContent = new Date().toLocaleDateString('zh-TW', {{ year: 'numeric', month: 'long', day: 'numeric' }});
             const nav = document.getElementById('nav-bar');
-            Object.keys(DEPTS).forEach(cat => {{
+            
+            // 按照 CATEGORY_ORDER 的順序生成導航
+            {json.dumps(CATEGORY_ORDER, ensure_ascii=False)}.forEach(cat => {{
                 if(cat === "其他重要國內外事件") return;
                 const div = document.createElement('div');
                 div.className = 'nav-item';
@@ -277,8 +297,8 @@ def generate_html(data):
 
         function showFull(idx) {{
             const item = DATA[idx];
-            const contentHtml = item.full_text ? esc(item.full_text) : '尚未擷取到全文內容';
-            document.getElementById('modal-content').innerHTML = `<h1 style="font-size:42px; font-family:'Noto Serif TC', serif; color:var(--imf-navy);">${{esc(item.title)}}</h1><div style="font-weight:700; color:#666; margin-bottom:30px;">來源：${{esc(item.source)}}</div><div class="article-content">${{contentHtml}}</div>`;
+            const contentHtml = item.full_text ? esc(item.full_text) : '尚未擷取到內文內容';
+            document.getElementById('modal-content').innerHTML = `<div style="max-width:900px; margin:0 auto;"><h1 style="font-size:42px; font-family:'Noto Serif TC', serif; color:var(--imf-navy); margin-bottom:10px;">${{esc(item.title)}}</h1><div style="font-weight:700; color:#666; margin-bottom:30px; border-bottom:1px solid #eee; padding-bottom:20px;">來源：${{esc(item.source)}}</div><div class="article-content">${{contentHtml}}</div></div>`;
             document.getElementById('modal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }}
