@@ -38,12 +38,13 @@ WATCH = [
 ]
 
 def get_priority(title):
-    if any(k in title for k in MUST_READ): return "must"
-    if any(k in title for k in WATCH): return "watch"
+    if any(k in title for k in MUST_READ):
+        return "must"
+    if any(k in title for k in WATCH):
+        return "watch"
     return "normal"
 
 def get_lead(title, cat):
-    """卡片一行導語：說明對總經的意義"""
     if any(k in title for k in ["資本支出", "AI", "設備", "伺服器"]):
         return "民間投資（I）上行動能，支撐 GDP 成長"
     if any(k in title for k in ["出口", "訂單", "外銷"]):
@@ -65,12 +66,10 @@ def get_lead(title, cat):
 
 # ── 2. 文字處理 ──────────────────────────────────────────────
 
-# 雜訊行的特徵，過濾掉這些不是新聞內容的行
 NOISE_PREFIXES = ["來源", "作者", "版面", "日期", "出處", "記者", "編輯", "回到目錄", "本報訊", "【本報"]
-NOISE_SHORT = 10   # 短於此字數的行視為標題/頁碼雜訊
+NOISE_SHORT = 10
 
 def clean_lines(text):
-    """清洗 PDF 擷取文字：移除雜訊行，回傳有效行清單"""
     if not text:
         return []
     lines = []
@@ -80,46 +79,31 @@ def clean_lines(text):
             continue
         if len(line) < NOISE_SHORT:
             continue
-        if any(line.startswith(prefix) for prefix in NOISE_PREFIXES):
+        if any(line.startswith(p) for p in NOISE_PREFIXES):
             continue
-        # 純數字行（頁碼）
         if line.replace(" ", "").isdigit():
             continue
         lines.append(line)
     return lines
 
 def extract_summary(full_text, limit=280):
-    """
-    從全文擷取新聞重點（前 1~2 段有意義的內文）。
-    策略：取第一行長度夠、不是 metadata 的正文句子。
-    """
     if not full_text:
         return ""
     lines = clean_lines(full_text)
     if not lines:
         return ""
-
-    # 嘗試找到第一個看起來像「正文」的句子（包含句號或逗號，且夠長）
     for line in lines:
         if len(line) >= 20 and ("，" in line or "。" in line or "、" in line):
             return line[:limit]
-
-    # fallback：直接取第一行
     return lines[0][:limit]
 
 def extract_full_text(all_page_texts, title, max_chars=1500):
-    """
-    從所有頁面文字中定位與標題最相關的段落，回傳完整擷取內容。
-    用標題前 6 個字當搜尋 key（比 4~5 字更精準），
-    找到後往後取 max_chars 字並清洗。
-    """
     search_key = title[:6]
     best_snippet = ""
     for page_text in all_page_texts:
         if search_key not in page_text:
             continue
         idx = page_text.find(search_key)
-        # 往前 30 字（可能有段落開頭），往後 max_chars
         raw = page_text[max(0, idx - 30): idx + max_chars]
         cleaned_lines = clean_lines(raw)
         if cleaned_lines:
@@ -139,7 +123,6 @@ def run_dashboard():
         print("data 資料夾內找不到 PDF")
         return
 
-    # 取最新（依修改時間）
     pdf_files.sort(key=lambda x: os.path.getmtime(os.path.join("data", x)))
     latest_pdf = os.path.join("data", pdf_files[-1])
     print(f"正在分析: {latest_pdf}")
@@ -151,7 +134,7 @@ def run_dashboard():
         print("緩存全文中...")
         all_page_texts = [p.extract_text() or "" for p in pdf.pages]
 
-        for page in pdf.pages[:10]:   # 目錄通常在前幾頁
+        for page in pdf.pages[:10]:
             table = page.extract_table()
             if not table:
                 continue
@@ -165,17 +148,14 @@ def run_dashboard():
                 if len(title) < 5 or "新聞議題" in title:
                     continue
 
-                # 分類
                 found_cat = "其他資訊"
                 for cat, info in DEPARTMENTS.items():
                     if any(k in title for k in info["keywords"]):
                         found_cat = cat
                         break
 
-                # 全文擷取（用改進後的 6 字 key + 清洗）
                 full_text = extract_full_text(all_page_texts, title)
                 summary = extract_summary(full_text)
-
                 priority = get_priority(title)
                 lead = get_lead(title, found_cat)
                 theme_key = title[:8]
@@ -185,13 +165,12 @@ def run_dashboard():
                         "main_title": title,
                         "related_titles": [],
                         "sources": [source],
-                        "full_text": full_text,      # 完整擷取（全文 tab 用）
-                        "summary": summary,           # 第一段（展開後第一眼）
+                        "full_text": full_text,
+                        "summary": summary,
                         "priority": priority,
                         "lead": lead,
                     }
                 else:
-                    # 優先級取較高者
                     p_rank = {"must": 0, "watch": 1, "normal": 2}
                     existing = organized_data[found_cat][theme_key]
                     if p_rank[priority] < p_rank[existing["priority"]]:
@@ -202,7 +181,7 @@ def run_dashboard():
                         existing["sources"].append(source)
 
     generate_html(organized_data)
-    print("✅ 已產生 index.html")
+    print("已產生 index.html")
 
 
 # ── 4. HTML 產生 ──────────────────────────────────────────────
@@ -215,7 +194,6 @@ def generate_html(data):
             continue
         dept = DEPARTMENTS[cat]
         item_list = sorted(items.values(), key=lambda x: p_rank[x["priority"]])
-        # full_text 可能很長，JSON 只傳必要欄位給前端
         for item in item_list:
             item["related_count"] = len(item["related_titles"])
         js_data[cat] = {
@@ -226,6 +204,10 @@ def generate_html(data):
 
     data_json = json.dumps(js_data, ensure_ascii=False).replace("</", "<\\/")
 
+    # 用 Python 預先產生重複字元，避免在 f-string 內使用 JS 語法
+    sep_double = "\u2550" * 36
+    sep_single = "\u2500" * 30
+
     html_content = f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -235,7 +217,6 @@ def generate_html(data):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ── Reset & Root ── */
 *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 :root {{
   --bg: #f7f6f3;
@@ -247,17 +228,14 @@ def generate_html(data):
   --text-m: #9e9c98;
   --accent: #1d4ed8;
   --accent-light: #eef2ff;
-
   --must-border: #f87171;
   --must-bg: #fef2f2;
   --must-tag: #b91c1c;
   --must-tag-bg: #fee2e2;
-
   --watch-border: #fbbf24;
   --watch-bg: #fffbeb;
   --watch-tag: #92400e;
   --watch-tag-bg: #fef3c7;
-
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
   --radius: 8px;
@@ -270,7 +248,7 @@ body {{
   line-height: 1.65;
 }}
 
-/* ── Header ── */
+/* Header */
 .header {{
   background: var(--white);
   border-bottom: 1px solid var(--border);
@@ -301,10 +279,9 @@ body {{
 .btn-ghost {{ background: transparent; color: var(--text-s); }}
 .btn-ghost:hover {{ border-color: var(--border-hover); color: var(--text-p); }}
 
-/* ── Main layout ── */
+/* Main */
 .main {{ padding: 24px 40px; max-width: 960px; margin: 0 auto; }}
 
-/* 優先級說明 */
 .legend {{
   display: flex; align-items: center; gap: 14px;
   margin-bottom: 18px; font-size: 12px; color: var(--text-m);
@@ -315,9 +292,9 @@ body {{
 .leg-dot.watch {{ background: #f59e0b; }}
 .leg-dot.normal {{ background: #d1d5db; }}
 
-/* ── Tabs ── */
+/* Tabs */
 .tabs {{
-  display: flex; gap: 0;
+  display: flex;
   border-bottom: 2px solid var(--border);
   margin-bottom: 22px;
 }}
@@ -331,7 +308,7 @@ body {{
 .tab-btn:hover {{ color: var(--text-p); }}
 .tab-btn.active {{ color: var(--accent); border-bottom-color: var(--accent); }}
 
-/* ── Card ── */
+/* Card list */
 .news-list {{ display: flex; flex-direction: column; gap: 8px; }}
 
 .news-card {{
@@ -346,7 +323,6 @@ body {{
 .news-card.priority-must {{ border-left-color: var(--must-border); background: var(--must-bg); }}
 .news-card.priority-watch {{ border-left-color: var(--watch-border); background: var(--watch-bg); }}
 
-/* 卡片頂部（永遠可見）*/
 .card-top {{
   padding: 14px 18px;
   display: flex; align-items: flex-start; gap: 12px;
@@ -370,9 +346,7 @@ body {{
   color: var(--text-p); margin-bottom: 4px;
   transition: color 0.15s;
 }}
-.card-lead {{
-  font-size: 12px; color: var(--text-s); margin-bottom: 7px;
-}}
+.card-lead {{ font-size: 12px; color: var(--text-s); margin-bottom: 7px; }}
 .card-meta {{ display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }}
 .src-tag {{
   font-size: 11px; color: var(--text-m);
@@ -388,14 +362,10 @@ body {{
 }}
 .news-card.open .toggle-icon {{ transform: rotate(90deg); color: var(--accent); }}
 
-/* ── 展開區 ── */
-.card-expand {{
-  display: none;
-  border-top: 1px solid var(--border);
-}}
+/* Expand */
+.card-expand {{ display: none; border-top: 1px solid var(--border); }}
 .news-card.open .card-expand {{ display: block; }}
 
-/* 內部 tab bar */
 .inner-tabs {{
   display: flex;
   background: var(--bg);
@@ -415,7 +385,7 @@ body {{
 .inner-panel.active {{ display: block; animation: fadeIn 0.18s ease; }}
 @keyframes fadeIn {{ from {{ opacity:0; transform:translateY(-3px); }} to {{ opacity:1; transform:translateY(0); }} }}
 
-/* 新聞重點（summary）*/
+/* 新聞重點 */
 .summary-block {{
   font-size: 14px; color: var(--text-s); line-height: 1.9;
   font-family: 'Noto Serif TC', serif;
@@ -430,7 +400,7 @@ body {{
   border-radius: 6px; border: 1px dashed var(--border);
 }}
 
-/* 全文區 */
+/* 全文 */
 .fulltext-body {{
   font-size: 13.5px; color: var(--text-s); line-height: 1.95;
   font-family: 'Noto Serif TC', serif; white-space: pre-wrap;
@@ -445,10 +415,7 @@ body {{
   resize: vertical; outline: none; line-height: 1.9;
 }}
 .fulltext-paste:focus {{ border-color: var(--accent); background: white; }}
-.fulltext-hint {{
-  font-size: 12px; color: var(--text-m); margin-bottom: 10px;
-  font-style: italic;
-}}
+.fulltext-hint {{ font-size: 12px; color: var(--text-m); margin-bottom: 10px; font-style: italic; }}
 
 /* 相關報導 */
 .related-row {{
@@ -464,7 +431,7 @@ body {{
   text-align: center; padding: 50px; color: var(--text-m); font-size: 14px;
 }}
 
-/* ── Print ── */
+/* Print */
 @media print {{
   .header {{ position: static; box-shadow: none; }}
   .btn, .tabs, .inner-tabs, .fulltext-paste, .fulltext-hint {{ display: none !important; }}
@@ -509,11 +476,10 @@ body {{
 const DATA = {data_json};
 const CATS = Object.keys(DATA);
 let currentTab = 'all';
-const pasteStore = {{}};  // 暫存使用者手動貼入的全文
-
+const pasteStore = {{}};
 const PRIO_LABEL = {{ must: '必看', watch: '關注', normal: '一般' }};
 
-// ── Tabs ──
+// Tabs
 function renderTabs() {{
   const el = document.getElementById('tabs');
   el.innerHTML = '';
@@ -539,7 +505,7 @@ function switchTab(id) {{
   renderList();
 }}
 
-// ── List ──
+// List
 function renderList() {{
   const list = document.getElementById('news-list');
   list.innerHTML = '';
@@ -559,41 +525,33 @@ function renderList() {{
   }}
 }}
 
-// ── Card ──
+// Card
 function makeCard(item, cat) {{
   const card = document.createElement('div');
   card.className = 'news-card priority-' + item.priority;
-
-  const srcHtml = item.sources.map(s => `<span class="src-tag">${{s}}</span>`).join('');
+  const srcHtml = item.sources.map(s => '<span class="src-tag">' + s + '</span>').join('');
   const relN = item.related_count || 0;
-
-  card.innerHTML = `
-    <div class="card-top">
-      <div class="prio-col">
-        <span class="prio-badge ${{item.priority}}">${{PRIO_LABEL[item.priority]}}</span>
-      </div>
-      <div class="card-info">
-        <div class="card-title">${{item.main_title}}</div>
-        <div class="card-lead">→ ${{item.lead}}</div>
-        <div class="card-meta">
-          ${{srcHtml}}
-          ${{relN ? `<span class="related-badge">＋${{relN}} 則相關</span>` : ''}}
-        </div>
-      </div>
-      <span class="toggle-icon">›</span>
-    </div>
-    <div class="card-expand"></div>`;
+  card.innerHTML =
+    '<div class="card-top">' +
+      '<div class="prio-col"><span class="prio-badge ' + item.priority + '">' + PRIO_LABEL[item.priority] + '</span></div>' +
+      '<div class="card-info">' +
+        '<div class="card-title">' + item.main_title + '</div>' +
+        '<div class="card-lead">→ ' + item.lead + '</div>' +
+        '<div class="card-meta">' + srcHtml + (relN ? '<span class="related-badge">＋' + relN + ' 則相關</span>' : '') + '</div>' +
+      '</div>' +
+      '<span class="toggle-icon">›</span>' +
+    '</div>' +
+    '<div class="card-expand"></div>';
 
   card.querySelector('.card-top').addEventListener('click', () => {{
     const isOpen = card.classList.contains('open');
     if (!isOpen) buildExpand(card, item);
     card.classList.toggle('open');
   }});
-
   return card;
 }}
 
-// ── 展開區（首次展開時才建立）──
+// Build expand panel (lazy)
 function buildExpand(card, item) {{
   const expand = card.querySelector('.card-expand');
   if (expand.dataset.ready) return;
@@ -622,7 +580,7 @@ function buildExpand(card, item) {{
     return p;
   }}
 
-  // ① 新聞重點（summary）
+  // Panel 1: 新聞重點
   const p1 = addInnerTab('新聞重點', true);
   if (item.summary) {{
     const div = document.createElement('div');
@@ -631,10 +589,10 @@ function buildExpand(card, item) {{
     div.textContent = item.summary;
     p1.appendChild(div);
   }} else {{
-    p1.innerHTML = `<div class="summary-empty">⚠️ 自動抓取失敗，請切換至「新聞全文」手動貼入內容</div>`;
+    p1.innerHTML = '<div class="summary-empty">⚠️ 自動抓取失敗，請切換至「新聞全文」手動貼入</div>';
   }}
 
-  // ② 新聞全文
+  // Panel 2: 新聞全文
   const p2 = addInnerTab('新聞全文', false);
   const storeKey = item.main_title;
   if (item.full_text) {{
@@ -646,54 +604,55 @@ function buildExpand(card, item) {{
     p2.appendChild(div);
   }} else {{
     const saved = pasteStore[storeKey] || '';
-    p2.innerHTML = `<div class="fulltext-hint">📋 未能自動擷取全文，請手動貼入：</div>
-      <textarea class="fulltext-paste" placeholder="在此貼入《${{item.main_title}}》全文...">${{saved}}</textarea>`;
+    p2.innerHTML = '<div class="fulltext-hint">📋 未能自動擷取，請手動貼入：</div>' +
+      '<textarea class="fulltext-paste" placeholder="在此貼入《' + item.main_title + '》全文...">' + saved + '</textarea>';
     p2.querySelector('textarea').addEventListener('input', e => {{ pasteStore[storeKey] = e.target.value; }});
   }}
 
-  // ③ 相關報導（有才顯示）
+  // Panel 3: 相關報導（有才顯示）
   if (item.related_titles && item.related_titles.length > 0) {{
-    const p3 = addInnerTab(`相關報導 (${{item.related_titles.length}})`, false);
+    const p3 = addInnerTab('相關報導 (' + item.related_titles.length + ')', false);
     item.related_titles.forEach(r => {{
       const row = document.createElement('div');
       row.className = 'related-row';
-      const title = typeof r === 'object' ? r.title : r;
-      const src = typeof r === 'object' ? r.source : '';
-      row.innerHTML = `<span class="related-bullet">▸</span>
-        <span style="flex:1">${{title}}</span>
-        ${{src ? `<span class="related-src">${{src}}</span>` : ''}}`;
+      const t = typeof r === 'object' ? r.title : r;
+      const s = typeof r === 'object' ? r.source : '';
+      row.innerHTML =
+        '<span class="related-bullet">▸</span>' +
+        '<span style="flex:1">' + t + '</span>' +
+        (s ? '<span class="related-src">' + s + '</span>' : '');
       p3.appendChild(row);
     }});
   }}
 }}
 
-// ── 複製今日摘要 ──
+// 複製今日摘要
 document.getElementById('btn-copy').addEventListener('click', () => {{
   const now = new Date();
   const roc = now.getFullYear() - 1911;
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
   const dateStr = roc + '.' + mm + '.' + dd;
+  const sep1 = '{sep_double}';
+  const sep2 = '{sep_single}';
 
-  let text = `【${{dateStr}} 經濟規劃科 · 每日新聞重點】\n`;
-  text += `${'═'.repeat(36)}\n\n`;
-
+  let text = '【' + dateStr + ' 經濟規劃科 · 每日新聞重點】\\n' + sep1 + '\\n\\n';
   const targets = currentTab === 'all' ? CATS : [currentTab];
   targets.forEach(cat => {{
     const d = DATA[cat];
-    text += `${{d.icon}} ${{cat}}\n${'─'.repeat(30)}\n`;
+    text += d.icon + ' ' + cat + '\\n' + sep2 + '\\n';
     d.items.forEach(item => {{
-      text += `▌ [${{PRIO_LABEL[item.priority]}}] ${{item.main_title}}\n`;
-      text += `   來源：${{item.sources.join('、')}}\n`;
-      text += `   → ${{item.lead}}\n`;
-      if (item.summary) text += `   重點：${{item.summary}}\n`;
+      text += '▌ [' + PRIO_LABEL[item.priority] + '] ' + item.main_title + '\\n';
+      text += '   來源：' + item.sources.join('、') + '\\n';
+      text += '   → ' + item.lead + '\\n';
+      if (item.summary) text += '   重點：' + item.summary + '\\n';
       if (item.related_titles && item.related_titles.length > 0) {{
         const rel = item.related_titles.map(r => typeof r === 'object' ? r.title : r);
-        text += `   相關：${{rel.join('；')}}\n`;
+        text += '   相關：' + rel.join('；') + '\\n';
       }}
-      text += `\n`;
+      text += '\\n';
     }});
-    text += `\n`;
+    text += '\\n';
   }});
 
   navigator.clipboard.writeText(text).then(() => {{
@@ -707,11 +666,11 @@ document.getElementById('btn-copy').addEventListener('click', () => {{
   }});
 }});
 
-// ── 日期（民國年）──
+// 日期（民國年）
 const now = new Date();
 const roc = now.getFullYear() - 1911;
 document.getElementById('date-label').textContent =
-  '民國 ' + roc + ' 年 ' + (now.getMonth()+1) + ' 月 ' + now.getDate() + ' 日';
+  '民國 ' + roc + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日';
 
 renderTabs();
 renderList();
