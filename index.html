@@ -1,634 +1,242 @@
 
-    <html><head><meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
     <style>
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #f0f4f8; color: #2d3748; padding: 40px; }
-        .container { max-width: 900px; margin: auto; }
-        .header { background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); color: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; border-left: 6px solid #cbd5e0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); }
-        .tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; margin-bottom: 10px; }
-        .note { background: #ebf8ff; padding: 10px; border-radius: 6px; font-size: 14px; color: #2c5282; margin: 10px 0; border: 1px solid #bee3f8; }
-        .high-risk { border-left-color: #e53e3e; background: #fff5f5; }
-        .footer { text-align: center; color: #a0aec0; font-size: 12px; margin-top: 50px; }
+        body { font-family: 'PingFang TC', sans-serif; background: #020617; color: #f8fafc; margin: 0; padding: 20px; overflow-x: hidden; }
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; height: 90vh; }
+        .header { grid-column: span 4; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #1e293b; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; }
+        .column { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+        .col-header { background: #1e3a8a; padding: 10px; font-weight: bold; text-align: center; font-size: 16px; border-bottom: 2px solid #38bdf8; }
+        .news-list { overflow-y: auto; flex-grow: 1; padding: 10px; }
+        .news-card { background: #1e293b; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 13px; cursor: pointer; border-left: 4px solid #334155; }
+        .news-card:hover { border-left-color: #38bdf8; background: #334155; }
+        .news-card b { display: block; margin-bottom: 5px; color: #38bdf8; }
+        .summary { font-size: 12px; color: #94a3b8; margin-top: 5px; display: none; background: #020617; padding: 5px; border-radius: 4px; }
+        .source { float: right; font-size: 10px; color: #64748b; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
-    </head>
-    <body contenteditable="true">
-        <div class="container">
-            <div class="header">
-                <div style="font-size:14px; opacity:0.8;">1150427 國家發展委員會</div>
-                <h1 style="margin:5px 0 0 0;">經濟規劃科：新聞訊號預警儀表板</h1>
-            </div>
+    <script>
+        function toggle(e) {
+            const s = e.querySelector('.summary');
+            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h2 style="margin:0;">📊 經濟規劃科戰情室 <small style="font-size:12px; color:#94a3b8;">(1150427 訊號監控)</small></h2>
+        <div style="font-size:14px; color:#38bdf8;">狀態：即時更新中</div>
+    </div>
+    <div class="dashboard">
+
+        <div class="column">
+            <div class="col-header">🔥 風險預警 (17)</div>
+            <div class="news-list">
+        
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A01 要聞</span>
+                    <b>白宮記協晚宴 驚傳槍響</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
             
-        <div class="card high-risk">
-            <div class="tag" style="background:#2b6cb0">投資 (I)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭曉，投資人關注資本支出是否轉化為獲利成長</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>關注半導體與 AI 鏈資本支出動能</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">聯發科參與Google TPU 8t專案ASIC傳捷報 供應鏈嗨</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#805ad5">政府投資 (G)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～6GW設置容量</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>能源轉型進度與長期電價壓力</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">白宮記協晚宴 驚傳槍響</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A01 要聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A01 要聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#2b6cb0">投資 (I)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">創業之星選秀 快來報名 創投產業推手跨境跨域整合實力，催動創新生態系升級 開發資本助新創搶AI先機</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>關注半導體與 AI 鏈資本支出動能</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A01 要聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">川普出席 白宮記協晚宴傳槍響</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A01 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">錄影「突圍」史國晚宴》 中華民國台灣是主權國家 賴：2300萬台灣人有權走向世界</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A01 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">春雨助攻 高雄農業旱情解除</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A01 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">10公克大麻 萬元賣牌友 販二級毒品不承認 重判11年</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A01 焦點新聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">供電吃緊 德國再掀重啟核能辯論 車諾比核災滿40周年梅爾茨指全面廢核電是戰略錯誤</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">獨家專訪／促台速通過國防特別條例 釋出強化自我防衛信號 谷立言：嚇阻力 維護和平最佳途徑</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A01 要聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A01 要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台積鉅額交易 創2,285元新高 總成交金額逾1.37億元</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 B05 集中市場 期貨</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#2b6cb0">投資 (I)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>關注半導體與 AI 鏈資本支出動能</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A06 綜合要聞</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#2b6cb0">投資 (I)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>關注半導體與 AI 鏈資本支出動能</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A06 綜合要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">Q1信義房價指數房價有撐短期難大跌</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A10 產業‧科技</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台積先進製程 神速擴產 法人推估今年底2、3奈米月產能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全拿」</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A03 話題</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">考量用電需求… 經部：強化資料中心審議機制</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A05 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">經長挺高雄設算力園區</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A05 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">環評總體檢 啟動雞尾酒療法</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A05 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">失能長照險混搭 保障互補 兩者理賠標準不同 雙重防護補足缺口 業者推出多元保單 協助小資族解決痛點</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A11 保險</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">淨零承諾 企業的能源硬仗</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A13 經營管理</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">廚餘養豬明年退場 營養午餐清運費恐大漲</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A06 生活新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A09 財經週報</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">時評 台灣淪先禁國家</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A10 時論廣場</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台灣國是會議》司徒文呼籲立院通過增加國防預算</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A03 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">又要普發現金？》藍再提稅收超徵修法 強調「還稅於民」制度化</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A04 政治新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">藍又要普發現金？》綠：擋預算又要發錢 讓國家失能</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A04 政治新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">兒托法訂定20項子法／教團反對監管雲 石崇良：不能隨時調閱</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A06 生活新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">專家：軍購不能成「無菜單料理」</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A02 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">軍購協商 韓國瑜：今挑燈夜戰 額度爭議大 藍指民進黨團死守1.25兆 如何協商</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A02 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">灰色地帶操作 削弱旅客保障</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A07 民生</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">「合法做不了、違規又不敢明做」 多輸局面 赴陸變形團政府續埋沙堆？</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A07 民生</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">2024年3月原已要解禁 賴當選後生變… 禁團令一禁6年 旅行業氣煞</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A07 民生</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">甘肅翻車 國台辦：全力協助 死者家屬抵當地 3人留院5月1日全團返台</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A07 民生</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">徒具形式 禁團令 旅遊業者：剩政治宣示意義 赴陸人數年年增 去年已達疫前8成 李奇嶽：市場需求難逆轉 不如實質納管</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A07 民生</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">石崇良：安樂死有疑慮 不考慮推動 安寧照護「8成在醫院」 健保擬加碼給付鼓勵在宅安寧</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A12 司法</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">制度補強 為失智者阻詐 民間促立法 台灣失智症協會擬定失智症基本法草案 盼患者面對財務法律問題不再孤立無援</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A12 司法</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">充滿變數 申請卡關 金門今赴廈考察降級 副縣長遭駁回縣府緊急調整名單</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A13 北部生活圈</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">司徒文促台增國防預算 吳志中籲結盟美日嚇阻</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">支持國防不等於放棄監督 應考量實際防衛需求 專家：特別軍購不能成為無菜單料理</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">軍購民調 年輕族群態度保留</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">通過國防特別條例 有助鄭訪美氛圍 谷立言肯定親美友日和陸路線 稱嚇阻與對話並重 可維護區域安全</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A03 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">無人機納國防特別預算 嚇阻力最快速</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A03 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">翻轉經濟學人「地球上最危險的地方」看法 谷立言稱台是最重要的地方之一</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A03 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">看好無人機產業 雙方致力履行ART條款 谷立言：台美進入經濟合作黃金年代</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A03 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">中選會今復活 藍白各推公投 安樂死受矚目 國民黨鎖定鞭刑 民眾黨提善終法草案 外界預期挑戰敏感生死議題</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A04 生活綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">8成安寧患者死在醫院 提倡在家善終 獎勵加碼至30%</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A04 生活綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">官方看法 加工死有違醫生使命 衛福部不支持多數決</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A04 生活綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">抗議監管雲 教團嗆石部長家先裝</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A04 生活綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">變形團興起 禁團令剩政治宣示</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A05 財經綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">假網購無卡提款詐騙 暴增4倍 僅需序號或掃二維碼就可秒領 立委籲調降額度 警盼禁網銀截圖降外洩風險</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A06 社會綜合／專輯</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">未理賠可退保費 金管會要查 憂心健康險變儲蓄險，將偏</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A05 綜合要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">專家解析 防癌險強化被保險人保障 非退還現金</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A05 綜合要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">國銀激戰 富豪財管規模近2.4兆</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A05 綜合要聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台灣消費的寒冬</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 D08 全球財經周報 經濟教室</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">3月信保融資金額 五年半次高</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A09 金融市場</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">國人信用卡月費 十年增幅逾3成</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A09 金融市場</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">亞資中心業務 拚全台落地 金管會7月起開放部分項目全國適用 市場看好家族辦公室、境外私募基金銷售先放行</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A02 話題</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4%兆豐、一銀成長最多 彰銀也揚升4.25%</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A10 金融</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">台日產業政策鏈結 聚焦5領域合作</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">打敗大盤 台股熱 主動式ETF規模狂飆 擁有主動選股優勢 第一季整體規模達2982億元、季增72%</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A06 話題</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A05 財經綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">財經會客室 跨境支付 讓世界更易走進台灣</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A07 生活理財</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">數位帳戶十年 走入打詐死胡同 交易額度下降 嚴審開戶市場飽和</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A07 生活理財</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">純網銀助攻 延續數位帳戶熱潮</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A07 生活理財</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">川普取消特使：伊朗想談可打電話</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A02 火線焦點</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A10 國際</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">美伊各認占上風 談判卡關</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A10 國際</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">陸前談判代表：中美有分歧 也尋共同利益</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A11 兩岸</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#e53e3e">風險 (Risk)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">川普取消特使赴巴 美伊談判停擺</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>地緣政治變數，需注意關稅與能源政策</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 AA02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">伊朗：荷莫茲不恢復戰前狀態</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 AA02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">全球超級央行周 利率料全數按兵不動</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A02 火線焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：工商時報 A02 火線焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A02 話題</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">荷莫茲封閉 金融市場掀連鎖反應 波灣各國主權基金重新評估支出次序 優先聚焦國內經濟 恐衝擊全球投資交易</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A06 國際</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">超級央行週 美英歐日料利率不變</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：自由時報 A02 焦點新聞</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A06 話題</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">荷莫茲效應 凸顯全球化未告終 油價、糧食及供應鏈危機從美中到非洲都不能倖免</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A09 全球瞭望</div>
-        </div>
-        
-        <div class="card high-risk">
-            <div class="tag" style="background:#2b6cb0">投資 (I)</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">美伊戰事未解 衝擊AI發展前景</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>關注半導體與 AI 鏈資本支出動能</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A09 全球瞭望</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：聯合報 A11 兩岸</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最後談話成焦點</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：中國時報 A05 財經綜合</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">數位ｘ淨零的綠色整合方案</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A04 焦點</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">石油期貨價格是騙人的？</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A06 國際</div>
-        </div>
-        
-        <div class="card ">
-            <div class="tag" style="background:#718096">一般財經</div>
-            <h3 style="margin:0 0 10px 0; font-size:18px;">華許不蕭規曹隨，但動作空間有限</h3>
-            <div class="note"><b>💡 規劃科判讀：</b>日常經貿動態觀測</div>
-            <div style="font-size:12px; color:#718096;">來源：經濟日報 A14 台股熱點</div>
-        </div>
-        
-            <div class="footer">本報表為自動化決策輔助工具，內容僅供內部研究參考</div>
-        </div>
-    </body></html>
-    
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A01 要聞</span>
+                    <b>取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">自由時報 A01 焦點新聞</span>
+                    <b>川普出席 白宮記協晚宴傳槍響</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A01 要聞</span>
+                    <b>孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">中國時報 A01 要聞</span>
+                    <b>又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A02 火線焦點</span>
+                    <b>川普取消特使：伊朗想談可打電話</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A10 國際</span>
+                    <b>和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A10 國際</span>
+                    <b>美伊各認占上風 談判卡關</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">中國時報 AA02 焦點新聞</span>
+                    <b>川普取消特使赴巴 美伊談判停擺</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">中國時報 AA02 焦點新聞</span>
+                    <b>伊朗：荷莫茲不恢復戰前狀態</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A02 火線焦點</span>
+                    <b>全球超級央行周 利率料全數按兵不動</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A02 火線焦點</span>
+                    <b>美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A02 話題</span>
+                    <b>Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">自由時報 A02 焦點新聞</span>
+                    <b>超級央行週 美英歐日料利率不變</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A06 話題</span>
+                    <b>緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A09 全球瞭望</span>
+                    <b>美伊戰事未解 衝擊AI發展前景</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">中國時報 A05 財經綜合</span>
+                    <b>科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最後談話成焦點</b>
+                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                </div>
+            </div></div>
+        <div class="column">
+            <div class="col-header">🌏 總體經濟 (2)</div>
+            <div class="news-list">
+        
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">自由時報 A09 財經週報</span>
+                    <b>＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長</b>
+                    <div class="summary">💡 判讀：觀測外需動能，為年度經濟成長率之關鍵指標。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A11 兩岸</span>
+                    <b>動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成</b>
+                    <div class="summary">💡 判讀：觀測外需動能，為年度經濟成長率之關鍵指標。</div>
+                </div>
+            </div></div>
+        <div class="column">
+            <div class="col-header">💻 產業投資 (5)</div>
+            <div class="news-list">
+        
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A01 要聞</span>
+                    <b>美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭曉，投資人關注資本支出是否轉化為獲利成長</b>
+                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A01 要聞</span>
+                    <b>創業之星選秀 快來報名 創投產業推手跨境跨域整合實力，催動創新生態系升級 開發資本助新創搶AI先機</b>
+                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A06 綜合要聞</span>
+                    <b>國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元</b>
+                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A06 綜合要聞</span>
+                    <b>AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產</b>
+                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">中國時報 A05 財經綜合</span>
+                    <b>金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪</b>
+                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                </div>
+            </div></div>
+        <div class="column">
+            <div class="col-header">🏛️ 政策/本會 (8)</div>
+            <div class="news-list">
+        
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">工商時報 A01 要聞</span>
+                    <b>台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～6GW設置容量</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A05 焦點</span>
+                    <b>經長挺高雄設算力園區</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A13 經營管理</span>
+                    <b>淨零承諾 企業的能源硬仗</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">自由時報 A02 焦點新聞</span>
+                    <b>台日產業政策鏈結 聚焦5領域合作</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">經濟日報 A04 焦點</span>
+                    <b>數位ｘ淨零的綠色整合方案</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 B01 健康</span>
+                    <b>當政策只是回應壓力 難解醫護流失</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A13 北部生活圈</span>
+                    <b>新四通不是政策想像 是逼近的現實</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            
+                <div class="news-card" onclick="toggle(this)">
+                    <span class="source">聯合報 A15 民意</span>
+                    <b>組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴的赴陸禁團令</b>
+                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                </div>
+            </div></div></div></body></html>
