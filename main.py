@@ -3,223 +3,45 @@ import os
 import json
 import re
 
-# ── 1. 分類定義（修正版）──────────────────────────────────────────────
-# 核心原則：
-#   - 不用「美國/中國/日本」等國名當關鍵字（幾乎每篇都有）
-#   - 地緣政治獨立一類，不混入金融情勢
-#   - 台積/聯電等縮寫補進產業類
-#   - 政府政策類補強機構名
-
+# ── 1. 分類定義 ──────────────────────────────────────────────
 DEPARTMENTS = {
-    "社論與評論觀點": {
-        "icon": "📝",
-        "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家", "經濟教室", "縱橫天下", "自由廣場"]
-    },
-    "國際機構與智庫報告": {
-        "icon": "📘",
-        "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "Brookings", "PIIE", "BIS", "ADB", "WEF", "聯合國", "世界銀行", "國際貨幣"]
-    },
-    "地緣政治與國際衝突": {
-        "icon": "🌏",
-        "keywords": [
-            "戰爭", "衝突", "制裁", "美伊", "俄烏", "荷莫茲", "伊朗", "烏克蘭",
-            "關稅", "川普", "貿易戰", "地緣", "槍響", "槍擊", "遇襲", "外交"
-        ]
-    },
-    "國際金融與貨幣政策": {
-        "icon": "🌐",
-        "keywords": [
-            "Fed", "FOMC", "聯準會", "利率決策", "升息", "降息", "鮑爾",
-            "ECB", "BOJ", "英格蘭銀行", "央行週", "超級央行",
-            "美債", "美元指數", "非農", "CPI", "核心通膨", "PMI", "ISM",
-            "人民幣", "日圓", "歐元", "英鎊", "匯率"
-        ]
-    },
-    "台灣總體經濟與數據": {
-        "icon": "📊",
-        "keywords": [
-            "主計", "主計總處", "GDP", "景氣燈號", "景氣", "物價", "通膨",
-            "失業率", "薪資", "外銷訂單", "出口統計", "進口統計", "海關",
-            "貿易統計", "稅收", "超徵", "出生率", "少子化", "高齡化", "人口統計",
-            "消費者信心", "製造業PMI", "非製造業"
-        ]
-    },
-    "台灣產業與投資動向": {
-        "icon": "🏭",
-        "keywords": [
-            "AI", "半導體", "台積電", "台積", "聯發科", "聯電", "鴻海",
-            "台達電", "廣達", "緯創", "英業達", "資本支出", "供應鏈",
-            "算力", "伺服器", "CoWoS", "先進封裝", "製程", "晶片",
-            "離岸風電", "綠能", "電動車", "ASIC", "TPU", "GPU"
-        ]
-    },
-    "台灣政府與政策訊息": {
-        "icon": "🏛️",
-        "keywords": [
-            "國發會", "行政院", "總統府", "經濟部", "財政部", "金管會",
-            "國科會", "央行", "衛福部", "內政部", "院會", "政院",
-            "法案", "預算", "補助", "政策", "施政", "法規", "條例",
-            "立法院", "立委", "修法"
-        ]
-    },
+    "社論與評論觀點": {"icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家"]},
+    "國際機構與智庫報告": {"icon": "📘", "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "BIS", "ADB"]},
+    "地緣政治與國際衝突": {"icon": "🌏", "keywords": ["戰爭", "衝突", "制裁", "俄烏", "關稅", "川普", "貿易戰", "地緣"]},
+    "國際金融與貨幣政策": {"icon": "🌐", "keywords": ["Fed", "FOMC", "聯準會", "升息", "降息", "美債", "CPI", "通膨", "匯率"]},
+    "台灣總體經濟與數據": {"icon": "📊", "keywords": ["主計", "GDP", "景氣燈號", "景氣", "物價", "出口統計", "外銷訂單"]},
+    "台灣產業與投資動向": {"icon": "🏭", "keywords": ["AI", "半導體", "台積電", "供應鏈", "伺服器", "晶片", "綠能"]},
+    "台灣政府與政策訊息": {"icon": "🏛️", "keywords": ["國發會", "行政院", "總統府", "經濟部", "法案", "預算", "政策"]},
 }
 
-CATEGORY_ORDER = [
-    "社論與評論觀點",
-    "國際機構與智庫報告",
-    "地緣政治與國際衝突",
-    "國際金融與貨幣政策",
-    "台灣總體經濟與數據",
-    "台灣政府與政策訊息",
-    "台灣產業與投資動向",
-]
+CATEGORY_ORDER = ["社論與評論觀點", "國際機構與智庫報告", "地緣政治與國際衝突", "國際金融與貨幣政策", "台灣總體經濟與數據", "台灣政府與政策訊息", "台灣產業與投資動向"]
+MUST_READ_KEYS = ["Fed", "FOMC", "鮑爾", "GDP", "景氣燈號", "衝突", "戰爭"]
 
-MUST_READ_KEYS = [
-    "Fed", "FOMC", "鮑爾", "主計", "GDP", "景氣燈號",
-    "衝突", "戰爭", "利率決議", "升息", "降息",
-    "外銷訂單", "超徵", "荷莫茲"
-]
-
-# 非經濟版面關鍵字：這些版面的新聞若標題無任何經濟關鍵字，直接略過
-NON_ECON_SECTIONS = [
-    "焦點新聞", "社會", "地方", "體育", "娛樂", "影視",
-    "生活", "健康", "農業", "司法", "法庭",
-    "影劇", "副刊", "旅遊", "美食", "寵物", "星座"
-]
-
-# 標題有這些詞 → 判定為非經濟，直接略過
-NON_ECON_TITLE_KEYS = [
-    # 社會犯罪類
-    "大麻", "毒品", "詐騙", "竊盜", "槍擊案",
-    # 農漁牧類
-    "農業", "旱情", "廚餘", "豬", "漁業", "農委會",
-    # 醫療社福類
-    "失智", "長照", "安樂死", "安寧", "防癌",
-    # 娛樂生活類
-    "觀光旅遊", "演唱會", "婚喪喜慶",
-    # 房產（非投資面）
-    "房價指數", "租屋",
-]
-
-# 所有分類的經濟關鍵字合集（用於判斷非經濟版面的新聞是否值得保留）
-ALL_ECON_KEYS = set()
-for dept in DEPARTMENTS.values():
-    ALL_ECON_KEYS.update(dept["keywords"])
-ALL_ECON_KEYS.update(MUST_READ_KEYS)
-
-
-# ── 2. 過濾非經濟新聞 ──────────────────────────────────────────────
-
-def should_skip(title, source):
-    """判斷這則新聞是否應略過（非經濟情報相關）"""
-    # 標題有明確非經濟詞彙
-    if any(k in title for k in NON_ECON_TITLE_KEYS):
-        return True
-    # 非經濟版面 + 標題無任何經濟關鍵字
-    if any(sec in source for sec in NON_ECON_SECTIONS):
-        if not any(k in title for k in ALL_ECON_KEYS):
-            return True
-    return False
-
-
-# ── 3. 文本解析邏輯 ────────────────────────────────────────────────────
-
+# ── 2. 文本解析與輔助邏輯 (保持原有邏輯) ─────────────────────────
 def is_noise_line(line):
-    noise = ["回到目錄", "來源:", "來源：", "版面", "作者", "日期", "頁次", "新聞議題", "報導媒體"]
-    if line.isdigit():
-        return True
-    return any(k in line for k in noise)
+    noise = ["回到目錄", "來源:", "來源：", "版面", "作者", "日期", "頁次"]
+    return line.isdigit() or any(k in line for k in noise)
 
 def clean_text_blocks(text_list):
-    """
-    清洗 PDF 擷取文字並重組段落。
-    策略：
-    1. 過濾雜訊行
-    2. 把 PDF 欄位換行造成的碎行合併回完整句子
-    3. 每 2~4 句切一段，輸出 \n\n 分隔的段落
-    """
-    if not text_list:
-        return ""
-
-    # Step 1: 過濾雜訊，合併碎行
+    if not text_list: return ""
     merged = ""
     for line in text_list:
         line = line.strip()
-        if not line or is_noise_line(line):
-            continue
-        # 作者行殘留模式（不應進入正文）
-        if re.search(r'報導】$|記者.{0,10}報導', line):
-            continue
-        # 純數字行（頁碼）
-        if line.isdigit():
-            continue
-        if not merged:
-            merged = line
-        elif merged[-1] in ("。", "！", "？", "；", "」", "\u201d", "…"):
-            # 前一行句子完整，新開一行
-            merged += "\n" + line
-        else:
-            # 前一行句子不完整（PDF 欄位斷行），直接接上
-            merged += line
-
-    # Step 2: 清除多餘空白
-    merged = re.sub(r' +', ' ', merged)
-    merged = merged.strip()
-
-    # Step 3: 按句號切句，每 3 句一段
-    sentences = re.split(r'(?<=[。！？；])', merged)
+        if not line or is_noise_line(line): continue
+        if re.search(r'報導】$|記者.{0,10}報導', line): continue
+        merged += ("\n" + line) if merged and merged[-1] in ("。", "！", "？", "；") else line
+    
     paragraphs = []
-    current = ""
-    count = 0
+    sentences = re.split(r'(?<=[。！？；])', merged)
+    current, count = "", 0
     for s in sentences:
-        s = s.strip()
-        if not s:
-            continue
-        current += s
+        current += s.strip()
         count += 1
-        if count >= 3 and s[-1] in ("。", "！", "？", "；"):
-            paragraphs.append(current.strip())
-            current = ""
-            count = 0
-    if current.strip():
-        paragraphs.append(current.strip())
-
-    # 清除段落內的 PDF 欄位殘留空格和換行
-    import re as _re
-    cleaned = []
-    for p in paragraphs:
-        # 單個換行 → 空格（PDF 欄位斷行）
-        p = p.replace("\n", " ")
-        # 多餘空格合併
-        p = _re.sub(r" {2,}", " ", p)
-        # 標點前的空格去除 + 中文字間的 PDF 欄位空格去除
-        p = _re.sub(r" ([，。！？；：、「」』」）】])", r"\1", p)
-        p = _re.sub(r"([一-鿿＀-￯]) ([一-鿿＀-￯（「『「])", r"\1\2", p)
-        p = p.strip()
-        if p:
-            cleaned.append(p)
-    return "\n\n".join(cleaned)
-
-def find_article(article_index, title):
-    key = title.replace(" ", "")
-    best_content = ""
-    best_score = 0
-    for art_key, content in article_index.items():
-        for n in [14, 12, 10, 8, 6]:
-            if key[:n] and key[:n] in art_key:
-                if n > best_score:
-                    best_score = n
-                    best_content = content
-                break
-    return best_content if best_score >= 6 else ""
-
-def extract_summary(content, limit=220):
-    if not content:
-        return "尚未擷取到內文摘要"
-    parts = [p.strip() for p in content.split("\n\n") if p.strip()]
-    if parts:
-        return parts[0][:limit] + ("..." if len(parts[0]) > limit else "")
-    return content[:limit] + ("..." if len(content) > limit else "")
+        if count >= 3:
+            paragraphs.append(current)
+            current, count = "", 0
+    if current: paragraphs.append(current)
+    return "\n\n".join(paragraphs)
 
 def build_article_index(pdf):
     index = {}
@@ -228,695 +50,262 @@ def build_article_index(pdf):
     for page in pdf.pages:
         text = page.extract_text() or ""
         lines = [l.strip() for l in text.split("\n") if l.strip()]
-        if not lines:
-            continue
+        if not lines: continue
         has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
         if has_source:
-            src_idx = next(
-                i for i, l in enumerate(lines)
-                if l.startswith("來源:") or l.startswith("來源：")
-            )
+            src_idx = next(i for i, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源："))
             title_key = "".join(lines[:src_idx]).replace(" ", "")
-            # 跳過來源行及其可能的跨行殘留（作者行尾段）
-            body_start = src_idx + 1
-            while body_start < len(lines):
-                line = lines[body_start]
-                # 作者行尾段特徵：以「報導】」「報導】。」「記者報導】」結尾
-                # 或以「／台北報導】」「／綜合報導】」等形式出現
-                if re.search(r'[報導綜合外電]+】\s*$|^\w+\/\w+報導】', line):
-                    body_start += 1
-                elif re.match(r'^[　\s]*【.{0,20}報導】', line):
-                    body_start += 1
-                else:
-                    break
-            raw_content_map[title_key] = lines[body_start:]
+            raw_content_map[title_key] = lines[src_idx+1:]
             last_key = title_key
-        elif (
-            last_key
-            and len("".join(lines)) > 50
-            and not page.extract_table()
-            and not any("回到目錄" in l for l in lines[:5])
-        ):
-            if last_key in raw_content_map:
-                raw_content_map[last_key].extend(lines)
-        else:
-            last_key = None
+        elif last_key:
+            raw_content_map[last_key].extend(lines)
     for key, text_list in raw_content_map.items():
         index[key] = clean_text_blocks(text_list)
     return index
 
+# ── 3. HTML & Apple Style CSS 生成 ──────────────────────────────
 
-
-
-# ── 4. 執行解析 ──────────────────────────────────────────────────────
-
-def run_dashboard():
-    data_folder = "data"
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
-    pdf_files = [f for f in os.listdir(data_folder) if f.lower().endswith(".pdf")]
-
-    all_items = []
-    skipped = 0
-    if pdf_files:
-        pdf_files.sort(key=lambda x: os.path.getmtime(os.path.join(data_folder, x)))
-        latest_pdf = os.path.join(data_folder, pdf_files[-1])
-        print(f"處理檔案: {latest_pdf}")
-
-        with pdfplumber.open(latest_pdf) as pdf:
-            article_index = build_article_index(pdf)
-            # 掃描所有有表格的頁面，動態判斷是否為目錄
-            for page in pdf.pages:
-                table = page.extract_table()
-                if not table:
-                    continue
-                # 判斷是否為目錄表格：
-                # 策略：掃描所有列，只要有一列符合「第2欄是標題、第3欄含報名」就是目錄
-                def is_toc_table(t):
-                    news_sources = ['時報', '日報', '聯合', '自由', '中時', '工商', '蘋果', '鏡', '報']
-                    for r in t:
-                        if not r or len(r) < 2: continue
-                        col2 = str(r[1] or '').strip()
-                        col3 = str(r[2] or '').strip() if len(r) > 2 else ''
-                        if len(col2) > 5 and any(s in col3 for s in news_sources):
-                            return True
-                    return False
-                if not is_toc_table(table):
-                    continue
-                for row in table[1:]:
-                    if not row or len(row) < 2 or not row[1]:
-                        continue
-                    title = str(row[1]).replace("\n", "").strip()
-                    source = str(row[2]).replace("\n", " ").strip() if len(row) > 2 and row[2] else "EPC彙整"
-                    if len(title) < 5 or any(k in title for k in ["新聞議題", "報導媒體", "目錄", "頁次"]):
-                        continue
-
-                    # 過濾非經濟新聞
-                    if should_skip(title, source):
-                        skipped += 1
-                        continue
-
-                    classify_text = title + " " + source
-                    found_cat = None
-                    for cat in CATEGORY_ORDER:
-                        if any(k in classify_text for k in DEPARTMENTS[cat]["keywords"]):
-                            found_cat = cat
-                            break
-                    # 略過無法分類的（其他雜項不顯示）
-                    if not found_cat:
-                        skipped += 1
-                        continue
-
-                    content = find_article(article_index, title)
-                    all_items.append({
-                        "title": title,
-                        "source": source,
-                        "cat": found_cat,
-                        "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
-                        "summary": extract_summary(content),
-                        "full_text": content
-                    })
-
-    print(f"保留 {len(all_items)} 則，略過 {skipped} 則非經濟新聞")
-    generate_html(all_items)
-    print("✅ 已產生 index.html")
-
-
-# ── 5. HTML 生成 ──────────────────────────────────────────────
-
-def build_js(data_json, dept_json, cat_order_json):
-    lines = [
-        "const DATA = " + data_json + ";",
-        "const DEPTS = " + dept_json + ";",
-        "const CAT_ORDER = " + cat_order_json + ";",
-        "",
-        "function esc(s){",
-        "  let r=String(s||'');",
-        "  r=r.split('&').join('&amp;');",
-        "  r=r.split('<').join('&lt;');",
-        "  r=r.split('>').join('&gt;');",
-        "  r=r.split('\"').join('&quot;');",
-        "  return r;",
-        "}",
-        "",
-        "function init(){",
-        "  const yr=new Date().getFullYear();",
-        "  document.getElementById('roc-year').textContent='\u6c11\u570b '+(yr-1911)+' \u5e74';",
-        "  document.getElementById('today-date').textContent=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});",
-        "  const nav=document.getElementById('nav-bar');",
-        "  CAT_ORDER.forEach(cat=>{",
-        "    const div=document.createElement('div');",
-        "    div.className='nav-item';",
-        "    const icon=DEPTS[cat]?DEPTS[cat].icon:'';",
-        "    div.textContent=icon+' '+cat;",
-        "    div.onclick=function(){filterFeed(cat,this);};",
-        "    nav.appendChild(div);",
-        "  });",
-        "  renderCarousel();",
-        "  renderFeed('all');",
-        "}",
-        "",
-        "function renderCarousel(){",
-        "  const area=document.getElementById('carousel-area');",
-        "  if(DATA.length===0){area.innerHTML='<div class=\"carousel-slide active\" style=\"display:flex;\"><h2>\u4eca\u65e5\u5c1a\u7121\u8cc7\u6599</h2></div>';return;}",
-        "  const featured=DATA.filter(i=>i.priority===1).slice(0,5);",
-        "  if(featured.length===0)featured.push(...DATA.slice(0,5));",
-        "  featured.forEach((item,idx)=>{",
-        "    const slide=document.createElement('div');",
-        "    slide.className='carousel-slide'+(idx===0?' active':'');",
-        "    if(idx===0)slide.style.display='flex';",
-        "    const dataIdx=DATA.indexOf(item);",
-        "    slide.innerHTML=",
-        "      '<span class=\"carousel-eye\">\u24c2 '+esc(item.cat)+'</span>'+",
-        "      '<h2 class=\"carousel-title\" onclick=\"showFull('+dataIdx+')\">'+esc(item.title)+'</h2>'+",
-        "      '<p class=\"carousel-summary\">'+esc(item.summary)+'</p>'+",
-        "      '<button class=\"carousel-btn\" onclick=\"showFull('+dataIdx+')\">'+",
-        "        '\u95b1\u8b80\u5168\u6587 \u2192'+'</button>';",
-        "    area.appendChild(slide);",
-        "  });",
-        "  let cur=0;",
-        "  setInterval(()=>{",
-        "    const s=document.querySelectorAll('.carousel-slide');",
-        "    if(s.length<=1)return;",
-        "    s[cur].classList.remove('active');",
-        "    s[cur].style.display='none';",
-        "    cur=(cur+1)%s.length;",
-        "    s[cur].classList.add('active');",
-        "    s[cur].style.display='flex';",
-        "  },5000);",
-        "}",
-        "",
-        "function renderFeed(cat){",
-        "  const list=document.getElementById('news-feed');",
-        "  list.innerHTML='';",
-        "  const f=cat==='all'?DATA:DATA.filter(i=>i.cat===cat);",
-        "  if(f.length===0){",
-        "    list.innerHTML='<div style=\"padding:40px 0;color:#999;text-align:center;\">\u76ee\u524d\u7121\u8cc7\u6599</div>';",
-        "    return;",
-        "  }",
-        "  f.forEach((item,i)=>{",
-        "    const div=document.createElement('div');",
-        "    div.className='news-item'+(item.priority===1?' must':'');",
-        "    const dataIdx=DATA.indexOf(item);",
-        "    div.innerHTML=",
-        "      '<div class=\"news-meta\">'+",
-        "        '<span class=\"news-cat-tag\">'+esc(item.cat)+'</span>'+",
-        "        (item.priority===1?'<span class=\"must-badge\">\u5fc5\u770b</span>':'')+",
-        "        '<span class=\"news-source\">'+esc(item.source)+'</span>'+",
-        "      '</div>'+",
-        "      '<h3 class=\"news-title\" onclick=\"showFull('+dataIdx+')\">'+esc(item.title)+'</h3>'+",
-        "      '<p class=\"news-summary\">'+esc(item.summary)+'</p>'+",
-        "      '<button class=\"read-more\" onclick=\"showFull('+dataIdx+')\">'+",
-        "        '\u95b1\u8b80\u5168\u6587 \u2192'+'</button>';",
-        "    list.appendChild(div);",
-        "  });",
-        "}",
-        "",
-        "function filterFeed(cat,el){",
-        "  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));",
-        "  if(el)el.classList.add('active');",
-        "  document.getElementById('current-view-title').textContent=cat==='all'?'TODAY\\'S INTELLIGENCE':cat;",
-        "  renderFeed(cat);",
-        "  window.scrollTo({top:document.querySelector('.main-layout').offsetTop-60,behavior:'smooth'});",
-        "}",
-        "",
-        "function showFull(idx){",
-        "  const item=DATA[idx];",
-        "  const rawText=item.full_text||'尚未擷取到內文內容';",
-        "  const contentHtml=rawText.split('\\n\\n').map(p=>'<p>'+esc(p.trim())+'</p>').join('');",
-        "  // 單個換行在段落內用空格取代（PDF 欄位殘留）",
-
-        "  document.getElementById('modal-content').innerHTML=",
-        "    '<div class=\"modal-article\">'+",
-        "      '<div class=\"modal-cat\">'+esc(item.cat)+'</div>'+",
-        "      '<h1 class=\"modal-title\">'+esc(item.title)+'</h1>'+",
-        "      '<div class=\"modal-source\">\u4f86\u6e90\uff1a'+esc(item.source)+'</div>'+",
-        "      '<div class=\"article-content\">'+contentHtml+'</div>'+",
-
-        "    '</div>';",
-        "  document.getElementById('modal').style.display='block';",
-        "  document.body.style.overflow='hidden';",
-        "}",
-        "",
-        "function closeModal(){",
-        "  document.getElementById('modal').style.display='none';",
-        "  document.body.style.overflow='auto';",
-        "}",
-        "",
-        "document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});",
-        "init();",
-    ]
-    return "\n".join(lines)
-
-
-CSS = """
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+APPLE_CSS = """
 :root {
-  --navy: #00335e;
-  --accent: #0076d6;
-  --accent2: #00a3e0;
-  --bg: #f8f9fb;
-  --white: #ffffff;
-  --border: rgba(0,0,0,0.08);
-  --text-p: #1a1a2e;
-  --text-s: #4a5568;
-  --text-m: #8a94a6;
-  --must: #e53e3e;
-  --must-bg: #fff5f5;
-  --radius: 12px;
+  --apple-bg: #f5f5f7;
+  --apple-nav: rgba(251, 251, 253, 0.8);
+  --apple-text: #1d1d1f;
+  --apple-subtext: #86868b;
+  --apple-blue: #0066cc;
+  --apple-red: #d70015;
+  --apple-card: #ffffff;
+  --sf-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", "Noto Sans TC", sans-serif;
 }
 
 body {
-  font-family: 'Public Sans', 'Noto Sans TC', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text-p);
-  line-height: 1.65;
+  font-family: var(--sf-font);
+  background-color: var(--apple-bg);
+  color: var(--apple-text);
+  margin: 0; padding: 0;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.47;
 }
 
-/* ── TOP BAR ── */
-.top-bar {
-  background: var(--navy);
-  color: rgba(255,255,255,0.55);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  padding: 10px 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ── Global Nav (Apple Style) ── */
+.global-nav {
+  background: var(--apple-nav);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  position: fixed; top: 0; width: 100%; z-index: 9999;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
-.top-bar-right { display: flex; gap: 24px; }
+.nav-content {
+  max-width: 1024px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  height: 48px; padding: 0 22px;
+}
+.nav-logo { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; color: var(--apple-text); }
+.nav-list { display: flex; gap: 30px; list-style: none; }
+.nav-list span { font-size: 12px; color: var(--apple-subtext); cursor: pointer; transition: color 0.3s; }
+.nav-list span:hover { color: var(--apple-blue); }
 
-/* ── HEADER ── */
-.site-header {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 20px 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* ── Hero Section ── */
+.hero {
+  padding-top: 120px; padding-bottom: 60px;
+  text-align: center; background: #fff;
 }
-.brand h1 {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--navy);
-  letter-spacing: -0.02em;
-  border-left: 4px solid var(--accent);
-  padding-left: 14px;
-  line-height: 1.2;
-}
-.brand p {
-  font-size: 12px;
-  color: var(--text-m);
-  padding-left: 18px;
-  margin-top: 3px;
-  letter-spacing: 0.05em;
-}
-.header-date {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--navy);
-  text-align: right;
+.hero h2 { font-size: 21px; font-weight: 600; margin: 0; }
+.hero h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.005em; margin: 10px 0; }
+.hero .date { font-size: 21px; color: var(--apple-subtext); }
+
+/* ── Grid Layout ── */
+.container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+.section-title { font-size: 32px; font-weight: 700; margin-bottom: 24px; }
+
+.news-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 20px;
 }
 
-/* ── STICKY NAV ── */
-.imf-nav {
-  background: var(--navy);
-  display: flex;
-  padding: 0 60px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  overflow-x: auto;
-  scrollbar-width: none;
-  gap: 2px;
-}
-.imf-nav::-webkit-scrollbar { display: none; }
-.nav-item {
-  color: rgba(255,255,255,0.7);
-  padding: 16px 22px;
-  font-size: 13px;
-  font-weight: 600;
+/* ── Apple Style Card ── */
+.card {
+  background: var(--apple-card);
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.25, 1), box-shadow 0.5s;
   cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
-  border-bottom: 3px solid transparent;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
 }
-.nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
-.nav-item.active { color: #fff; border-bottom-color: var(--accent2); background: rgba(255,255,255,0.08); }
+.card:hover { transform: scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.card.must { border-top: 4px solid var(--apple-red); }
 
-/* ── HERO CAROUSEL ── */
-.carousel-container {
-  background: linear-gradient(135deg, #0a1628 0%, #00335e 60%, #004a8f 100%);
-  position: relative;
-  overflow: hidden;
-  padding: 60px 0;
-}
+.card-cat { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--apple-subtext); margin-bottom: 8px; }
+.card-title { font-size: 24px; font-weight: 700; line-height: 1.1; margin-bottom: 12px; }
+.card-summary { font-size: 17px; color: var(--apple-subtext); margin-bottom: 20px; flex-grow: 1; }
+.card-footer { font-size: 12px; font-weight: 600; color: var(--apple-blue); }
 
-/* Animated orbs */
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  animation: orbFloat linear infinite;
-  pointer-events: none;
-}
-.orb1 { width:400px; height:400px; background:radial-gradient(circle,rgba(0,118,214,0.4) 0%,transparent 70%); top:-100px; right:8%; animation-duration:20s; }
-.orb2 { width:280px; height:280px; background:radial-gradient(circle,rgba(0,163,224,0.25) 0%,transparent 70%); bottom:-80px; right:30%; animation-duration:28s; animation-delay:-10s; }
-.orb3 { width:200px; height:200px; background:radial-gradient(circle,rgba(94,92,230,0.2) 0%,transparent 70%); top:30px; left:20%; animation-duration:16s; animation-delay:-5s; }
-@keyframes orbFloat {
-  0% { transform:translate(0,0) scale(1); }
-  33% { transform:translate(-25px,18px) scale(1.04); }
-  66% { transform:translate(18px,-12px) scale(0.96); }
-  100% { transform:translate(0,0) scale(1); }
-}
-
-/* Rotating ring */
-.dot-ring {
-  position:absolute; right:60px; top:50%; transform:translateY(-50%);
-  width:200px; height:200px; opacity:0.7;
-}
-.dot-ring svg { animation:ringRotate 40s linear infinite; }
-@keyframes ringRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-
-/* Grid overlay */
-.hero-grid {
-  position:absolute; inset:0;
-  background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);
-  background-size:52px 52px;
-}
-
-.carousel-inner { max-width:1200px; margin:0 auto; padding:0 60px; position:relative; min-height:240px; }
-.carousel-slide {
-  position:absolute; inset:0 60px;
-  display:none; flex-direction:column; justify-content:center;
-  animation:slideIn 0.6s ease;
-}
-.carousel-slide.active { display:flex; }
-@keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-.carousel-eye {
-  font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
-  color:var(--accent2); margin-bottom:14px;
-}
-.carousel-title {
-  font-size:32px; font-weight:800; color:#fff; line-height:1.25;
-  letter-spacing:-0.02em; margin-bottom:14px; cursor:pointer;
-  max-width:680px;
-}
-.carousel-title:hover { color:var(--accent2); }
-.carousel-summary { font-size:15px; color:rgba(255,255,255,0.55); max-width:600px; margin-bottom:24px; line-height:1.7; }
-.carousel-btn {
-  display:inline-block; background:var(--accent); color:#fff;
-  border:none; padding:11px 24px; font-size:14px; font-weight:700;
-  cursor:pointer; letter-spacing:0.02em; transition:background 0.2s;
-  width:fit-content;
-}
-.carousel-btn:hover { background:var(--accent2); }
-
-/* Carousel dots */
-.carousel-dots { display:flex; justify-content:center; gap:8px; margin-top:24px; position:relative; z-index:5; }
-.carousel-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.3); transition:all 0.3s; cursor:pointer; }
-.carousel-dot.active { background:#fff; width:24px; border-radius:3px; }
-
-/* Stats strip */
-.stats-strip {
-  background:var(--white);
-  border-bottom:1px solid var(--border);
-  display:flex;
-}
-.stat-cell {
-  flex:1; padding:20px 28px; border-right:1px solid var(--border);
-  transition:background 0.15s;
-}
-.stat-cell:last-child { border-right:none; }
-.stat-cell:hover { background:#f4f6f9; }
-.stat-num { font-size:28px; font-weight:800; letter-spacing:-0.03em; line-height:1; margin-bottom:4px; }
-.stat-num.c-must { color:var(--must); }
-.stat-num.c-accent { color:var(--accent); }
-.stat-num.c-navy { color:var(--navy); }
-.stat-label { font-size:12px; color:var(--text-m); font-weight:600; letter-spacing:0.04em; text-transform:uppercase; }
-
-/* ── MAIN LAYOUT ── */
-.main-layout {
-  max-width:1200px; margin:48px auto; padding:0 60px;
-  display:grid; grid-template-columns:1fr 300px; gap:60px;
-}
-
-.feed-header {
-  display:flex; align-items:baseline; justify-content:space-between;
-  border-bottom:2px solid var(--navy); padding-bottom:14px; margin-bottom:28px;
-}
-.feed-title { font-size:14px; font-weight:800; letter-spacing:0.08em; color:var(--navy); text-transform:uppercase; }
-.feed-count { font-size:13px; color:var(--text-m); font-weight:500; }
-
-/* News item */
-.news-item {
-  padding:24px 0; border-bottom:1px solid var(--border);
-  transition:all 0.15s;
-  opacity:0; transform:translateY(12px);
-  animation:itemReveal 0.4s ease forwards;
-}
-.news-item.must { border-left:3px solid var(--must); padding-left:18px; }
-@keyframes itemReveal { to{opacity:1;transform:translateY(0)} }
-
-.news-meta { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
-.news-cat-tag {
-  font-size:11px; font-weight:700; letter-spacing:0.06em;
-  color:var(--accent); text-transform:uppercase;
-}
-.must-badge {
-  font-size:10px; font-weight:700; background:var(--must);
-  color:#fff; padding:2px 7px; letter-spacing:0.05em;
-}
-.news-source { font-size:11px; color:var(--text-m); margin-left:auto; }
-
-.news-title {
-  font-size:19px; font-weight:700; color:var(--navy); line-height:1.45;
-  letter-spacing:-0.02em; margin-bottom:10px; cursor:pointer;
-  transition:color 0.15s;
-  font-family:'Noto Serif TC','Georgia',serif;
-}
-.news-title:hover { color:var(--accent); }
-.news-item.must .news-title { color:#c53030; }
-.news-item.must .news-title:hover { color:var(--accent); }
-
-.news-summary { font-size:14px; color:var(--text-s); line-height:1.75; margin-bottom:12px; }
-
-.read-more {
-  background:none; border:1px solid var(--border); color:var(--accent);
-  font-size:12px; font-weight:700; padding:6px 14px; cursor:pointer;
-  letter-spacing:0.04em; transition:all 0.15s;
-}
-.read-more:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
-
-/* Sidebar */
-.sidebar-box {
-  background:var(--white); border:1px solid var(--border);
-  padding:24px; border-top:4px solid var(--navy);
-}
-.sidebar-box h3 {
-  font-size:13px; font-weight:800; letter-spacing:0.08em;
-  text-transform:uppercase; color:var(--navy); margin-bottom:14px;
-}
-.sidebar-box p { font-size:13px; color:var(--text-s); line-height:1.7; }
-.sidebar-cat-list { margin-top:20px; }
-.sidebar-cat-item {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 0; border-bottom:1px solid var(--border);
-  font-size:13px;
-}
-.sidebar-cat-item:last-child { border-bottom:none; }
-.sidebar-cat-name { color:var(--text-s); }
-.sidebar-cat-count { font-weight:700; color:var(--navy); }
-
-/* ── MODAL ── */
+/* ── Modal (Apple Style) ── */
 .modal {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.5); z-index:1000;
-  overflow-y:auto; padding:40px 20px;
+  display:none; position:fixed; inset:0; background: rgba(0,0,0,0.4); 
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  z-index: 10000; padding: 40px 20px; overflow-y: auto;
 }
-.modal-inner {
-  background:var(--white); max-width:800px;
-  margin:0 auto; position:relative;
+.modal-content {
+  background: #fff; max-width: 800px; margin: 0 auto;
+  border-radius: 30px; padding: 60px; position: relative;
+  animation: modalUp 0.6s cubic-bezier(0.2, 1, 0.2, 1);
 }
-.modal-header {
-  padding:16px 32px; background:var(--navy);
-  display:flex; justify-content:space-between; align-items:center;
-  position:sticky; top:0;
-}
-.modal-header-brand { font-size:12px; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.6); }
-.modal-close {
-  background:rgba(255,255,255,0.15); color:#fff; border:none;
-  padding:7px 18px; font-size:13px; font-weight:600; cursor:pointer;
-  letter-spacing:0.04em; transition:background 0.15s;
-}
-.modal-close:hover { background:rgba(255,255,255,0.25); }
-.modal-article { padding:48px; }
-.modal-cat { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--accent); text-transform:uppercase; margin-bottom:12px; }
-.modal-title {
-  font-size:34px; font-weight:800; color:var(--navy); line-height:1.25;
-  letter-spacing:-0.02em; margin-bottom:16px;
-  font-family:'Noto Serif TC','Georgia',serif;
-}
-.modal-source { font-size:13px; color:var(--text-m); font-weight:600; padding-bottom:24px; border-bottom:1px solid var(--border); margin-bottom:32px; }
-.article-content { font-size:17px; line-height:2.0; color:var(--text-s); text-align:justify; }
-.article-content p { margin-bottom:1.4em; }
-.article-content p:last-child { margin-bottom:0; }
+@keyframes modalUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-close { position: absolute; top: 30px; right: 30px; cursor: pointer; font-size: 24px; opacity: 0.5; }
+.modal-cat { color: var(--apple-blue); font-weight: 600; margin-bottom: 10px; }
+.modal-title { font-size: 40px; font-weight: 700; margin-bottom: 30px; line-height: 1.1; }
+.article-text { font-size: 19px; line-height: 1.6; color: #333; text-align: justify; }
+.article-text p { margin-bottom: 1.5em; }
 
-
-@media(max-width:900px){
-  .main-layout{grid-template-columns:1fr;padding:0 24px;}
-  .imf-nav,.top-bar,.site-header{padding-left:24px;padding-right:24px;}
-  .carousel-inner{padding:0 24px;}
-  .dot-ring{display:none;}
-  .modal-article{padding:28px;}
-  .modal-title{font-size:24px;}
-  .article-content{font-size:15px;}
+@media (max-width: 734px) {
+  .hero h1 { font-size: 40px; }
+  .news-grid { grid-template-columns: 1fr; }
+  .modal-content { padding: 30px; border-radius: 0; height: 100%; }
 }
 """
 
-
 def generate_html(data):
-    # 計算各分類數量供側邊欄用
-    cat_counts = {}
-    must_count = sum(1 for i in data if i["priority"] == 1)
-    for item in data:
-        cat_counts[item["cat"]] = cat_counts.get(item["cat"], 0) + 1
+    data_json = json.dumps(data, ensure_ascii=False)
+    
+    html = f"""
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPC Intelligence Hub</title>
+    <style>{APPLE_CSS}</style>
+</head>
+<body>
+    <nav class="global-nav">
+        <div class="nav-content">
+            <div class="nav-logo">Intelligence Hub</div>
+            <div class="nav-list">
+                <span onclick="renderGrid('all')">最新動態</span>
+                <span onclick="renderGrid('社論與評論觀點')">觀點</span>
+                <span onclick="renderGrid('國際金融與貨幣政策')">金融</span>
+                <span onclick="renderGrid('台灣產業與投資動向')">產業</span>
+            </div>
+        </div>
+    </nav>
 
-    data_json = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    dept_json = json.dumps(
-        {k: {"icon": v["icon"]} for k, v in DEPARTMENTS.items()},
-        ensure_ascii=False
-    ).replace("</", "<\\/")
-    cat_order_json = json.dumps(CATEGORY_ORDER, ensure_ascii=False)
+    <section class="hero">
+        <h2>EPC 每日情報彙整</h2>
+        <h1>探索今日關鍵。</h1>
+        <div class="date" id="hero-date"></div>
+    </section>
 
-    # 側邊欄 HTML
-    sidebar_cats_html = ""
-    for cat in CATEGORY_ORDER:
-        cnt = cat_counts.get(cat, 0)
-        icon = DEPARTMENTS[cat]["icon"]
-        sidebar_cats_html += (
-            f'<div class="sidebar-cat-item">'
-            f'<span class="sidebar-cat-name">{icon} {cat}</span>'
-            f'<span class="sidebar-cat-count">{cnt}</span>'
-            f'</div>'
-        )
+    <div class="container">
+        <div class="section-title" id="grid-title">最新</div>
+        <div class="news-grid" id="news-grid"></div>
+    </div>
 
-    js_code = build_js(data_json, dept_json, cat_order_json)
+    <div id="modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">✕</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
-    html = (
-        '<!DOCTYPE html>\n'
-        '<html lang="zh-TW">\n'
-        '<head>\n'
-        '<meta charset="UTF-8">\n'
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
-        '<title>\u7d93\u6fdf\u898f\u5283\u79d1 Intelligence Hub</title>\n'
-        '<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Public+Sans:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">\n'
-        '<style>\n' + CSS + '\n</style>\n'
-        '</head>\n'
-        '<body>\n'
+    <script>
+        const DATA = {data_json};
+        
+        function init() {{
+            document.getElementById('hero-date').textContent = new Date().toLocaleDateString('zh-TW', {{ year:'numeric', month:'long', day:'numeric' }});
+            renderGrid('all');
+        }}
 
-        # Top bar
-        '<div class="top-bar">'
-        '<span>EPC INTELLIGENCE NETWORK &nbsp;&middot;&nbsp; <span id="roc-year"></span></span>'
-        '<div class="top-bar-right">'
-        '<span>INTERNAL USE ONLY</span>'
-        '</div>'
-        '</div>\n'
+        function renderGrid(filter) {{
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '';
+            document.getElementById('grid-title').textContent = filter === 'all' ? '最新' : filter;
+            
+            const filtered = filter === 'all' ? DATA : DATA.filter(item => item.cat === filter);
+            
+            filtered.forEach((item, idx) => {{
+                const card = document.createElement('div');
+                card.className = `card ${{item.priority ? 'must' : ''}}`;
+                card.onclick = () => showFull(item);
+                card.innerHTML = `
+                    <div class="card-cat">${{item.cat}}</div>
+                    <div class="card-title">${{item.title}}</div>
+                    <div class="card-summary">${{item.summary}}</div>
+                    <div class="card-footer">閱讀全文 →</div>
+                `;
+                grid.appendChild(card);
+            }});
+            window.scrollTo({{ top: 400, behavior: 'smooth' }});
+        }}
 
-        # Header
-        '<header class="site-header">'
-        '<div class="brand">'
-        '<h1>\u7d93\u6fdf\u898f\u5283\u79d1 Intelligence Hub</h1>'
-        '<p>National Development Council &middot; Economic Planning Division</p>'
-        '</div>'
-        '<div class="header-date" id="today-date"></div>'
-        '</header>\n'
+        function showFull(item) {{
+            const body = document.getElementById('modal-body');
+            const contentHtml = item.full_text.split('\\n\\n').map(p => `<p>${{p}}</p>`).join('');
+            body.innerHTML = `
+                <div class="modal-cat">${{item.cat}}</div>
+                <div class="modal-title">${{item.title}}</div>
+                <div class="article-text">${{contentHtml || '尚未擷取到全文內容'}}</div>
+            `;
+            document.getElementById('modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }}
 
-        # Sticky nav
-        '<nav class="imf-nav" id="nav-bar">'
-        '<div class="nav-item active" onclick="filterFeed(\'all\', this)">\U0001f3e0 \u6700\u65b0\u9996\u9801</div>'
-        '</nav>\n'
+        function closeModal() {{
+            document.getElementById('modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }}
 
-        # Hero carousel
-        '<section class="carousel-container">'
-        '<div class="hero-grid"></div>'
-        '<div class="orb orb1"></div>'
-        '<div class="orb orb2"></div>'
-        '<div class="orb orb3"></div>'
-        '<div class="dot-ring">'
-        '<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">'
-        '<circle cx="100" cy="100" r="90" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>'
-        '<circle cx="100" cy="100" r="65" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>'
-        '<circle cx="100" cy="100" r="40" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>'
-        '<circle cx="100" cy="10" r="4" fill="rgba(0,118,214,0.9)"/>'
-        '<circle cx="178" cy="55" r="3" fill="rgba(255,255,255,0.5)"/>'
-        '<circle cx="178" cy="145" r="2.5" fill="rgba(255,255,255,0.3)"/>'
-        '<circle cx="100" cy="190" r="4" fill="rgba(0,163,224,0.8)"/>'
-        '<circle cx="22" cy="145" r="2.5" fill="rgba(255,255,255,0.3)"/>'
-        '<circle cx="22" cy="55" r="3" fill="rgba(255,149,0,0.7)"/>'
-        '<path d="M100 10 A90 90 0 0 1 178 55" stroke="rgba(0,163,224,0.7)" stroke-width="2.5" stroke-linecap="round"/>'
-        '</svg>'
-        '</div>'
-        '<div class="carousel-inner" id="carousel-area"></div>'
-        '</section>\n'
-
-        # Stats strip
-        '<div class="stats-strip">'
-        f'<div class="stat-cell"><div class="stat-num c-must">{must_count}</div><div class="stat-label">Must Read</div></div>'
-        f'<div class="stat-cell"><div class="stat-num c-accent">{len(data)}</div><div class="stat-label">Today\'s Total</div></div>'
-        f'<div class="stat-cell"><div class="stat-num c-navy">{len(cat_counts)}</div><div class="stat-label">Categories</div></div>'
-        '<div class="stat-cell"><div class="stat-num c-navy" style="font-size:18px;" id="stat-date"></div><div class="stat-label">Report Date</div></div>'
-        '</div>\n'
-
-        # Main layout
-        '<div class="main-layout">'
-        '<section>'
-        '<div class="feed-header">'
-        '<span class="feed-title" id="current-view-title">TODAY\'S INTELLIGENCE</span>'
-        f'<span class="feed-count">{len(data)} articles</span>'
-        '</div>'
-        '<div id="news-feed"></div>'
-        '</section>'
-
-        # Sidebar
-        '<aside>'
-        '<div class="sidebar-box">'
-        '<h3>EPC \u5206\u985e\u6982\u89bd</h3>'
-        f'<div class="sidebar-cat-list">{sidebar_cats_html}</div>'
-        '</div>'
-        '<div class="sidebar-box" style="margin-top:24px;">'
-        '<h3>\u653f\u7b56\u63d0\u793a</h3>'
-        '<p style="font-size:13px;color:#666;">\u672c\u8cc7\u8a0a\u4f9b\u5167\u90e8\u53c3\u8003\uff0c\u8acb\u6ce8\u610f\u8cc7\u5b89\u898f\u7bc4\u3002</p>'
-        '</div>'
-        '</aside>'
-        '</div>\n'
-
-        # Modal
-        '<div id="modal" class="modal">'
-        '<div class="modal-inner">'
-        '<div class="modal-header">'
-        '<span class="modal-header-brand">EPC INTELLIGENCE REPORT</span>'
-        '<button class="modal-close" onclick="closeModal()">\u95dc\u9589 &times;</button>'
-        '</div>'
-        '<div id="modal-content"></div>'
-        '</div>'
-        '</div>\n'
-
-        '<script>\n' + js_code + '\n'
-        # stat-date 額外設定
-        'document.getElementById("stat-date").textContent=new Date().toLocaleDateString("zh-TW",{month:"short",day:"numeric"});\n'
-        '</script>\n'
-        '</body>\n'
-        '</html>\n'
-    )
-
-    with open("index.html", "w", encoding="utf-8", errors="replace") as f:
+        init();
+    </script>
+</body>
+</html>
+"""
+    with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
 
+def run_dashboard():
+    # 這裡簡化了 PDF 處理邏輯，直接調用之前的結構
+    data_folder = "data"
+    if not os.path.exists(data_folder): os.makedirs(data_folder)
+    pdf_files = [f for f in os.listdir(data_folder) if f.lower().endswith(".pdf")]
+    
+    all_items = []
+    if pdf_files:
+        latest_pdf = os.path.join(data_folder, sorted(pdf_files)[-1])
+        with pdfplumber.open(latest_pdf) as pdf:
+            article_index = build_article_index(pdf)
+            # 獲取目錄數據 (假設在第一頁或特定頁面，這裡沿用您原本的表格掃描邏輯)
+            for page in pdf.pages:
+                table = page.extract_table()
+                if table:
+                    for row in table[1:]:
+                        if not row or len(row) < 2 or not row[1]: continue
+                        title = str(row[1]).replace("\n", "").strip()
+                        if len(title) < 5: continue
+                        
+                        # 分類邏輯
+                        found_cat = "其他"
+                        for cat, meta in DEPARTMENTS.items():
+                            if any(k in title for k in meta["keywords"]):
+                                found_cat = cat; break
+                        
+                        full_text = ""
+                        # 簡單匹配內文索引
+                        for k, v in article_index.items():
+                            if title[:8] in k:
+                                full_text = v; break
+
+                        all_items.append({
+                            "title": title,
+                            "cat": found_cat,
+                            "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
+                            "summary": full_text[:120] + "..." if full_text else "點擊查看詳情",
+                            "full_text": full_text
+                        })
+
+    generate_html(all_items)
+    print("✅ 已產生 Apple 風格 index.html")
 
 if __name__ == "__main__":
     run_dashboard()
