@@ -4,239 +4,326 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: 'PingFang TC', sans-serif; background: #020617; color: #f8fafc; margin: 0; padding: 20px; overflow-x: hidden; }
-        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; height: 90vh; }
-        .header { grid-column: span 4; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #1e293b; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; }
-        .column { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        .col-header { background: #1e3a8a; padding: 10px; font-weight: bold; text-align: center; font-size: 16px; border-bottom: 2px solid #38bdf8; }
-        .news-list { overflow-y: auto; flex-grow: 1; padding: 10px; }
-        .news-card { background: #1e293b; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 13px; cursor: pointer; border-left: 4px solid #334155; }
-        .news-card:hover { border-left-color: #38bdf8; background: #334155; }
-        .news-card b { display: block; margin-bottom: 5px; color: #38bdf8; }
-        .summary { font-size: 12px; color: #94a3b8; margin-top: 5px; display: none; background: #020617; padding: 5px; border-radius: 4px; }
-        .source { float: right; font-size: 10px; color: #64748b; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-    </style>
-    <script>
-        function toggle(e) {
-            const s = e.querySelector('.summary');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        :root {
+            --bg-metal: #1a1a1a;
+            --panel-bg: #262626;
+            --accent-yellow: #f59e0b;
+            --accent-orange: #ea580c;
+            --border-gray: #404040;
+            --text-light: #e5e5e5;
+            --text-dim: #a3a3a3;
         }
-    </script>
+        body {
+            background-color: var(--bg-metal);
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px; /* 工業風格網格背景 */
+            color: var(--text-light);
+            font-family: 'Consolas', 'Microsoft JhengHei', monospace;
+            margin: 0; padding: 15px; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            border: 2px solid var(--border-gray);
+            background: #111; padding: 10px 25px; margin-bottom: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .header h1 { margin: 0; font-size: 24px; color: var(--accent-yellow); letter-spacing: 2px; }
+        
+        .dashboard {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; height: 82vh;
+        }
+        .column {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-gray);
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+        .column::before { /* 工業螺栓裝飾 */
+            content: '●'; position: absolute; top: 5px; right: 5px; color: #444; font-size: 10px;
+        }
+        .col-header {
+            background: #333; padding: 12px; font-weight: bold; text-align: center;
+            border-bottom: 3px solid var(--accent-yellow); color: var(--accent-yellow);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .news-list { overflow-y: auto; flex-grow: 1; padding: 10px; }
+        
+        .news-card {
+            background: #1a1a1a; border: 1px solid var(--border-gray);
+            padding: 12px; margin-bottom: 12px; border-left: 5px solid #555;
+            transition: 0.2s;
+        }
+        .news-card:hover { border-left-color: var(--accent-orange); background: #222; }
+        
+        .news-title { font-size: 14px; font-weight: bold; line-height: 1.5; margin-bottom: 8px; color: #fff; }
+        
+        .analysis {
+            background: #111; padding: 10px; border: 1px dashed #444;
+            font-size: 12px; color: var(--accent-yellow); outline: none; margin-top: 8px;
+        }
+        .source-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .source-tag {
+            font-size: 10px; color: var(--text-dim); background: #000;
+            padding: 2px 6px; border: 1px solid #333;
+        }
+        .status-dot { display: inline-block; width: 8px; height: 8px; background: var(--accent-orange); border-radius: 50%; margin-right: 8px; animation: blink 2s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #444; }
+    </style>
 </head>
 <body>
     <div class="header">
-        <h2 style="margin:0;">📊 經濟規劃科戰情室 <small style="font-size:12px; color:#94a3b8;">(1150427 訊號監控)</small></h2>
-        <div style="font-size:14px; color:#38bdf8;">狀態：即時更新中</div>
+        <h1><span class="status-dot"></span>NDCP : NEWS INTELLIGENCE SYSTEM</h1>
+        <div style="font-size: 12px; color: var(--text-dim);">SYSTEM_DATE: 1150427 // DEPT: ECONOMIC_PLANNING</div>
     </div>
     <div class="dashboard">
 
         <div class="column">
-            <div class="col-header">🔥 風險預警 (17)</div>
+            <div class="col-header">⚠️ 風險監控 (Risk) [16]</div>
             <div class="news-list">
         
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A01 要聞</span>
-                    <b>白宮記協晚宴 驚傳槍響</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">白宮記協晚宴 驚傳槍響</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A01 要聞</span>
-                    <b>取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">取消美伊談判行程 強調未必代表會重啟戰爭 川普：已收到伊朗新提案</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">自由時報 A01 焦點新聞</span>
-                    <b>川普出席 白宮記協晚宴傳槍響</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">川普出席 白宮記協晚宴傳槍響</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A01 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A01 要聞</span>
-                    <b>孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">孤狼槍手闖安檢 川普記協晚宴遇襲 開火後被捕 1特勤人員中彈</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">中國時報 A01 要聞</span>
-                    <b>又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">又遇槍擊案 川普急撤報平安 白宮記協晚宴驚魂 31歲教師闖安檢站開火遭逮</div>
+                    <div class="source-container"><span class="source-tag">中國時報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A02 火線焦點</span>
-                    <b>川普取消特使：伊朗想談可打電話</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">川普取消特使：伊朗想談可打電話</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A02 火線焦點</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A10 國際</span>
-                    <b>和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">和談未明 川普：伊朗不擁核才能協議 美代表團取消赴巴基斯坦 伊朗外長又重返巴國：不在施壓下談判</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A10 國際</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A10 國際</span>
-                    <b>美伊各認占上風 談判卡關</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">美伊各認占上風 談判卡關</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A10 國際</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">中國時報 AA02 焦點新聞</span>
-                    <b>川普取消特使赴巴 美伊談判停擺</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">川普取消特使赴巴 美伊談判停擺</div>
+                    <div class="source-container"><span class="source-tag">中國時報 AA02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">🚨 [系統性風險] 地緣政治變數。影響指標：調高不確定性溢價權重。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">中國時報 AA02 焦點新聞</span>
-                    <b>伊朗：荷莫茲不恢復戰前狀態</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">伊朗：荷莫茲不恢復戰前狀態</div>
+                    <div class="source-container"><span class="source-tag">中國時報 AA02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A02 火線焦點</span>
-                    <b>全球超級央行周 利率料全數按兵不動</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">全球超級央行周 利率料全數按兵不動</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A02 火線焦點</span></div>
+                    <div class="analysis" contenteditable="true">⚖️ [成本監控] 供給端壓力仍存。影響指標：CPI 通膨路徑需重新校準。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A02 火線焦點</span>
-                    <b>美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">美關鍵參議員不再阻撓 華許接掌Fed最大障礙沒了</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A02 火線焦點</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A02 話題</span>
-                    <b>Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">Fed本周開會 將以「鷹眼」緊盯通膨訊號 鮑爾可能暗示降息門檻高</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A02 話題</span></div>
+                    <div class="analysis" contenteditable="true">⚖️ [成本監控] 供給端壓力仍存。影響指標：CPI 通膨路徑需重新校準。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">自由時報 A02 焦點新聞</span>
-                    <b>超級央行週 美英歐日料利率不變</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">超級央行週 美英歐日料利率不變</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">⚖️ [成本監控] 供給端壓力仍存。影響指標：CPI 通膨路徑需重新校準。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A06 話題</span>
-                    <b>緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">緊盯通膨 Fed年底前降息 門檻很高 美國及G7央行本周舉行決策會議 預料利率不變</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A06 話題</span></div>
+                    <div class="analysis" contenteditable="true">⚖️ [成本監控] 供給端壓力仍存。影響指標：CPI 通膨路徑需重新校準。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A09 全球瞭望</span>
-                    <b>美伊戰事未解 衝擊AI發展前景</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
-                </div>
-            
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">中國時報 A05 財經綜合</span>
-                    <b>科技巨頭財報周登場 牽動市場波動 超級央行周 鮑爾最後談話成焦點</b>
-                    <div class="summary">💡 判讀：連動避險情緒，需觀察油價及下半年通膨路徑。</div>
+                <div class="news-card">
+                    <div class="news-title">美伊戰事未解 衝擊AI發展前景</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A09 全球瞭望</span></div>
+                    <div class="analysis" contenteditable="true">🛠️ [生產力映射] AI 供應鏈擴產動能強勁。影響指標：民間投資 (I) 權重調升。</div>
                 </div>
             </div></div>
         <div class="column">
-            <div class="col-header">🌏 總體經濟 (2)</div>
+            <div class="col-header">📊 總體數據 (Macro) [4]</div>
             <div class="news-list">
         
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">自由時報 A09 財經週報</span>
-                    <b>＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長</b>
-                    <div class="summary">💡 判讀：觀測外需動能，為年度經濟成長率之關鍵指標。</div>
+                <div class="news-card">
+                    <div class="news-title">美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭曉，投資人關注資本支出是否轉化為獲利成長</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">🛠️ [生產力映射] AI 供應鏈擴產動能強勁。影響指標：民間投資 (I) 權重調升。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A11 兩岸</span>
-                    <b>動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成</b>
-                    <div class="summary">💡 判讀：觀測外需動能，為年度經濟成長率之關鍵指標。</div>
+                <div class="news-card">
+                    <div class="news-title">＜財經週報-本週熱點＞ 景氣燈號有望連4紅 首季拚雙位數成長</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A09 財經週報</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">公股銀放款中小企業 衝高 金額突破5.8兆元 年增2.4%兆豐、一銀成長最多 彰銀也揚升4.25%</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A10 金融</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">動能改善 陸GDP增長 外資機構上調至4.9% 全球地緣政治風險上升之際 看好人民幣資產由「可選配置」轉向重要組成</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A11 兩岸</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             </div></div>
         <div class="column">
-            <div class="col-header">💻 產業投資 (5)</div>
+            <div class="col-header">⚙️ 產業動能 (I) [5]</div>
             <div class="news-list">
         
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A01 要聞</span>
-                    <b>美超級財報周 點火AI台鏈 四大CSP及蘋果季報將揭曉，投資人關注資本支出是否轉化為獲利成長</b>
-                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                <div class="news-card">
+                    <div class="news-title">創業之星選秀 快來報名 創投產業推手跨境跨域整合實力，催動創新生態系升級 開發資本助新創搶AI先機</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">🛠️ [生產力映射] AI 供應鏈擴產動能強勁。影響指標：民間投資 (I) 權重調升。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A01 要聞</span>
-                    <b>創業之星選秀 快來報名 創投產業推手跨境跨域整合實力，催動創新生態系升級 開發資本助新創搶AI先機</b>
-                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                <div class="news-card">
+                    <div class="news-title">國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A06 綜合要聞</span></div>
+                    <div class="analysis" contenteditable="true">🛠️ [生產力映射] AI 供應鏈擴產動能強勁。影響指標：民間投資 (I) 權重調升。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A06 綜合要聞</span>
-                    <b>國科會揪經部 拚AI中央廚房 再次祭出徵案，業者每年每案最高補貼3,000萬元、大專院校則為500萬元</b>
-                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                <div class="news-card">
+                    <div class="news-title">AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A06 綜合要聞</span></div>
+                    <div class="analysis" contenteditable="true">🛠️ [生產力映射] AI 供應鏈擴產動能強勁。影響指標：民間投資 (I) 權重調升。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A06 綜合要聞</span>
-                    <b>AI中央廚房補助計畫地方美食IP化策略 讓特色料理變成數位資產</b>
-                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                <div class="news-card">
+                    <div class="news-title">台積先進製程 神速擴產 法人推估今年底2、3奈米月產能上看28萬片 遠超預期 可望憑藉技術優勢「贏者全拿」</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A03 話題</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">中國時報 A05 財經綜合</span>
-                    <b>金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪</b>
-                    <div class="summary">💡 判讀：民間投資先行指標，決定 Q3 投資達成率。</div>
+                <div class="news-card">
+                    <div class="news-title">金管會祭台積電條款 台股今拚4萬點 法人：慎防震盪</div>
+                    <div class="source-container"><span class="source-tag">中國時報 A05 財經綜合</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             </div></div>
         <div class="column">
-            <div class="col-header">🏛️ 政策/本會 (8)</div>
+            <div class="col-header">🏢 政策規畫 (G) [13]</div>
             <div class="news-list">
         
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">工商時報 A01 要聞</span>
-                    <b>台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～6GW設置容量</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">台中兩岸直航I點航道開放開發 離岸風電3-4期 釋4～6GW設置容量</div>
+                    <div class="source-container"><span class="source-tag">工商時報 A01 要聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A05 焦點</span>
-                    <b>經長挺高雄設算力園區</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">經長挺高雄設算力園區</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A05 焦點</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A13 經營管理</span>
-                    <b>淨零承諾 企業的能源硬仗</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">淨零承諾 企業的能源硬仗</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A13 經營管理</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">自由時報 A02 焦點新聞</span>
-                    <b>台日產業政策鏈結 聚焦5領域合作</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">台灣國是會議》司徒文呼籲立院通過增加國防預算</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A03 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">經濟日報 A04 焦點</span>
-                    <b>數位ｘ淨零的綠色整合方案</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">藍又要普發現金？》綠：擋預算又要發錢 讓國家失能</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A04 政治新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 B01 健康</span>
-                    <b>當政策只是回應壓力 難解醫護流失</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">司徒文促台增國防預算 吳志中籲結盟美日嚇阻</div>
+                    <div class="source-container"><span class="source-tag">中國時報 A02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A13 北部生活圈</span>
-                    <b>新四通不是政策想像 是逼近的現實</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">無人機納國防特別預算 嚇阻力最快速</div>
+                    <div class="source-container"><span class="source-tag">中國時報 A03 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
             
-                <div class="news-card" onclick="toggle(this)">
-                    <span class="source">聯合報 A15 民意</span>
-                    <b>組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴的赴陸禁團令</b>
-                    <div class="summary">💡 判讀：涉及政策推動，注意中長期發展之引導效益。</div>
+                <div class="news-card">
+                    <div class="news-title">台日產業政策鏈結 聚焦5領域合作</div>
+                    <div class="source-container"><span class="source-tag">自由時報 A02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
                 </div>
-            </div></div></div></body></html>
+            
+                <div class="news-card">
+                    <div class="news-title">數位ｘ淨零的綠色整合方案</div>
+                    <div class="source-container"><span class="source-tag">經濟日報 A04 焦點</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">當政策只是回應壓力 難解醫護流失</div>
+                    <div class="source-container"><span class="source-tag">聯合報 B01 健康</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">新四通不是政策想像 是逼近的現實</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A13 北部生活圈</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">組團地下化反添風險 政府應務實檢討對陸政策 掩耳盜鈴的赴陸禁團令</div>
+                    <div class="source-container"><span class="source-tag">聯合報 A15 民意</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            
+                <div class="news-card">
+                    <div class="news-title">軍購今3度協商 8千億是關鍵密碼 立院可能挑燈夜戰拚送院會表決 在野準備加碼 設發價書才編預算但書</div>
+                    <div class="source-container"><span class="source-tag">中國時報 A02 焦點新聞</span></div>
+                    <div class="analysis" contenteditable="true">📝 [一般監測] 經濟訊號穩定，建議維持現行預測模型參數。</div>
+                </div>
+            </div></div></div>
+    <div style="text-align: right; font-size: 10px; color: #444; margin-top: 10px;">INDUSTRIAL MONITORING INTERFACE v4.0 // END_OF_LINE</div>
+</body></html>
