@@ -62,15 +62,8 @@ def is_frontpage(source):
     return "A01" in source or "AA01" in source
 
 def get_priority(title, source, found_cat):
-    """
-    優先級判定：
-    - A01 頭版 且 符合分類 → 必看 (priority=1)
-    - 標題含 MUST_READ_KEYS → 必看
-    - 其他 → 一般 (priority=0)
-    """
+    """必看 = A01 頭版 且 符合分類，其他一律為一般"""
     if is_frontpage(source) and found_cat is not None:
-        return 1
-    if any(k in title for k in MUST_READ_KEYS):
         return 1
     return 0
 
