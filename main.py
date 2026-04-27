@@ -79,43 +79,62 @@ def get_lead(title, cat):
 
 def build_article_index(pdf):
     """
-    掃描 PDF 所有頁面，找出內文頁（包含「來源:」行），
-    回傳 {去空格標題: 正文內容} 的字典。
+    掃描 PDF 所有頁面，建立「去空格標題 → 完整正文」索引。
+
+    通式判斷邏輯（不依賴固定字串，適用任何格式的日報 PDF）：
+      'start' — 頁面含「來源:」行 → 內文首頁
+      'toc'   — 頁面含表格 → 目錄頁
+      'sep'   — 非首頁且去空格文字 < 30 字 → 分隔/空白頁
+      'cont'  — 其餘 → 內文續頁，合併到前一篇
+
+    跨頁新聞：cont 頁的內容直接接續到前一篇 start 的正文。
+    連續多頁的 cont 也支援。
     """
-    index = {}
+    results = []
     for page in pdf.pages:
         text = page.extract_text() or ""
         lines = [l.strip() for l in text.split("\n") if l.strip()]
-        if not lines:
-            continue
+        has_source = any(l.startswith("來源:") for l in lines[:8])
+        has_table = page.extract_table() is not None
+        char_count = len("".join(lines))
 
-        # 找「來源:」行的位置
-        src_idx = None
-        for j, line in enumerate(lines):
-            if line.startswith("來源:"):
-                src_idx = j
-                break
-        if src_idx is None:
-            continue
+        if has_source:
+            cat = "start"
+        elif has_table:
+            cat = "toc"
+        elif char_count < 30:   # 分隔頁文字極少（如「回到目錄」+頁碼）
+            cat = "sep"
+        else:
+            cat = "cont"
+        results.append((cat, lines))
 
-        # 來源行之前所有行合併為標題（處理跨行標題）
-        title_raw = "".join(lines[:src_idx])
-        title_key = title_raw.replace(" ", "")  # 去空格作為 key
+    index = {}
+    last_key = None
 
-        # 來源行之後為正文（跳過「報導】」等殘留行）
-        body_lines = []
-        for line in lines[src_idx + 1:]:
-            # 過濾殘留的作者行尾（如「報導】」）
-            if line in ["報導】", "報導】。", "綜合報導】"]:
+    for cat, lines in results:
+        if cat == "start":
+            src_idx = next((j for j, l in enumerate(lines) if l.startswith("來源:")), None)
+            if src_idx is None:
+                last_key = None
                 continue
-            body_lines.append(line)
+            title_key = "".join(lines[:src_idx]).replace(" ", "")
+            title_key = title_key.encode("utf-8", errors="replace").decode("utf-8")
+            body_lines = [l for l in lines[src_idx + 1:] if not l.strip().isdigit()]
+            body = "\n".join(body_lines).encode("utf-8", errors="replace").decode("utf-8")
+            if title_key:
+                index[title_key] = body
+                last_key = title_key
 
-        body = "\n".join(body_lines)
-        # 清除 PDF 可能產生的 surrogate 字元（無效 Unicode）
-        body = body.encode("utf-8", errors="replace").decode("utf-8")
-        title_key = title_key.encode("utf-8", errors="replace").decode("utf-8")
-        if title_key and body:
-            index[title_key] = body
+        elif cat == "cont" and last_key:
+            extra_lines = [l for l in lines if not l.strip().isdigit()]
+            extra = "\n".join(extra_lines).encode("utf-8", errors="replace").decode("utf-8")
+            if extra:
+                index[last_key] = index[last_key] + "\n" + extra
+            # last_key 維持，允許連續多頁續頁
+
+        else:
+            # sep / toc：重置，不合併
+            last_key = None
 
     return index
 
