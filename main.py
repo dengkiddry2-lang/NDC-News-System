@@ -386,6 +386,7 @@ def build_js(data_json, dept_json, cat_order_json):
         "",
         "function showFull(idx){",
         "  const item=DATA[idx];",
+        "  const contentHtml=item.full_text?esc(item.full_text):'尚未擷取到內文內容';",
         "  document.getElementById('modal-content').innerHTML=",
         "    '<div class=\"modal-article\">'+",
         "      '<div class=\"modal-cat\">'+esc(item.cat)+'</div>'+",
