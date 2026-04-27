@@ -6,27 +6,29 @@ import re
 # ── 1. 分類定義 ───────────────────────────────────────────────────
 DEPARTMENTS = {
     "台灣政府與政策訊息": {
-        "icon": "🏛️", "keywords": ["總統府", "行政院", "國發會", "經濟部", "財政部", "金管會", "國科會", "央行", "政策", "計畫", "預算", "法案", "施政"]
+        "icon": "🏛️", "label": "POLICY", "keywords": ["總統府", "行政院", "國發會", "經濟部", "財政部", "政策", "計畫", "預算", "法案"]
     },
     "台灣總體經濟與人口數據": {
-        "icon": "📊", "keywords": ["主計", "GDP", "CPI", "物價", "通膨", "失業率", "景氣", "出口", "貿易", "人口", "少子化"]
+        "icon": "📊", "label": "DATA", "keywords": ["主計", "GDP", "CPI", "物價", "通膨", "失業率", "景氣", "出口", "人口"]
     },
     "台灣產業與投資動向": {
-        "icon": "🏭", "keywords": ["AI", "半導體", "台積電", "聯發科", "鴻海", "資本支出", "投資", "算力", "供應鏈", "能源"]
+        "icon": "🏭", "label": "INDUSTRY", "keywords": ["AI", "半導體", "台積電", "聯發科", "資本支出", "投資", "供應鏈"]
     },
     "國際經濟與金融情勢": {
-        "icon": "🌐", "keywords": ["Fed", "FOMC", "ECB", "聯準會", "利率", "升息", "美元", "匯率", "美中", "貿易戰", "地緣", "戰爭"]
+        "icon": "🌐", "label": "GLOBAL", "keywords": ["Fed", "FOMC", "聯準會", "利率", "升息", "美元", "匯率", "地緣", "戰爭"]
     },
     "國際機構與智庫報告": {
-        "icon": "📘", "keywords": ["IMF", "OECD", "世界銀行", "World Bank", "WTO", "智庫", "Brookings", "PIIE"]
+        "icon": "📘", "label": "RESEARCH", "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "Brookings", "PIIE"]
     },
     "社論與評論觀點": {
-        "icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家"]
+        "icon": "📝", "label": "CAPACITY", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論"]
     },
     "其他重要國內外事件": {
-        "icon": "🗞️", "keywords": []
+        "icon": "🗞️", "label": "NEWS", "keywords": []
     }
 }
+
+MUST_READ_KEYS = ["Fed", "國發會", "主計", "GDP", "利率", "槍響", "衝突"]
 
 # ── 2. 文字清洗與段落重組 ──────────────────────────────────────────
 def clean_text_blocks(text_list):
@@ -106,59 +108,61 @@ def run_dashboard():
                 content = article_index.get(title.replace(" ", ""), "")
                 all_items.append({
                     "title": title,
-                    "source": str(row[2]).replace("\n", " ") if len(row)>2 else "智庫",
+                    "source": str(row[2]).replace("\n", " ") if len(row)>2 else "EPC REPORT",
                     "cat": found_cat,
-                    "icon": DEPARTMENTS[found_cat]["icon"],
-                    "summary": content[:150].replace("\n", "") + "...",
+                    "label": DEPARTMENTS[found_cat]["label"],
+                    "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
+                    "summary": content[:160].replace("\n", "") + "...",
                     "full_text": content
                 })
-
     generate_html(all_items)
 
-# ── 4. 日經風格 HTML/JS (首頁看板架構) ────────────────────────────────
+# ── 4. IMF 風格 HTML ───────────────────────────────────────────────
 
 def generate_html(data):
     data_json = json.dumps(data, ensure_ascii=False)
     dept_info = json.dumps(DEPARTMENTS, ensure_ascii=False)
     
     css = """
-    :root { --nikkei-red: #be0000; --nikkei-black: #1a1a1a; --nikkei-border: #dcdcdc; }
-    body { font-family: "Noto Serif TC", serif; background: #fff; color: var(--nikkei-black); margin: 0; padding: 0; }
-    .header { border-top: 5px solid var(--nikkei-red); padding: 20px 0; text-align: center; border-bottom: 1px solid var(--nikkei-border); cursor: pointer; }
-    .brand { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--nikkei-red); }
+    :root { --imf-blue: #004b87; --imf-light-blue: #0076d6; --imf-gray: #f4f4f4; --imf-dark: #333; }
+    body { font-family: 'Public Sans', -apple-system, sans-serif; margin: 0; background: #fff; color: var(--imf-dark); }
     
-    /* 導航列 */
-    .nav { display: flex; justify-content: center; gap: 15px; padding: 12px 0; border-bottom: 3px double var(--nikkei-border); position: sticky; top: 0; background: #fff; z-index: 100; }
-    .nav-item { font-weight: 600; cursor: pointer; font-size: 14px; padding: 5px 10px; transition: 0.2s; }
-    .nav-item:hover { color: var(--nikkei-red); }
+    /* Top Bar */
+    .top-nav { background: #000; color: #fff; padding: 10px 50px; font-size: 11px; letter-spacing: 1px; display: flex; justify-content: space-between; }
+    
+    /* Main Header */
+    .header { background: #fff; padding: 25px 50px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+    .logo { color: var(--imf-blue); font-size: 24px; font-weight: 800; text-decoration: none; border-left: 4px solid var(--imf-blue); padding-left: 15px; }
+    
+    /* Navigation */
+    .nav { background: var(--imf-blue); display: flex; padding: 0 50px; sticky: top; }
+    .nav-item { color: #fff; padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .nav-item:hover { background: var(--imf-light-blue); }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
-    
-    /* 看板網格 */
-    .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-    .board-section { border-top: 2px solid #000; padding-top: 15px; margin-bottom: 20px; }
-    .board-title { color: var(--nikkei-red); font-size: 20px; font-weight: 900; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .board-title:hover { opacity: 0.7; }
-    .board-title i { font-style: normal; font-size: 12px; color: #999; font-weight: 400; }
-    
-    .news-link { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .news-link:hover { color: var(--nikkei-red); }
-    .news-link .source { font-size: 12px; color: #999; font-weight: 400; display: block; margin-top: 4px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 
-    /* 分類列表頁 */
-    .list-view { display: none; }
-    .list-item { border-bottom: 1px solid var(--nikkei-border); padding: 20px 0; }
-    .list-item h3 { margin: 0 0 10px 0; font-size: 24px; cursor: pointer; }
-    .list-item .summary { color: #555; font-size: 16px; line-height: 1.6; }
+    /* IMF Style Featured Section */
+    .featured-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 50px; }
+    .hero-card { background: var(--imf-blue); color: #fff; padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
+    .hero-card .label { font-size: 12px; font-weight: 700; color: #ffca28; margin-bottom: 10px; }
+    .hero-card h2 { font-size: 36px; margin: 0; line-height: 1.1; font-family: 'Noto Serif TC', serif; }
 
-    /* 全文 Modal */
-    .modal { display: none; position: fixed; inset: 0; background: #fff; z-index: 9999; overflow-y: auto; padding: 50px 20px; }
-    .modal-content { max-width: 780px; margin: 0 auto; }
-    .full-text { font-size: 19px; line-height: 2.1; text-align: justify; white-space: pre-line; word-break: break-word; }
-    .close-btn { position: fixed; top: 20px; right: 40px; font-size: 40px; cursor: pointer; color: var(--nikkei-red); }
+    /* News Sections */
+    .section-title { font-size: 24px; font-weight: 800; border-bottom: 2px solid var(--imf-blue); padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; }
     
-    .breadcrumb { margin-bottom: 20px; font-size: 14px; color: var(--nikkei-gray); }
-    .breadcrumb span { cursor: pointer; color: var(--nikkei-red); font-weight: bold; }
+    .imf-list-item { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid #eee; transition: 0.2s; }
+    .imf-list-item:hover { background: #fcfcfc; }
+    .imf-list-item .date { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; }
+    .imf-list-item .content-type { font-size: 11px; font-weight: 800; color: var(--imf-blue); margin-bottom: 5px; }
+    .imf-list-item h3 { margin: 0 0 10px 0; font-size: 20px; color: var(--imf-blue); cursor: pointer; font-family: 'Noto Serif TC', serif; }
+    .imf-list-item .summary { font-size: 15px; color: #666; line-height: 1.5; }
+
+    /* Modal IMF Report Style */
+    .modal { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; overflow-y: auto; }
+    .modal-nav { background: #f8f8f8; padding: 15px 50px; border-bottom: 1px solid #ddd; position: sticky; top: 0; }
+    .modal-content { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+    .full-text { font-size: 18px; line-height: 1.8; text-align: justify; color: #333; white-space: pre-line; font-family: 'Public Sans', sans-serif; }
+    .full-text h1 { color: var(--imf-blue); font-size: 42px; margin-bottom: 20px; }
     """
 
     html = f"""
@@ -166,27 +170,31 @@ def generate_html(data):
     <html lang="zh-TW">
     <head>
         <meta charset="UTF-8">
-        <title>經濟規劃科 · 每日新聞門戶</title>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+        <title>EPC Intelligence - IMF Style</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Public+Sans:wght@400;700;800&display=swap" rel="stylesheet">
         <style>{css}</style>
     </head>
     <body>
-        <header class="header" onclick="showHome()">
-            <div class="brand">經濟規劃科 · 每日新聞</div>
+        <div class="top-nav">
+            <div>NATIONAL DEVELOPMENT COUNCIL · ECONOMIC PLANNING</div>
+            <div>INTERNAL USE ONLY</div>
+        </div>
+        <header class="header">
+            <a href="#" class="logo" onclick="location.reload()">EPC Intelligence</a>
+            <div id="header-date" style="font-weight:700; font-size:14px;"></div>
         </header>
         <nav class="nav" id="nav-bar"></nav>
 
         <div class="container">
-            <div id="home-view" class="board-grid"></div>
-
-            <div id="list-view" class="list-view">
-                <div class="breadcrumb">您在：<span onclick="showHome()">首頁</span> / <b id="current-cat-name"></b></div>
-                <div id="list-container"></div>
+            <div id="home-view">
+                <div class="featured-grid" id="featured-area"></div>
+                <div class="section-title">Latest Updates <span style="font-size:14px; font-weight:400; color:#666;">分類動態</span></div>
+                <div id="imf-list"></div>
             </div>
         </div>
 
         <div id="modal" class="modal">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-nav"><span style="cursor:pointer; font-weight:700; color:var(--imf-blue);" onclick="closeModal()">❮ BACK TO HOME</span></div>
             <div class="modal-content" id="modal-body"></div>
         </div>
 
@@ -195,79 +203,66 @@ def generate_html(data):
             const DEPTS = {dept_info};
 
             function init() {{
+                const d = new Date();
+                document.getElementById('header-date').textContent = d.toLocaleDateString('zh-TW', {{ year:'numeric', month:'long', day:'numeric' }});
+                
                 const nav = document.getElementById('nav-bar');
                 Object.keys(DEPTS).forEach(cat => {{
                     const div = document.createElement('div');
                     div.className = 'nav-item';
-                    div.textContent = cat.replace('台灣', '').split('與')[0];
-                    div.onclick = () => showCategory(cat);
+                    div.textContent = DEPTS[cat].label;
+                    div.onclick = () => renderList(cat);
                     nav.appendChild(div);
                 }});
-                showHome();
+                
+                renderHome();
             }}
 
-            // 顯示首頁聚合看板
-            function showHome() {{
-                document.getElementById('home-view').style.display = 'grid';
-                document.getElementById('list-view').style.display = 'none';
-                const container = document.getElementById('home-view');
-                container.innerHTML = '';
+            function renderHome() {{
+                const featuredArea = document.getElementById('featured-area');
+                featuredArea.innerHTML = '';
+                const mustRead = DATA.filter(i => i.priority === 1).slice(0, 3);
+                
+                if(mustRead[0]) {{
+                    const hero = document.createElement('div');
+                    hero.className = 'hero-card';
+                    hero.onclick = () => showFull(DATA.indexOf(mustRead[0]));
+                    hero.innerHTML = `<div class="label">FEATURED REPORT</div><h2>${{mustRead[0].title}}</h2>`;
+                    featuredArea.appendChild(hero);
+                }}
 
-                Object.keys(DEPTS).forEach(cat => {{
-                    const items = DATA.filter(i => i.cat === cat);
-                    if (items.length === 0) return;
+                renderList('all');
+            }}
 
-                    const section = document.createElement('div');
-                    section.className = 'board-section';
-                    section.innerHTML = `
-                        <div class="board-title" onclick="showCategory('${{cat}}')">
-                            <span>${{DEPTS[cat].icon}} ${{cat}}</span>
-                            <i>查看更多 ❯</i>
+            function renderList(cat) {{
+                const list = document.getElementById('imf-list');
+                list.innerHTML = '';
+                const filtered = cat === 'all' ? DATA : DATA.filter(i => i.cat === cat);
+                
+                filtered.forEach(item => {{
+                    const div = document.createElement('div');
+                    div.className = 'imf-list-item';
+                    div.innerHTML = `
+                        <div class="date">${{item.source.split(' ')[0]}}</div>
+                        <div>
+                            <div class="content-type">${{item.label}}</div>
+                            <h3 onclick="showFull(${{DATA.indexOf(item)}})">${{item.title}}</h3>
+                            <div class="summary">${{item.summary}}</div>
                         </div>
                     `;
-                    
-                    // 每個看板只顯示前 4 條
-                    items.slice(0, 4).forEach(item => {{
-                        const link = document.createElement('div');
-                        link.className = 'news-link';
-                        link.innerHTML = `${{item.title}}<span class="source">${{item.source}}</span>`;
-                        link.onclick = () => showFull(${{DATA.indexOf(item)}});
-                        section.appendChild(link);
-                    }});
-                    container.appendChild(section);
+                    list.appendChild(div);
                 }});
-            }}
-
-            // 顯示特定分類列表
-            function showCategory(cat) {{
-                document.getElementById('home-view').style.display = 'none';
-                document.getElementById('list-view').style.display = 'block';
-                document.getElementById('current-cat-name').textContent = cat;
-                
-                const container = document.getElementById('list-container');
-                container.innerHTML = '';
-                
-                const items = DATA.filter(i => i.cat === cat);
-                items.forEach(item => {{
-                    const div = document.createElement('div');
-                    div.className = 'list-item';
-                    div.innerHTML = `
-                        <div class="meta" style="color:var(--nikkei-red); font-size:12px; font-weight:bold;">${{item.source}}</div>
-                        <h3 onclick="showFull(${{DATA.indexOf(item)}})">${{item.title}}</h3>
-                        <div class="summary">${{item.summary}}</div>
-                    `;
-                    container.appendChild(div);
-                }});
-                window.scrollTo(0,0);
             }}
 
             function showFull(idx) {{
                 const item = DATA[idx];
                 document.getElementById('modal-body').innerHTML = `
-                    <div style="color:var(--nikkei-red); font-weight:bold; margin-bottom:10px;">${{item.cat}}</div>
-                    <h1 style="font-size:36px; line-height:1.3; font-weight:900; margin-bottom:20px;">${{item.title}}</h1>
-                    <div style="border-bottom:1px solid #000; padding-bottom:10px; margin-bottom:30px; color:#666;">來源：${{item.source}}</div>
-                    <div class="full-text">${{item.full_text}}</div>
+                    <div class="full-text">
+                        <div style="font-weight:800; color:var(--imf-blue); text-transform:uppercase; font-size:14px;">${{item.cat}}</div>
+                        <h1>${{item.title}}</h1>
+                        <p style="color:#666; font-weight:700;">Source: ${{item.source}}</p>
+                        <div style="margin-top:40px;">${{item.full_text}}</div>
+                    </div>
                 `;
                 document.getElementById('modal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
@@ -285,7 +280,7 @@ def generate_html(data):
     """
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
-    print("✅ 看板式門戶網頁已生成：index.html")
+    print("✅ 已生成 IMF 風格專業儀表板：index.html")
 
 if __name__ == "__main__":
     run_dashboard()
