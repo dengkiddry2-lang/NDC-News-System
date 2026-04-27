@@ -3,20 +3,21 @@ import os
 import json
 import re
 
-# ── 1. 分類與核心定義 ──────────────────────────────────────────────
+# ── 1. 分類定義與核心邏輯 ──────────────────────────────────────────
+# 核心原則：精簡分類，確保卡片呈現時具有一致的美感
 DEPARTMENTS = {
-    "社論與評論觀點": {"icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家", "經濟教室", "縱橫天下", "自由廣場"]},
-    "國際機構與智庫報告": {"icon": "📘", "keywords": ["IMF", "OECD", "World Bank", "WTO", "智庫", "Brookings", "PIIE", "BIS", "ADB", "WEF", "聯合國", "世界銀行", "國際貨幣"]},
-    "地緣政治與國際衝突": {"icon": "🌏", "keywords": ["戰爭", "衝突", "制裁", "美伊", "俄烏", "荷莫茲", "伊朗", "烏克蘭", "關稅", "川普", "貿易戰", "地緣", "槍響", "槍擊", "遇襲", "外交"]},
-    "國際金融與貨幣政策": {"icon": "🌐", "keywords": ["Fed", "FOMC", "聯準會", "利率決策", "升息", "降息", "鮑爾", "ECB", "BOJ", "英格蘭銀行", "央行週", "超級央行", "美債", "美元指數", "非農", "CPI", "核心通膨", "PMI", "ISM", "人民幣", "日圓", "歐元", "英鎊", "匯率"]},
-    "台灣總體經濟與數據": {"icon": "📊", "keywords": ["主計", "主計總處", "GDP", "景氣燈號", "景氣", "物價", "通膨", "失業率", "薪資", "外銷訂單", "出口統計", "進口統計", "海關", "貿易統計", "稅收", "超徵", "出生率", "少子化", "高齡化", "人口統計", "消費者信心", "製造業PMI", "非製造業"]},
-    "台灣政府與政策訊息": {"icon": "🏛️", "keywords": ["國發會", "行政院", "總統府", "經濟部", "財政部", "金管會", "國科會", "央行", "衛福部", "內政部", "院會", "政院", "法案", "預算", "補助", "政策", "施政", "法規", "條例", "立法院", "立委", "修法"]},
-    "台灣產業與投資動向": {"icon": "🏭", "keywords": ["AI", "半導體", "台積電", "台積", "聯發科", "聯電", "鴻海", "台達電", "廣達", "緯創", "英業達", "資本支出", "供應鏈", "算力", "伺服器", "CoWoS", "先進封裝", "製程", "晶片", "離岸風電", "綠能", "電動車", "ASIC", "TPU", "GPU"]},
+    "社論評論": {"icon": "📝", "keywords": ["社論", "時評", "觀點", "專欄"]},
+    "智庫報告": {"icon": "📘", "keywords": ["IMF", "OECD", "智庫", "BIS"]},
+    "地緣政治": {"icon": "🌏", "keywords": ["戰爭", "衝突", "地緣", "關稅"]},
+    "金融貨幣": {"icon": "🌐", "keywords": ["Fed", "利率", "通膨", "央行"]},
+    "總體經濟": {"icon": "📊", "keywords": ["GDP", "景氣", "出口", "物價"]},
+    "產業投資": {"icon": "🏭", "keywords": ["AI", "半導體", "台積", "供應鏈"]},
+    "政府政策": {"icon": "🏛️", "keywords": ["國發會", "政院", "法案", "施政"]},
 }
 
-MUST_READ_KEYS = ["Fed", "FOMC", "鮑爾", "主計", "GDP", "景氣燈號", "衝突", "戰爭", "利率決議", "升息", "降息", "外銷訂單", "超徵"]
+MUST_READ_KEYS = ["Fed", "FOMC", "鮑爾", "GDP", "景氣燈號", "衝突", "戰爭", "降息", "超徵"]
 
-# ── 2. Apple 台灣首頁風格 CSS ──────────────────────────────────────────
+# ── 2. Apple 台灣官網視覺規範 (CSS) ────────────────────────────────
 
 APPLE_CSS = """
 :root {
@@ -43,6 +44,7 @@ body {
     letter-spacing: -0.022em;
 }
 
+/* Apple 標準導航 - 毛玻璃特效 */
 .global-nav {
     position: fixed;
     top: 0;
@@ -77,6 +79,7 @@ body {
     opacity: .88;
 }
 
+/* 沉浸式 Hero 區 - 全白背景與大標 */
 .hero {
     min-height: 520px;
     padding: 104px 22px 56px;
@@ -119,6 +122,7 @@ body {
     padding: 18px 12px 80px;
 }
 
+/* 類別導覽列 - Sticky 且具備模糊感 */
 .category-nav {
     position: sticky;
     top: 44px;
@@ -133,7 +137,6 @@ body {
     -webkit-backdrop-filter: blur(18px);
 }
 
-/* 隱藏捲軸 */
 .category-nav::-webkit-scrollbar { display: none; }
 
 .cat-link {
@@ -148,15 +151,14 @@ body {
     transition: .2s ease;
 }
 
-.cat-link:hover {
-    color: var(--link);
-}
+.cat-link:hover { color: var(--link); }
 
 .cat-link.active {
     border-color: var(--text);
     font-weight: 600;
 }
 
+/* 產品網格 - 雙欄式區塊 */
 .news-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -172,6 +174,8 @@ body {
     overflow: hidden;
     position: relative;
     transition: transform .35s ease, box-shadow .35s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .apple-card:hover {
@@ -213,6 +217,7 @@ body {
     color: var(--link);
 }
 
+/* 彈窗樣式 - 沉浸式背景模糊 */
 .modal {
     display: none;
     position: fixed;
@@ -249,7 +254,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
 }
 
 .modal-cat {
@@ -272,7 +276,6 @@ body {
     color: #333336;
     margin: 0 0 1.35em;
     word-break: break-word;
-    overflow-wrap: anywhere;
 }
 
 .empty-state {
@@ -285,74 +288,16 @@ body {
 
 @media (max-width: 734px) {
     .nav-links { display: none; }
-    .hero { min-height: 420px; padding-top: 90px; }
     .hero-headline { font-size: 44px; }
     .hero-subhead { font-size: 22px; }
     .news-grid { grid-template-columns: 1fr; }
     .apple-card { min-height: 340px; padding: 34px 28px; }
     .card-title { font-size: 30px; }
-    .modal-inner {
-        width: 100%;
-        height: 100%;
-        max-height: none;
-        margin: 0;
-        border-radius: 0;
-        padding: 34px 26px;
-    }
-    .modal-title { font-size: 34px; }
+    .modal-inner { width: 100%; height: 100%; margin: 0; border-radius: 0; padding: 34px 26px; }
 }
 """
 
-# ── 3. 文本解析與輔助邏輯 ────────────────────────────────────────────
-
-def clean_text_blocks(text_list):
-    if not text_list: return ""
-    merged = ""
-    for line in text_list:
-        line = line.strip()
-        if not line or any(k in line for k in ["回到目錄", "來源:", "來源：", "版面", "作者", "日期", "頁次"]):
-            continue
-        if re.search(r'報導】$|記者.{0,10}報導', line): continue
-        if line.isdigit(): continue
-        
-        if not merged: merged = line
-        elif merged[-1] in ("。", "！", "？", "；", "」", "…"):
-            merged += "\n" + line
-        else: merged += line
-
-    # 格式化為段落
-    paragraphs = []
-    lines = merged.split('\n')
-    current_p = ""
-    for l in lines:
-        current_p += l
-        if len(current_p) > 100 or l.endswith("。"):
-            paragraphs.append(current_p.strip())
-            current_p = ""
-    if current_p: paragraphs.append(current_p.strip())
-    
-    return "\n\n".join(paragraphs)
-
-def build_article_index(pdf):
-    index = {}
-    last_key = None
-    raw_content_map = {}
-    for page in pdf.pages:
-        text = page.extract_text() or ""
-        lines = [l.strip() for l in text.split("\n") if l.strip()]
-        has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
-        if has_source:
-            src_idx = next(i for i, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源："))
-            title_key = "".join(lines[:src_idx]).replace(" ", "")
-            raw_content_map[title_key] = lines[src_idx+1:]
-            last_key = title_key
-        elif last_key:
-            raw_content_map[last_key].extend(lines)
-    for key, text_list in raw_content_map.items():
-        index[key] = clean_text_blocks(text_list)
-    return index
-
-# ── 4. HTML 生成 ───────────────────────────────────────────────────
+# ── 3. 核心數據處理與生成函數 ───────────────────────────────────────
 
 def generate_html(data):
     data_json = json.dumps(data, ensure_ascii=False)
@@ -376,11 +321,7 @@ def generate_html(data):
         <div class="nav-container">
             <strong>Intelligence Hub</strong>
             <div class="nav-links">
-                <span>總經</span>
-                <span>產業</span>
-                <span>政策</span>
-                <span>國際</span>
-                <span>社論</span>
+                <span>總經</span><span>產業</span><span>政策</span><span>國際</span><span>社論</span>
             </div>
         </div>
     </nav>
@@ -399,13 +340,12 @@ def generate_html(data):
             <button class="cat-link active" onclick="renderNews('all', this)">全部</button>
             {cat_html}
         </nav>
-
         <section class="news-grid" id="grid"></section>
     </main>
 
     <div id="modal" class="modal" onclick="closeModal()">
         <article class="modal-inner" onclick="event.stopPropagation()">
-            <button class="close-btn" onclick="closeModal()">×</button>
+            <button class="close-btn" onclick="closeModal()">✕</button>
             <div id="modal-content"></div>
         </article>
     </div>
@@ -449,14 +389,14 @@ def generate_html(data):
                     <div class="card-summary">${{escapeHtml(item.summary)}}</div>
                     <div class="card-more">進一步了解 ›</div>
                 `;
-
                 grid.appendChild(card);
             }});
         }}
 
         function openModal(item) {{
             const content = document.getElementById('modal-content');
-
+            
+            // 處理換行：針對雙換行切段
             const paragraphs = String(item.full_text || '')
                 .replace(/\\\\r\\\\n/g, '\\\\n')
                 .split(/\\\\n\\\\s*\\\\n/)
@@ -487,10 +427,7 @@ def generate_html(data):
 
         document.getElementById('date-display').textContent =
             new Date().toLocaleDateString('zh-TW', {{
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long'
+                year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
             }});
 
         renderNews('all');
@@ -501,7 +438,33 @@ def generate_html(data):
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_template)
 
-# ── 5. 執行程序 ─────────────────────────────────────────────────────
+# ── 4. PDF 解析邏輯 (整合並優化) ──────────────────────────────────────
+
+def build_article_index(pdf):
+    index = {}
+    last_key = None
+    raw_content_map = {}
+    for page in pdf.pages:
+        text = page.extract_text() or ""
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        if not lines: continue
+        
+        has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
+        if has_source:
+            src_idx = next(i for i, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源："))
+            title_key = "".join(lines[:src_idx]).replace(" ", "")
+            raw_content_map[title_key] = lines[src_idx+1:]
+            last_key = title_key
+        elif last_key:
+            raw_content_map[last_key].extend(lines)
+            
+    for key, text_list in raw_content_map.items():
+        # 清洗與合併
+        cleaned = " ".join([l for l in text_list if not (l.isdigit() or "回到目錄" in l)])
+        # 嘗試簡單段落切分（在。之後加雙換行以便前端解析）
+        formatted = cleaned.replace("。", "。\n\n")
+        index[key] = formatted
+    return index
 
 def run_dashboard():
     data_folder = "data"
@@ -519,32 +482,29 @@ def run_dashboard():
                 for row in table[1:]:
                     if not row or len(row) < 2 or not row[1]: continue
                     title = str(row[1]).replace("\n", "").strip()
-                    source = str(row[2]).strip() if len(row) > 2 else "EPC"
+                    if len(title) < 5: continue
                     
-                    found_cat = None
+                    found_cat = "其他"
                     for cat, meta in DEPARTMENTS.items():
                         if any(k in title for k in meta["keywords"]):
                             found_cat = cat; break
-                    if not found_cat: continue
-
-                    # 內文匹配
+                    
                     content = ""
                     clean_title = title.replace(" ", "")
                     for k, v in article_index.items():
                         if clean_title[:8] in k:
                             content = v; break
-
+                    
                     all_items.append({
                         "title": title,
-                        "source": source,
                         "cat": found_cat,
                         "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
-                        "summary": content[:110] + "..." if content else "點擊深入了解更多細節。",
+                        "summary": content[:110] + "..." if content else "點擊了解更多細節。",
                         "full_text": content
                     })
 
     generate_html(all_items)
-    print(f"✅ 成功處理 {len(all_items)} 則情報，已生成 Apple 風格 index.html")
+    print(f"✅ 已成功產出 Apple 風格看板，共計 {len(all_items)} 則消息。")
 
 if __name__ == "__main__":
     run_dashboard()
