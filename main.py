@@ -3,7 +3,7 @@ import os
 import json
 import re
 
-# ── 1. 分類定義與優先序 (修正點 6: 補強總體數據關鍵字) ────────────────────────
+# ── 1. 分類定義與優先序 ──────────────────────────────────────────────────
 DEPARTMENTS = {
     "社論與評論觀點": {
         "icon": "📝", "keywords": ["社論", "時評", "社評", "專欄", "論壇", "觀點", "評論", "名家", "經濟教室"]
@@ -31,10 +31,9 @@ DEPARTMENTS = {
 CATEGORY_ORDER = ["社論與評論觀點", "國際機構與智庫報告", "台灣總體經濟與人口數據", "台灣產業與投資動向", "國際經濟與金融情勢", "台灣政府與政策訊息", "其他重要國內外事件"]
 MUST_READ_KEYS = ["Fed", "國發會", "主計", "GDP", "利率", "槍響", "衝突", "戰爭", "下修", "調升"]
 
-# ── 2. 文本解析優化 (修正點 3, 4, 5) ────────────────────────────────────────
+# ── 2. 文本解析邏輯 ────────────────────────────────────────────────────
 
 def is_noise_line(line):
-    """ 修正點 4: 雜訊過濾 """
     noise = ["回到目錄", "來源:", "來源：", "版面", "作者", "日期", "頁次"]
     if line.isdigit(): return True
     return any(k in line for k in noise)
@@ -68,7 +67,6 @@ def clean_text_blocks(text_list):
     return "\n\n".join(paragraphs)
 
 def find_article(article_index, title):
-    """ 修正點 3: 強化匹配邏輯，最低門檻 6 字 """
     key = title.replace(" ", "")
     best_content = ""
     best_score = 0
@@ -90,8 +88,6 @@ def extract_summary(content, limit=220):
         return parts[0][:limit] + ("..." if len(parts[0]) > limit else "")
     return content[:limit] + ("..." if len(content) > limit else "")
 
-# ── 3. 主程式流程 (修正點 2, 5) ─────────────────────────────────────────────
-
 def build_article_index(pdf):
     index = {}
     last_key = None
@@ -100,28 +96,30 @@ def build_article_index(pdf):
         text = page.extract_text() or ""
         lines = [l.strip() for l in text.split("\n") if l.strip()]
         if not lines: continue
-        
         has_source = any(l.startswith("來源:") or l.startswith("來源：") for l in lines[:8])
         if has_source:
             src_idx = next(i for i, l in enumerate(lines) if l.startswith("來源:") or l.startswith("來源："))
             title_key = "".join(lines[:src_idx]).replace(" ", "")
             raw_content_map[title_key] = lines[src_idx + 1:]
             last_key = title_key
-        # 修正點 5: 增加續頁合併條件
         elif last_key and len("".join(lines)) > 50 and not page.extract_table():
             raw_content_map[last_key].extend(lines)
         else:
             last_key = None
-            
     for key, text_list in raw_content_map.items():
         index[key] = clean_text_blocks(text_list)
     return index
+
+# ── 3. 執行解析 ──────────────────────────────────────────────────────
 
 def run_dashboard():
     data_folder = "data"
     if not os.path.exists(data_folder): os.makedirs(data_folder)
     pdf_files = [f for f in os.listdir(data_folder) if f.lower().endswith(".pdf")]
-    if not pdf_files: return
+    if not pdf_files: 
+        print("data folder is empty.")
+        generate_html([])
+        return
 
     pdf_files.sort(key=lambda x: os.path.getmtime(os.path.join(data_folder, x)))
     latest_pdf = os.path.join(data_folder, pdf_files[-1])
@@ -133,13 +131,10 @@ def run_dashboard():
             table = page.extract_table()
             if not table: continue
             for row in table[1:]:
-                # 修正點 2: 回歸穩定欄位判斷
                 if not row or len(row) < 2 or not row[1]: continue
                 title = str(row[1]).replace("\n", "").strip()
                 source = str(row[2]).replace("\n", " ").strip() if len(row) > 2 and row[2] else "EPC智庫"
-                
-                if len(title) < 5 or any(k in title for k in ["新聞議題", "報導媒體", "目錄", "頁次"]):
-                    continue
+                if len(title) < 5 or any(k in title for k in ["新聞議題", "報導媒體", "目錄", "頁次"]): continue
                 
                 classify_text = title + " " + source
                 found_cat = "其他重要國內外事件"
@@ -155,10 +150,9 @@ def run_dashboard():
                 })
     generate_html(all_items)
 
-# ── 4. HTML 與 JS 優化 (修正點 1, 7) ──────────────────────────────────────
+# ── 4. HTML 生成 (修正 Python f-string 語法錯誤) ──────────────────────────
 
 def generate_html(data):
-    # 修正點 1: Python 端不 Escape，僅處理 JS 字串終止符
     data_json = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     dept_info = json.dumps(DEPARTMENTS, ensure_ascii=False).replace("</", "<\\/")
     
@@ -175,16 +169,12 @@ def generate_html(data):
     .carousel-slide { position: absolute; inset: 0 60px; background: var(--imf-navy); color: #fff; padding: 45px; display: none; flex-direction: column; justify-content: center; border-top: 8px solid var(--imf-accent); opacity: 0; transition: opacity 0.8s ease; }
     .carousel-slide.active { display: flex; opacity: 1; }
     .carousel-slide h2 { font-size: 40px; margin: 0 0 20px 0; font-family: 'Noto Serif TC', serif; line-height: 1.2; cursor: pointer; }
-    .main-layout { max-width: 1200px; margin: 50px auto; padding: 0 60px; display: grid; grid-template-columns: 1fr 320px; gap: 70px; }
-    .news-item { padding: 25px 0; border-bottom: 1px solid #eee; }
-    .news-title { font-size: 22px; font-weight: 800; color: var(--imf-navy); margin: 0 0 10px 0; cursor: pointer; font-family: 'Noto Serif TC', serif; }
     .modal { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; overflow-y: auto; }
     .modal-header { padding: 20px 60px; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; display: flex; justify-content: space-between; }
-    .modal-body { max-width: 850px; margin: 60px auto; padding: 0 60px; }
     .article-content { font-size: 19px; line-height: 2.1; white-space: pre-line; text-align: justify; word-break: break-word; color: #222; }
-    .read-btn { background: #fff; color: var(--imf-navy); border: none; padding: 10px 20px; font-weight: 800; cursor: pointer; align-self: flex-start; margin-top: 15px; }
     """
 
+    # 注意：在 Python f-string 中，JS 的大括號需寫成 {{ }}，變數引用需寫成 \${ } 避開 Python 解析
     html = f"""
     <!DOCTYPE html>
     <html lang="zh-TW">
@@ -200,10 +190,13 @@ def generate_html(data):
             <div class="brand-titles"><h1>經濟規劃科 Intelligence Hub</h1></div>
             <div style="margin-left:auto; font-weight:800; color:var(--imf-navy);" id="today-date"></div>
         </header>
-        <nav class="imf-nav" id="nav-bar"><div class="nav-item active" onclick="location.reload()">最新首頁</div></nav>
+        <nav class="imf-nav" id="nav-bar"><div class="nav-item active" onclick="location.reload()">首頁 HOME</div></nav>
         <div id="home-view">
             <section class="carousel-container"><div class="carousel-inner" id="carousel-area"></div></section>
-            <div class="main-layout"><section><div id="news-feed"></div></section><aside><div style="background:var(--imf-bg-light); padding:30px; border-top:5px solid var(--imf-navy);"><h3>EPC 政策提示</h3><p style="font-size:14px; color:#666;">本資訊供內部參考，請注意資安規範。</p></div></aside></div>
+            <div style="max-width:1200px; margin:50px auto; padding:0 60px; display:grid; grid-template-columns:1fr 320px; gap:70px;">
+                <section><div id="news-feed"></div></section>
+                <aside><div style="background:var(--imf-bg-light); padding:30px; border-top:5px solid var(--imf-navy);"><h3>EPC 政策提示</h3><p style="font-size:14px; color:#666;">本資訊供內部參考，請注意資安規範。</p></div></aside>
+            </div>
         </div>
         <div id="modal" class="modal">
             <div class="modal-header"><div style="font-weight:900;">EPC REPORT</div><button onclick="closeModal()" style="background:var(--imf-navy); color:#fff; border:none; padding:8px 20px; cursor:pointer;">關閉</button></div>
@@ -213,7 +206,6 @@ def generate_html(data):
             const DATA = {data_json};
             const DEPTS = {dept_info};
 
-            // 修正點 7: JS 端安全 Escape
             function esc(s) {{
                 return String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
             }}
@@ -228,7 +220,7 @@ def generate_html(data):
                     const div = document.createElement('div');
                     div.className = 'nav-item';
                     div.textContent = cat;
-                    div.onclick = function() {{ filterFeed(cat, this); }};
+                    div.onclick = function() {{ filterFeed(cat, div); }};
                     nav.appendChild(div);
                 }});
                 renderCarousel();
@@ -237,13 +229,13 @@ def generate_html(data):
 
             function renderCarousel() {{
                 const area = document.getElementById('carousel-area');
-                if (DATA.length === 0) {{ area.innerHTML = '<div class="carousel-slide active"><h2>今日尚無資料，請確認 PDF 放置於 data 資料夾</h2></div>'; return; }}
+                if (DATA.length === 0) {{ area.innerHTML = '<div class="carousel-slide active"><h2>今日尚無資料</h2></div>'; return; }}
                 const featured = DATA.filter(i => i.priority === 1).slice(0, 5);
                 if(featured.length === 0) featured.push(...DATA.slice(0, 5));
                 featured.forEach((item, idx) => {{
                     const slide = document.createElement('div');
                     slide.className = 'carousel-slide' + (idx === 0 ? ' active' : '');
-                    slide.innerHTML = `<span style="color:#ffca28; font-weight:800; font-size:12px;">FEATURED · \${esc(item.cat)}</span><h2 onclick="showFull(\${DATA.indexOf(item)})">\${esc(item.title)}</h2><button class="read-btn" onclick="showFull(\${DATA.indexOf(item)})">閱讀全文</button>`;
+                    slide.innerHTML = `<span style="color:#ffca28; font-weight:800; font-size:12px;">FEATURED · \${{esc(item.cat)}}</span><h2 onclick="showFull(\${{DATA.indexOf(item)}})">\${{esc(item.title)}}</h2><button style="background:#fff; color:var(--imf-navy); border:none; padding:10px 20px; font-weight:800; cursor:pointer; margin-top:15px;" onclick="showFull(\${{DATA.indexOf(item)}})">閱讀全文</button>`;
                     area.appendChild(slide);
                 }});
                 let cur = 0;
@@ -263,7 +255,9 @@ def generate_html(data):
                 f.forEach(item => {{
                     const div = document.createElement('div');
                     div.className = 'news-item';
-                    div.innerHTML = `<div style="font-size:11px; font-weight:800; color:var(--imf-accent);">\${esc(item.cat)}</div><h3 class="news-title" onclick="showFull(\${DATA.indexOf(item)})">\${esc(item.title)}</h3><div style="font-size:15px; color:#555;">\${esc(item.summary)}</div>`;
+                    div.style.padding = '25px 0';
+                    div.style.borderBottom = '1px solid #eee';
+                    div.innerHTML = `<div style="font-size:11px; font-weight:800; color:var(--imf-accent); margin-bottom:5px;">\${{esc(item.cat)}}</div><h3 style="font-size:22px; font-weight:800; color:var(--imf-navy); cursor:pointer; margin:0 0 10px 0; font-family:'Noto Serif TC', serif;" onclick="showFull(\${{DATA.indexOf(item)}})">\${{esc(item.title)}}</h3><div style="font-size:15px; color:#555;">\${{esc(item.summary)}}</div>`;
                     list.appendChild(div);
                 }});
             }}
@@ -277,7 +271,7 @@ def generate_html(data):
 
             function showFull(idx) {{
                 const item = DATA[idx];
-                document.getElementById('modal-content').innerHTML = `<h1 style="font-size:42px; font-family:'Noto Serif TC', serif; color:var(--imf-navy);">\${esc(item.title)}</h1><div style="font-weight:700; color:#666; margin-bottom:30px;">來源：\${esc(item.source)}</div><div class="article-content">\${esc(item.full_text) || '尚未擷取到全文'}</div>`;
+                document.getElementById('modal-content').innerHTML = `<h1 style="font-size:42px; font-family:'Noto Serif TC', serif; color:var(--imf-navy);">\${{esc(item.title)}}</h1><div style="font-weight:700; color:#666; margin-bottom:30px;">來源：\${{esc(item.source)}}</div><div class="article-content">\${{esc(item.full_text) || '尚未擷取到全文'}}</div>`;
                 document.getElementById('modal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
             }}
@@ -290,7 +284,7 @@ def generate_html(data):
     """
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
-    print("✅ 已優化穩定性與安全性解析：index.html")
+    print("✅ index.html 已生成。")
 
 if __name__ == "__main__":
     run_dashboard()
