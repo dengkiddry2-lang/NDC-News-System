@@ -131,35 +131,74 @@ def is_noise_line(line):
     return any(k in line for k in noise)
 
 def clean_text_blocks(text_list):
+    """
+    清洗 PDF 擷取文字並重組段落。
+    策略：
+    1. 過濾雜訊行
+    2. 把 PDF 欄位換行造成的碎行合併回完整句子
+    3. 每 2~4 句切一段，輸出 \n\n 分隔的段落
+    """
     if not text_list:
         return ""
-    combined_text = ""
+
+    # Step 1: 過濾雜訊，合併碎行
+    merged = ""
     for line in text_list:
         line = line.strip()
         if not line or is_noise_line(line):
             continue
-        if combined_text and not combined_text.endswith(("。", "！", "？", "；", "」", "\u201d")):
-            combined_text += line
+        # 作者行殘留模式（不應進入正文）
+        if re.search(r'報導】$|記者.{0,10}報導', line):
+            continue
+        # 純數字行（頁碼）
+        if line.isdigit():
+            continue
+        if not merged:
+            merged = line
+        elif merged[-1] in ("。", "！", "？", "；", "」", "\u201d", "…"):
+            # 前一行句子完整，新開一行
+            merged += "\n" + line
         else:
-            combined_text += "\n" + line
-    combined_text = combined_text.strip()
-    sentences = re.split(r'(?<=[。！？；])', combined_text)
+            # 前一行句子不完整（PDF 欄位斷行），直接接上
+            merged += line
+
+    # Step 2: 清除多餘空白
+    merged = re.sub(r' +', ' ', merged)
+    merged = merged.strip()
+
+    # Step 3: 按句號切句，每 3 句一段
+    sentences = re.split(r'(?<=[。！？；])', merged)
     paragraphs = []
-    current_para = ""
+    current = ""
     count = 0
     for s in sentences:
         s = s.strip()
         if not s:
             continue
-        current_para += s
+        current += s
         count += 1
-        if (count >= 3 and s.endswith(("。", "！", "？", "；"))) or s.endswith(("」", "\u201d")):
-            paragraphs.append(current_para.strip())
-            current_para = ""
+        if count >= 3 and s[-1] in ("。", "！", "？", "；"):
+            paragraphs.append(current.strip())
+            current = ""
             count = 0
-    if current_para:
-        paragraphs.append(current_para.strip())
-    return "\n\n".join(paragraphs)
+    if current.strip():
+        paragraphs.append(current.strip())
+
+    # 清除段落內的 PDF 欄位殘留空格和換行
+    import re as _re
+    cleaned = []
+    for p in paragraphs:
+        # 單個換行 → 空格（PDF 欄位斷行）
+        p = p.replace("\n", " ")
+        # 多餘空格合併
+        p = _re.sub(r" {2,}", " ", p)
+        # 標點前的空格去除 + 中文字間的 PDF 欄位空格去除
+        p = _re.sub(r" ([，。！？；：、「」』」）】])", r"\1", p)
+        p = _re.sub(r"([一-鿿＀-￯]) ([一-鿿＀-￯（「『「])", r"\1\2", p)
+        p = p.strip()
+        if p:
+            cleaned.append(p)
+    return "\n\n".join(cleaned)
 
 def find_article(article_index, title):
     key = title.replace(" ", "")
@@ -198,7 +237,19 @@ def build_article_index(pdf):
                 if l.startswith("來源:") or l.startswith("來源：")
             )
             title_key = "".join(lines[:src_idx]).replace(" ", "")
-            raw_content_map[title_key] = lines[src_idx + 1:]
+            # 跳過來源行及其可能的跨行殘留（作者行尾段）
+            body_start = src_idx + 1
+            while body_start < len(lines):
+                line = lines[body_start]
+                # 作者行尾段特徵：以「報導】」「報導】。」「記者報導】」結尾
+                # 或以「／台北報導】」「／綜合報導】」等形式出現
+                if re.search(r'[報導綜合外電]+】\s*$|^\w+\/\w+報導】', line):
+                    body_start += 1
+                elif re.match(r'^[　\s]*【.{0,20}報導】', line):
+                    body_start += 1
+                else:
+                    break
+            raw_content_map[title_key] = lines[body_start:]
             last_key = title_key
         elif (
             last_key
@@ -391,13 +442,17 @@ def build_js(data_json, dept_json, cat_order_json):
         "",
         "function showFull(idx){",
         "  const item=DATA[idx];",
-        "  const contentHtml=item.full_text?esc(item.full_text):'尚未擷取到內文內容';",
+        "  const rawText=item.full_text||'尚未擷取到內文內容';",
+        "  const contentHtml=rawText.split('\\n\\n').map(p=>'<p>'+esc(p.trim())+'</p>').join('');",
+        "  // 單個換行在段落內用空格取代（PDF 欄位殘留）",
+
         "  document.getElementById('modal-content').innerHTML=",
         "    '<div class=\"modal-article\">'+",
         "      '<div class=\"modal-cat\">'+esc(item.cat)+'</div>'+",
         "      '<h1 class=\"modal-title\">'+esc(item.title)+'</h1>'+",
         "      '<div class=\"modal-source\">\u4f86\u6e90\uff1a'+esc(item.source)+'</div>'+",
         "      '<div class=\"article-content\">'+contentHtml+'</div>'+",
+
         "    '</div>';",
         "  document.getElementById('modal').style.display='block';",
         "  document.body.style.overflow='hidden';",
@@ -707,7 +762,9 @@ body {
   font-family:'Noto Serif TC','Georgia',serif;
 }
 .modal-source { font-size:13px; color:var(--text-m); font-weight:600; padding-bottom:24px; border-bottom:1px solid var(--border); margin-bottom:32px; }
-.article-content { font-size:17px; line-height:2.0; color:var(--text-s); white-space:pre-line; text-align:justify; }
+.article-content { font-size:17px; line-height:2.0; color:var(--text-s); text-align:justify; }
+.article-content p { margin-bottom:1.4em; }
+.article-content p:last-child { margin-bottom:0; }
 
 
 @media(max-width:900px){
