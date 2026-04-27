@@ -43,6 +43,37 @@ CATEGORY_ORDER = [
 
 MUST_READ_KEYS = ["Fed","FOMC","鮑爾","主計","GDP","景氣燈號","衝突","戰爭","利率決議","升息","降息","外銷訂單","超徵","荷莫茲"]
 
+# 頭版版面識別（各報 A01 / AA01 等）
+FRONT_PAGE_PATTERNS = ["A01", "AA01"]
+
+
+
+# 頭版版面識別（各報 A01 / AA01 等）
+FRONT_PAGE_PATTERNS = ["A01", "AA01"]
+
+def is_front_page(source):
+    """判斷是否為各報頭版"""
+    return any(p in source for p in FRONT_PAGE_PATTERNS)
+
+# 頭版新聞（A01）若符合分類關鍵字自動升必看，但排除這些社會事件詞
+
+def is_frontpage(source):
+    """判斷是否為頭版新聞"""
+    return "A01" in source or "AA01" in source
+
+def get_priority(title, source, found_cat):
+    """
+    優先級判定：
+    - A01 頭版 且 符合分類 → 必看 (priority=1)
+    - 標題含 MUST_READ_KEYS → 必看
+    - 其他 → 一般 (priority=0)
+    """
+    if is_frontpage(source) and found_cat is not None:
+        return 1
+    if any(k in title for k in MUST_READ_KEYS):
+        return 1
+    return 0
+
 NON_ECON_TITLE_KEYS = ["大麻","毒品","詐騙","竊盜","農業","旱情","廚餘","豬","漁業","失智","長照","安樂死","安寧","防癌","觀光旅遊","演唱會","房價指數","租屋"]
 NON_ECON_SECTIONS = ["焦點新聞","社會","地方","體育","娛樂","影視","生活","健康","農業","司法","法庭","影劇","副刊","旅遊","美食","寵物","星座"]
 ALL_ECON_KEYS = set()
@@ -189,7 +220,7 @@ def run_dashboard():
                 content = find_article(article_index, title)
                 all_items.append({
                     "title": title, "source": source, "cat": found_cat,
-                    "priority": 1 if any(k in title for k in MUST_READ_KEYS) else 0,
+                    "priority": get_priority(title, source, found_cat),
                     "summary": extract_summary(content), "full_text": content
                 })
 
@@ -285,8 +316,22 @@ document.getElementById('gnav-date').textContent =
     <div class="highlights-scroll" id="highlights-scroll"></div>
   </section>
 
-  <!-- CATEGORY BRICKS -->
-  <div id="brick-grid"></div>
+  <!-- 今日必看 -->
+  <section class="must-section" id="must-section">
+    <div class="must-section-header">
+      <span class="must-section-label">今日必看</span>
+      <span class="must-section-sub">以下新聞今日登上各大報頭版，且符合本科關注領域</span>
+    </div>
+    <div class="must-grid" id="must-grid"></div>
+  </section>
+
+  <!-- 所有新聞 -->
+  <section class="all-section">
+    <div class="all-section-header">
+      <span class="all-section-label">全部新聞</span>
+    </div>
+    <div id="brick-grid"></div>
+  </section>
 
 </div><!-- end home-view -->
 
@@ -379,39 +424,55 @@ function buildHighlights(){{
 }}
 
 // ── CATEGORY BRICKS (home) ──
-function renderBricks(cat){{
-  const grid = document.getElementById('brick-grid');
-  grid.innerHTML = '';
-  // 直接放新聞，按優先級排序，必看在前
-  const items = (cat&&cat!=='all') ? DATA.filter(i=>i.cat===cat) : DATA;
-  if(!items.length){{
-    grid.innerHTML = '<div class="empty-brick">\u76ee\u524d\u7121\u8cc7\u6599</div>';
-    return;
-  }}
-  items.forEach((item, idx)=>{{
-    const dataIdx = DATA.indexOf(item);
-    const dept = DEPTS[item.cat] || {{}};
-    // 版型：第一則全寬，之後兩欄交替；每5則一個淺色卡（呼吸感）
-    const isFull = idx === 0;
-    const isLight = !isFull && idx % 5 === 3;
-    const brick = document.createElement('div');
-    brick.className = 'brick'
-      + (isFull ? ' brick-full' : '')
-      + (isLight ? ' brick-light' : ' brick-dark');
-
-    let inner = '';
-    if(item.priority===1) inner += '<div class="brick-must-bar"></div>';
-    inner += '<div class="brick-eyebrow">'+(dept.icon||'')+' '+esc(item.cat)+'</div>';
-    inner += '<div class="brick-title">'+esc(item.title)+'</div>';
-    inner += '<div class="brick-summary">'+esc(item.summary)+'</div>';
-    inner += '<div class="brick-meta"><span class="brick-source">'+esc(item.source)+'</span>'
-      +(item.priority===1?'<span class="badge-must">\u5fc5\u770b</span>':'')+'</div>';
-    inner += '<div class="brick-cta">\u95b1\u8b80\u5168\u6587 \u203a</div>';
-    brick.innerHTML = inner;
-    brick.onclick = ()=>openArticle(dataIdx);
-    grid.appendChild(brick);
-  }});
+function makeBrick(item, idx, isMustZone){{
+  const dataIdx = DATA.indexOf(item);
+  const dept = DEPTS[item.cat] || {{}};
+  const isFull = idx === 0;
+  const isLight = !isMustZone && !isFull && idx % 5 === 3;
+  const brick = document.createElement('div');
+  brick.className = 'brick'
+    + (isFull ? ' brick-full' : '')
+    + (isMustZone ? ' brick-must-zone' : '')
+    + (isLight ? ' brick-light' : ' brick-dark');
+  let inner = '';
+  if(isMustZone) inner += '<div class="brick-must-bar"></div>';
+  inner += '<div class="brick-eyebrow">'+(dept.icon||'')+' '+esc(item.cat)+'</div>';
+  inner += '<div class="brick-title">'+esc(item.title)+'</div>';
+  inner += '<div class="brick-summary">'+esc(item.summary)+'</div>';
+  inner += '<div class="brick-meta"><span class="brick-source">'+esc(item.source)+'</span>'
+    + (isMustZone?'<span class="badge-must">必看</span>':'')+'</div>';
+  inner += '<div class="brick-cta">閱讀全文 ›</div>';
+  brick.innerHTML = inner;
+  brick.onclick = ()=>openArticle(dataIdx);
+  return brick;
 }}
+
+function renderBricks(cat){{
+  const mustGrid = document.getElementById('must-grid');
+  const allGrid = document.getElementById('brick-grid');
+  const mustSec = document.getElementById('must-section');
+  const allSec = allGrid ? allGrid.closest('.all-section') : null;
+  if(mustGrid) mustGrid.innerHTML = '';
+  if(allGrid) allGrid.innerHTML = '';
+
+  const allItems = (cat&&cat!=='all') ? DATA.filter(i=>i.cat===cat) : DATA;
+  const mustItems = allItems.filter(i=>i.priority===1);
+  const restItems = allItems.filter(i=>i.priority!==1);
+
+  // 今日必看區
+  if(mustSec) mustSec.style.display = mustItems.length ? 'block' : 'none';
+  if(mustGrid) mustItems.forEach((item,idx)=>mustGrid.appendChild(makeBrick(item,idx,true)));
+
+  // 全部新聞區
+  if(allSec) allSec.style.display = restItems.length ? 'block' : 'none';
+  if(allGrid){{
+    if(!restItems.length && !mustItems.length)
+      allGrid.innerHTML='<div class="empty-brick">目前無資料</div>';
+    else
+      restItems.forEach((item,idx)=>allGrid.appendChild(makeBrick(item,idx,false)));
+  }}
+}}
+
 
 // ── CATEGORY VIEW ──
 function openCatView(cat){{
@@ -683,6 +744,41 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
 .article-body { max-width: 680px; margin: 0 auto; padding: 52px 24px 100px; }
 .article-body p { font-size: 19px; line-height: 1.9; color: var(--tb); margin-bottom: 1.5em; font-weight: 400; letter-spacing: -0.01em; }
 .article-body p:last-child { margin-bottom: 0; }
+
+/* ── MUST SECTION ── */
+.must-section {
+  background: var(--black); padding: 0 0 2px;
+  border-bottom: 2px solid rgba(255,59,48,0.3);
+}
+.must-section-header {
+  padding: 36px 24px 20px;
+  display: flex; align-items: baseline; gap: 16px;
+}
+.must-section-label {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.03em; color: var(--tw);
+}
+.must-section-sub {
+  font-size: 13px; color: var(--tw3); font-weight: 400;
+}
+.must-grid {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 2px;
+}
+.brick-must-zone {
+  background: #1a0a0a;
+}
+.brick-must-zone .brick-eyebrow { color: #ff6b60; }
+.brick-must-zone .brick-title { color: var(--tw); }
+.brick-must-zone .brick-summary { color: var(--tw2); }
+.brick-must-zone .brick-source { color: var(--tw3); }
+.brick-must-zone .brick-cta { color: #ff6b60; }
+
+.all-section { background: var(--bg); }
+.all-section-header {
+  padding: 32px 24px 16px;
+}
+.all-section-label {
+  font-size: 22px; font-weight: 700; letter-spacing: -0.025em; color: var(--tb);
+}
 
 /* responsive */
 @media (max-width: 720px) {
