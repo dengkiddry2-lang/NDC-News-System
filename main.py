@@ -260,7 +260,7 @@ def generate_html(data):
             "items": item_list
         }
 
-    data_json = json.dumps(js_data, ensure_ascii=True).replace("</", "<\\/")
+    data_json = json.dumps(js_data, ensure_ascii=False).replace("</", "<\\/")
 
     sep_double = "\u2550" * 36
     sep_single = "\u2500" * 30
@@ -700,8 +700,7 @@ renderList();
 </body>
 </html>"""
 
-    html_content = html_content.encode("utf-8", errors="replace").decode("utf-8")
-    with open("index.html", "w", encoding="utf-8") as f:
+    with open("index.html", "w", encoding="utf-8", errors="replace") as f:
         f.write(html_content)
 
 
