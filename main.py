@@ -83,15 +83,22 @@ MUST_READ_KEYS = [
 # 非經濟版面關鍵字：這些版面的新聞若標題無任何經濟關鍵字，直接略過
 NON_ECON_SECTIONS = [
     "焦點新聞", "社會", "地方", "體育", "娛樂", "影視",
-    "生活", "健康", "農業", "司法", "法庭"
+    "生活", "健康", "農業", "司法", "法庭",
+    "影劇", "副刊", "旅遊", "美食", "寵物", "星座"
 ]
 
 # 標題有這些詞 → 判定為非經濟，直接略過
 NON_ECON_TITLE_KEYS = [
-    "大麻", "毒品", "農業", "旱情", "春雨", "廚餘", "豬",
-    "失智", "長照", "安樂死", "安寧", "防癌", "保險理賠",
-    "農業旱", "觀光", "甘肅翻車", "金門", "禁團令旅遊",
-    "信用卡月費", "房價指數"
+    # 社會犯罪類
+    "大麻", "毒品", "詐騙", "竊盜", "槍擊案",
+    # 農漁牧類
+    "農業", "旱情", "廚餘", "豬", "漁業", "農委會",
+    # 醫療社福類
+    "失智", "長照", "安樂死", "安寧", "防癌",
+    # 娛樂生活類
+    "觀光旅遊", "演唱會", "婚喪喜慶",
+    # 房產（非投資面）
+    "房價指數", "租屋",
 ]
 
 # 所有分類的經濟關鍵字合集（用於判斷非經濟版面的新聞是否值得保留）
@@ -227,9 +234,23 @@ def run_dashboard():
 
         with pdfplumber.open(latest_pdf) as pdf:
             article_index = build_article_index(pdf)
-            for page in pdf.pages[:15]:
+            # 掃描所有有表格的頁面，動態判斷是否為目錄
+            for page in pdf.pages:
                 table = page.extract_table()
                 if not table:
+                    continue
+                # 判斷是否為目錄表格：
+                # 策略：掃描所有列，只要有一列符合「第2欄是標題、第3欄含報名」就是目錄
+                def is_toc_table(t):
+                    news_sources = ['時報', '日報', '聯合', '自由', '中時', '工商', '蘋果', '鏡', '報']
+                    for r in t:
+                        if not r or len(r) < 2: continue
+                        col2 = str(r[1] or '').strip()
+                        col3 = str(r[2] or '').strip() if len(r) > 2 else ''
+                        if len(col2) > 5 and any(s in col3 for s in news_sources):
+                            return True
+                    return False
+                if not is_toc_table(table):
                     continue
                 for row in table[1:]:
                     if not row or len(row) < 2 or not row[1]:
