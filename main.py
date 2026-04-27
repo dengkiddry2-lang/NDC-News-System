@@ -447,8 +447,10 @@ def build_js(data_json, dept_json, cat_order_json):
         "",
         "function showFull(idx){",
         "  const item=DATA[idx];",
-        "  const contentHtml=item.full_text?esc(item.full_text):'\u5c1a\u672a\u64f7\u53d6\u5230\u5167\u6587\u5167\u5bb9';",
-        "  const imgHtml=item.img_path?'<div class=\"modal-img-wrap\"><img class=\"modal-img\" src=\"'+item.img_path+'\" alt=\"'+esc(item.title)+'\"></div>':'';",
+        "  const imgHtml=item.img_path",
+        "    ?'<details class=\"newspaper-wrap\"><summary class=\"newspaper-toggle\">&#128240; 查看報紙原版</summary>'",
+        "    +'<div class=\"newspaper-img-box\"><img class=\"newspaper-img\" src=\"'+item.img_path+'\" loading=\"lazy\" alt=\"'+esc(item.title)+'\">'+'</div></details>'",
+        "    :'';",
         "  document.getElementById('modal-content').innerHTML=",
         "    '<div class=\"modal-article\">'+",
         "      '<div class=\"modal-cat\">'+esc(item.cat)+'</div>'+",
@@ -766,8 +768,17 @@ body {
 }
 .modal-source { font-size:13px; color:var(--text-m); font-weight:600; padding-bottom:24px; border-bottom:1px solid var(--border); margin-bottom:32px; }
 .article-content { font-size:17px; line-height:2.0; color:var(--text-s); white-space:pre-line; text-align:justify; }
-.modal-img-wrap { margin-bottom:28px; border:1px solid var(--border); overflow:hidden; }
-.modal-img { width:100%; display:block; }
+.newspaper-wrap {
+  margin-bottom:24px; border:1px solid var(--border); border-radius:6px; overflow:hidden;
+}
+.newspaper-toggle {
+  padding:12px 18px; font-size:13px; font-weight:600; color:var(--accent);
+  cursor:pointer; background:#f4f8ff; user-select:none;
+  letter-spacing:0.02em; display:block;
+}
+.newspaper-toggle::-webkit-details-marker { display:none; }
+.newspaper-img-box { border-top:1px solid var(--border); background:#fafafa; padding:12px; }
+.newspaper-img { width:100%; display:block; border-radius:2px; }
 
 @media(max-width:900px){
   .main-layout{grid-template-columns:1fr;padding:0 24px;}
