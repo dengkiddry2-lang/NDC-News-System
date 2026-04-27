@@ -328,7 +328,12 @@ const DEPTS = {"社論與評論觀點": {"icon": "📝"}, "國際機構與智庫
 const CAT_ORDER = ["社論與評論觀點", "國際機構與智庫報告", "地緣政治與國際衝突", "國際金融與貨幣政策", "台灣總體經濟與數據", "台灣政府與政策訊息", "台灣產業與投資動向"];
 
 function esc(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let r=String(s||'');
+  r=r.split('&').join('&amp;');
+  r=r.split('<').join('&lt;');
+  r=r.split('>').join('&gt;');
+  r=r.split('"').join('&quot;');
+  return r;
 }
 
 function init(){
