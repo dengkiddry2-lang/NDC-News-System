@@ -714,17 +714,6 @@ document.addEventListener('keydown', e => {{
   buildCatOverview();
   buildAllSections();
   showView('home-view');
-
-  // 淡入動畫
-  const obs = new IntersectionObserver(entries => {{
-    entries.forEach(e => {{
-      if (e.isIntersecting) {{ e.target.classList.add('visible'); obs.unobserve(e.target); }}
-    }});
-  }}, {{threshold: 0.05}});
-  document.querySelectorAll('.cs-card,.list-row,.sub-row,.must-item').forEach((el,i) => {{
-    el.style.transitionDelay = (i % 5 * 50) + 'ms';
-    obs.observe(el);
-  }});
 }})();
 </script>
 </body>
@@ -822,8 +811,7 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 /* ── 次要新聞 ── */
 .sub-header { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--g4); text-transform: uppercase; padding: 20px 0 8px; border-bottom: 2px solid var(--black); }
 .sub-list { background: var(--white); border: 1px solid var(--g6); border-top: none; }
-.sub-row { display: flex; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
-.sub-row.visible { opacity: 1; transform: none; }
+.sub-row { display: flex; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
 .sub-row:last-child { border-bottom: none; }
 .sub-row:hover { background: var(--g8); }
 .sub-must { background: var(--mustbg); }
@@ -842,8 +830,7 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 .red-header .sb-title { color: var(--red); }
 .sb-title { font-size: 13px; font-weight: 700; color: var(--black); letter-spacing: .03em; }
 .sb-sub { font-size: 11px; color: var(--g5); }
-.must-item { padding: 11px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
-.must-item.visible { opacity: 1; transform: none; }
+.must-item { padding: 11px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
 .must-item:last-child { border-bottom: none; }
 .must-item:hover { background: var(--mustbg); }
 .mi-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 3px; }
@@ -868,8 +855,7 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 .cs-more { font-size: 12px; color: var(--red); font-weight: 600; background: none; border: 1px solid var(--red); padding: 3px 10px; cursor: pointer; font-family: var(--sans); transition: all .15s; }
 .cs-more:hover { background: var(--red); color: #fff; }
 .cs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--g6); border: 1px solid var(--g6); }
-.cs-card { background: var(--white); padding: 14px 16px; cursor: pointer; position: relative; transition: background .15s; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease, background .15s; }
-.cs-card.visible { opacity: 1; transform: none; }
+.cs-card { background: var(--white); padding: 14px 16px; cursor: pointer; position: relative; transition: background .15s; }
 .cs-card:hover { background: var(--g8); }
 .cs-must { background: var(--mustbg); }
 .cs-lead { grid-column: 1 / -1; border-bottom: 1px solid var(--g6); }
@@ -888,8 +874,7 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 
 /* ── 分類列表頁 ── */
 .list-wrapper { max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
-.list-row { background: var(--white); border: 1px solid var(--g6); border-top: none; cursor: pointer; transition: background .15s; position: relative; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
-.list-row.visible { opacity: 1; transform: none; }
+.list-row { background: var(--white); border: 1px solid var(--g6); border-top: none; cursor: pointer; transition: background .15s; position: relative; }
 .list-row:first-child { border-top: 2px solid var(--black); }
 .list-row:hover { background: var(--g8); }
 .list-must { background: var(--mustbg); }
