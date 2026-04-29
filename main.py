@@ -870,8 +870,8 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 .cs-card-src { font-size: 11px; color: var(--g5); }
 
 /* ── 次頁導覽 ── */
-/* ── 분류페이지 패딩 ── */
-#cat-view, #article-view { padding-top: 0; }
+#cat-view { min-height: 100vh; background: #f5f5f5; }
+#article-view { min-height: 100vh; background: #ffffff; }
 .sub-nav { background: var(--white); border-bottom: 1px solid var(--g6); padding: 9px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 800; }
 .back-btn { background: none; border: none; font-size: 13px; color: var(--red); font-weight: 600; cursor: pointer; font-family: var(--sans); padding: 3px 0; }
 .back-btn:hover { opacity: .7; }
@@ -879,20 +879,20 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 
 /* ── 分類列表頁 ── */
 .list-wrapper { max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
-.list-row { background: var(--white); border: 1px solid var(--g6); border-top: none; cursor: pointer; transition: background .15s; position: relative; }
-.list-row:first-child { border-top: 2px solid var(--black); }
-.list-row:hover { background: var(--g8); }
-.list-must { background: var(--mustbg); }
+.list-row { background: #ffffff; border: 1px solid #dddddd; border-top: none; cursor: pointer; transition: background .15s; position: relative; }
+.list-row:first-child { border-top: 2px solid #111111; }
+.list-row:hover { background: #f5f5f5; }
+.list-must { background: #fff8f8; }
 .lr-inner { padding: 18px 22px; position: relative; }
-.lr-red-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+.lr-red-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #d0011b; }
 .lr-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-.lr-cat { font-size: 10px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 1px 7px; letter-spacing: .06em; }
-.lr-must-tag { font-size: 10px; font-weight: 700; background: var(--red); color: #fff; padding: 1px 7px; }
-.lr-title { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--black); line-height: 1.5; margin-bottom: 7px; }
-.lr-summary { font-size: 13px; color: var(--g2); line-height: 1.75; margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lr-cat { font-size: 10px; font-weight: 700; color: #d0011b; border: 1px solid #d0011b; padding: 1px 7px; letter-spacing: .06em; }
+.lr-must-tag { font-size: 10px; font-weight: 700; background: #d0011b; color: #fff; padding: 1px 7px; }
+.lr-title { font-family: var(--serif); font-size: 18px; font-weight: 700; color: #111111; line-height: 1.5; margin-bottom: 7px; }
+.lr-summary { font-size: 13px; color: #555555; line-height: 1.75; margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .lr-footer { display: flex; justify-content: space-between; align-items: center; }
-.lr-src { font-size: 11px; color: var(--g5); }
-.lr-cta { font-size: 12px; color: var(--red); font-weight: 600; }
+.lr-src { font-size: 11px; color: #bbbbbb; }
+.lr-cta { font-size: 12px; color: #d0011b; font-weight: 600; }
 
 /* ── 文章頁 ── */
 .article-wrapper { max-width: 700px; margin: 0 auto; padding: 40px 20px 100px; }
