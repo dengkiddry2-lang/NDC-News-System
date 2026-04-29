@@ -5,29 +5,20 @@ import re
 from collections import Counter
 
 # ── 1. 分類定義 ──────────────────────────────────────────────
-# ── 分類定義 ────────────────────────────────────────────────
-# 策略：先用 PDF 原始分類標題做第一層，再用關鍵字做第二層細分
-# PDF 原始分類：01頭版 02本會 03國內要聞 04國內財經 05國際要聞 06國際財經 07觀點評論 08各報社論
-
 DEPARTMENTS = {
     "社論與評論觀點": {
         "icon": "📝", "short": "社論",
-        # 08-各報社論：直接對應，不需關鍵字
-        # 07-觀點與評論：用版面名稱篩選（社論/社評/時評版）
         "keywords": ["社論","社評","時評","縱橫天下"],
         "pdf_sections": ["08", "07"],
         "source_keywords": ["社論","社評","時評","時論廣場","論壇","廣場"],
     },
     "國際經濟情勢": {
         "icon": "🌐", "short": "國際",
-        # 對應 PDF 05-國際要聞 + 06-國際財經
-        # 涵蓋：美陸經濟數據、Fed/ECB/BOJ、地緣衝突、國際貿易
         "keywords": [],
         "pdf_sections": ["05", "06"],
     },
     "台灣總體經濟與數據": {
         "icon": "📊", "short": "總經",
-        # 對應 PDF 04-國內財經 中的總體數據類
         "keywords": [
             "GDP","景氣燈號","景氣","物價","通膨","CPI","失業率","薪資",
             "外銷訂單","出口統計","進口統計","貿易統計","稅收","超徵",
@@ -38,7 +29,6 @@ DEPARTMENTS = {
     },
     "台灣產業與投資動向": {
         "icon": "🏭", "short": "產業",
-        # 對應 PDF 02-本會相關新聞 + 04-國內財經 中的產業類
         "keywords": [
             "AI","半導體","台積電","台積","聯發科","聯電","鴻海",
             "台達電","廣達","緯創","英業達","資本支出","供應鏈",
@@ -52,7 +42,6 @@ DEPARTMENTS = {
     },
     "台灣政府與政策訊息": {
         "icon": "🏛️", "short": "政策",
-        # 對應 PDF 03-國內要聞 + 04-國內財經 中的政策類
         "keywords": [
             "國發會","行政院","總統府","經濟部","財政部","金管會",
             "國科會","央行","院會","法案","預算","政策","施政",
@@ -60,7 +49,6 @@ DEPARTMENTS = {
             "軍購","軍事預算","特別條例",
         ],
         "pdf_sections": ["03", "04"],
-        # 負向過濾：這些詞出現時排除（即使有政府機關關鍵字）
         "exclude_keywords": [
             "安樂死","安寧","失智","醫護","廚餘","豬","旅遊",
             "禁團令","詐騙","甘肅","鞭刑","兒托","監管雲",
@@ -76,16 +64,12 @@ CATEGORY_ORDER = [
     "台灣政府與政策訊息",
 ]
 
-
 NOISE_PREFIXES = ["來源","作者","版面","日期","出處","記者","編輯","回到目錄","本報訊"]
-
 FRONT_PAGE_PATTERNS = ["A01", "AA01"]
 
 def is_frontpage(source):
     return any(p in source for p in FRONT_PAGE_PATTERNS)
 
-
-# 即使在目錄裡，這些標題一定排除（與經濟完全無關）
 HARD_EXCLUDE = [
     "大麻","毒品","農業旱","廚餘養豬","安樂死","安寧照護",
     "失智","長照","石崇良","監管雲","甘肅翻車","鞭刑",
@@ -93,17 +77,13 @@ HARD_EXCLUDE = [
 ]
 
 def should_skip(title, source, pdf_section):
-    """判斷是否排除這則新聞"""
-    # 硬性排除
     if any(k in title for k in HARD_EXCLUDE):
         return True
-    # 政策類的負向過濾
     dept = DEPARTMENTS.get("台灣政府與政策訊息", {})
     if dept.get("exclude_keywords"):
         if any(k in title for k in dept["exclude_keywords"]):
             return True
     return False
-
 
 def is_noise_line(line):
     if line.isdigit(): return True
@@ -115,16 +95,13 @@ def clean_text_blocks(text_list):
     for line in text_list:
         line = line.strip()
         if not line or is_noise_line(line): continue
-        # 過濾作者行殘留（跨行後的尾段）
         if re.search(r'報導[〕】]$|^[／/].{0,10}報導[〕】]|^[合綜]\w*報導[〕】]|^記者.{0,15}報導', line): continue
         if len(line) <= 10 and re.search(r'[〕】報導]', line): continue
         if line.isdigit(): continue
         if not merged:
             merged = line
         elif (
-            # 真正的句子結束：句尾標點
             merged[-1] in ("。","！","？","；","…") or
-            # 句尾標點 + 引號（如：好。」、完！」）
             (len(merged) >= 2 and merged[-1] in ("」","\u201d","'","\u2019") and
              merged[-2] in ("。","！","？","；","…"))
         ):
@@ -154,10 +131,7 @@ def clean_text_blocks(text_list):
         p = p.strip()
         if p: cleaned.append(p)
     result = "\n\n".join(cleaned)
-    # 段落以 」』等收尾引號開頭，代表是上一段被切斷的引號尾
-    # 直接合併回前一段（去除兩段間的換行）
     result = re.sub(r'\n\n([」』\u201d\u2019])', r'\1', result)
-    # 同樣處理段落內的殘留：「提案說明 → 緊接前文
     return result
 
 def find_article(article_index, title):
@@ -192,13 +166,11 @@ def build_article_index(pdf):
             body_start = src_idx + 1
             while body_start < len(lines):
                 l = lines[body_start]
-                # 跳過作者行跨行殘留：
-                # 條件：行長 <= 15 字 且 符合以下任一模式
                 is_author_tail = (
                     len(l) <= 15 and (
-                        re.search(r'[報導〕】]\s*$', l) or   # 以報導/〕/】結尾
-                        re.search(r'^[／/].{0,10}報導[〕】]', l) or  # /台北報導】
-                        re.search(r'^[合綜]\w*報導[〕】]', l)   # 合報導/綜合報導
+                        re.search(r'[報導〕】]\s*$', l) or
+                        re.search(r'^[／/].{0,10}報導[〕】]', l) or
+                        re.search(r'^[合綜]\w*報導[〕】]', l)
                     )
                 )
                 if is_author_tail:
@@ -253,12 +225,10 @@ def run_dashboard():
                 c2 = str(row[1] or '').strip() if len(row) > 1 else ''
                 c3 = str(row[2] or '').strip() if len(row) > 2 else ''
 
-                # 偵測分類標題行（如 "01-頭版新聞(14)"）
                 if _re2.match(r'^\d{2}-', c1) and not c2:
                     current_section = c1
                     continue
 
-                # 一般新聞行
                 if not c2 or len(c2) < 5: continue
                 if any(k in c2 for k in ["新聞議題","報導媒體","目錄","頁次"]): continue
                 title = c2.replace("\n","").strip()
@@ -267,7 +237,6 @@ def run_dashboard():
 
                 if should_skip(title, source, current_section): skipped += 1; continue
 
-                # ── 兩層分類邏輯 ──
                 found_cat = None
                 sec_num = current_section[:2] if current_section else ""
 
@@ -275,24 +244,19 @@ def run_dashboard():
                     dept = DEPARTMENTS[cat]
                     in_section = sec_num in dept.get("pdf_sections", [])
 
-                    # 第一層：直接對應（社論08/國際，keywords 為空）
                     if in_section and not dept["keywords"] and "source_keywords" not in dept:
                         found_cat = cat; break
-                    # 社論07：版面名稱篩選
                     if in_section and dept.get("source_keywords"):
                         if (any(k in source for k in dept["source_keywords"]) or
                             any(k in title for k in dept.get("keywords", []))):
                             found_cat = cat; break
 
-                    # 第二層：section 內用關鍵字細分
                     if in_section and dept["keywords"]:
                         if any(k in title + " " + source for k in dept["keywords"]):
                             found_cat = cat; break
 
-                # 頭版（01）：關鍵字未命中時，嘗試所有分類
                 if not found_cat and sec_num == "01":
                     classify_text = title + " " + source
-                    # 版面含國際字眼，或標題明顯是境外事件 → 歸國際
                     intl_src = ["國際","兩岸","全球","外電"]
                     intl_title = ["德國","法國","日本","韓國","美國","英國","歐洲",
                                   "中國","大陸","北京","上海","俄羅斯","以色列",
@@ -335,10 +299,9 @@ def generate_html(data):
     cat_counts = Counter(i["cat"] for i in data_sorted)
     must_total = sum(1 for i in data_sorted if i["priority"] == 1)
 
-    # Pre-compute highlight cards data
     highlights = []
     if must_total > 0:
-        highlights.append({"label": f"今日必看", "value": f"{must_total} 則", "cat": ""})
+        highlights.append({"label": "今日必看", "value": f"{must_total} 則", "cat": ""})
     for cat in CATEGORY_ORDER:
         cnt = cat_counts.get(cat, 0)
         if cnt > 0:
@@ -349,13 +312,6 @@ def generate_html(data):
                 "cat": cat
             })
     highlights_json = json.dumps(highlights, ensure_ascii=False)
-
-    now_script = """
-const now = new Date();
-const roc = now.getFullYear() - 1911;
-document.getElementById('gnav-date').textContent =
-  '\u6c11\u570b ' + roc + ' \u5e74 ' + (now.getMonth()+1) + ' \u6708 ' + now.getDate() + ' \u65e5';
-"""
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-TW">
@@ -463,11 +419,17 @@ const DEPTS = {dept_json};
 const CAT_ORDER = {cat_order_json};
 const HIGHLIGHTS = {highlights_json};
 
-{now_script}
+// 日期
+(function() {{
+  const now = new Date();
+  const roc = now.getFullYear() - 1911;
+  document.getElementById('gnav-date').textContent =
+    '\u6c11\u570b ' + roc + ' \u5e74 ' + (now.getMonth()+1) + ' \u6708 ' + now.getDate() + ' \u65e5';
+}})();
 
 // ESC helper
-function esc(s){{
-  let r = String(s||'');
+function esc(s) {{
+  let r = String(s || '');
   r = r.split('&').join('&amp;');
   r = r.split('<').join('&lt;');
   r = r.split('>').join('&gt;');
@@ -476,19 +438,19 @@ function esc(s){{
 }}
 
 // ── GLOBAL NAV TABS ──
-function buildGnavTabs(){{
+function buildGnavTabs() {{
   const bar = document.getElementById('gnav-tabs');
   bar.innerHTML = '';
   const tabs = [{{'label':'\u6982\u89bd','cat':'all'}}].concat(
-    CAT_ORDER.map(c=>({{'label': DEPTS[c]?DEPTS[c].short:c, 'cat': c}}))
+    CAT_ORDER.map(c => ({{'label': DEPTS[c] ? DEPTS[c].short : c, 'cat': c}}))
   );
-  tabs.forEach(t=>{{
+  tabs.forEach(t => {{
     const btn = document.createElement('button');
     btn.className = 'gnav-tab';
     btn.textContent = t.label;
     btn.dataset.cat = t.cat;
-    btn.onclick = ()=>{{
-      if(t.cat==='all') goHome();
+    btn.onclick = () => {{
+      if (t.cat === 'all') goHome();
       else openCatView(t.cat);
     }};
     bar.appendChild(btn);
@@ -496,30 +458,30 @@ function buildGnavTabs(){{
   setActiveTab('all');
 }}
 
-function setActiveTab(cat){{
-  document.querySelectorAll('.gnav-tab').forEach(b=>{{
-    b.classList.toggle('active', b.dataset.cat===cat);
+function setActiveTab(cat) {{
+  document.querySelectorAll('.gnav-tab').forEach(b => {{
+    b.classList.toggle('active', b.dataset.cat === cat);
   }});
 }}
 
 // ── HIGHLIGHTS STRIP ──
-function buildHighlights(){{
+function buildHighlights() {{
   const scroll = document.getElementById('highlights-scroll');
   scroll.innerHTML = '';
-  HIGHLIGHTS.forEach(h=>{{
+  HIGHLIGHTS.forEach(h => {{
     const card = document.createElement('div');
-    card.className = 'highlight-card' + (h.cat===''?' highlight-must':'');
-    card.innerHTML = '<div class="hl-label">'+esc(h.label)+'</div><div class="hl-value">'+esc(h.value)+'</div>';
-    card.onclick = ()=>{{
-      if(h.cat==='') openCatView('must');
+    card.className = 'highlight-card' + (h.cat === '' ? ' highlight-must' : '');
+    card.innerHTML = '<div class="hl-label">' + esc(h.label) + '</div><div class="hl-value">' + esc(h.value) + '</div>';
+    card.onclick = () => {{
+      if (h.cat === '') openCatView('must');
       else openCatView(h.cat);
     }};
     scroll.appendChild(card);
   }});
 }}
 
-// ── CATEGORY BRICKS (home) ──
-function makeBrick(item, idx, isMustZone){{
+// ── MAKE BRICK ──
+function makeBrick(item, idx, isMustZone) {{
   const dataIdx = DATA.indexOf(item);
   const dept = DEPTS[item.cat] || {{}};
   const isFull = idx === 0;
@@ -529,83 +491,83 @@ function makeBrick(item, idx, isMustZone){{
     + (isFull ? ' brick-full' : '')
     + (isMustZone ? ' brick-must-zone' : '')
     + (isLight ? ' brick-light' : ' brick-dark');
+
   let inner = '';
-  if(isMustZone) inner += '<div class="brick-must-bar"></div>';
-  inner += '<div class="brick-eyebrow">'+(dept.icon||'')+' '+esc(item.cat)+'</div>';
-  inner += '<div class="brick-title">'+esc(item.title)+'</div>';
-  inner += '<div class="brick-summary">'+esc(item.summary)+'</div>';
-  inner += '<div class="brick-meta"><span class="brick-source">'+esc(item.source)+'</span>'
-    + (isMustZone?'<span class="badge-must">必看</span>':'')+'</div>';
+  if (isMustZone) inner += '<div class="brick-must-bar"></div>';
+  inner += '<div class="brick-eyebrow">' + (dept.icon || '') + ' ' + esc(item.cat) + '</div>';
+  inner += '<div class="brick-title">' + esc(item.title) + '</div>';
+  inner += '<div class="brick-summary">' + esc(item.summary) + '</div>';
+  inner += '<div class="brick-meta"><span class="brick-source">' + esc(item.source) + '</span>'
+    + (isMustZone ? '<span class="badge-must">必看</span>' : '') + '</div>';
   inner += '<div class="brick-cta">閱讀全文 ›</div>';
   brick.innerHTML = inner;
-  brick.onclick = ()=>openArticle(dataIdx);
+  brick.onclick = () => openArticle(dataIdx);
   return brick;
 }}
 
-function renderBricks(cat){{
+// ── RENDER BRICKS ──
+function renderBricks(cat) {{
   const mustGrid = document.getElementById('must-grid');
   const allGrid = document.getElementById('brick-grid');
   const mustSec = document.getElementById('must-section');
   const allSec = allGrid ? allGrid.closest('.all-section') : null;
-  if(mustGrid) mustGrid.innerHTML = '';
-  if(allGrid) allGrid.innerHTML = '';
+  if (mustGrid) mustGrid.innerHTML = '';
+  if (allGrid) allGrid.innerHTML = '';
 
-  const allItems = (cat&&cat!=='all') ? DATA.filter(i=>i.cat===cat) : DATA;
-  const mustItems = allItems.filter(i=>i.priority===1);
-  const restItems = allItems.filter(i=>i.priority!==1);
+  const allItems = (cat && cat !== 'all') ? DATA.filter(i => i.cat === cat) : DATA;
+  const mustItems = allItems.filter(i => i.priority === 1);
+  const restItems = allItems.filter(i => i.priority !== 1);
 
-  // 今日必看區
-  if(mustSec) mustSec.style.display = mustItems.length ? 'block' : 'none';
-  if(mustGrid) mustItems.forEach((item,idx)=>mustGrid.appendChild(makeBrick(item,idx,true)));
+  if (mustSec) mustSec.style.display = mustItems.length ? 'block' : 'none';
+  if (mustGrid) mustItems.forEach((item, idx) => mustGrid.appendChild(makeBrick(item, idx, true)));
 
-  // 全部新聞區
-  if(allSec) allSec.style.display = restItems.length ? 'block' : 'none';
-  if(allGrid){{
-    if(!restItems.length && !mustItems.length)
-      allGrid.innerHTML='<div class="empty-brick">目前無資料</div>';
+  if (allSec) allSec.style.display = restItems.length ? 'block' : 'none';
+  if (allGrid) {{
+    if (!restItems.length && !mustItems.length)
+      allGrid.innerHTML = '<div class="empty-brick">目前無資料</div>';
     else
-      restItems.forEach((item,idx)=>allGrid.appendChild(makeBrick(item,idx,false)));
+      restItems.forEach((item, idx) => allGrid.appendChild(makeBrick(item, idx, false)));
   }}
-  // 重新觀察新渲染的 brick
-  if(typeof observeBricks === 'function') observeBricks();
+
+  // 觸發 reveal 動畫（observeBricks 在此時已定義）
+  if (typeof window.observeBricks === 'function') window.observeBricks();
 }}
 
-
 // ── CATEGORY VIEW ──
-function openCatView(cat){{
-  const isMust = cat==='must';
-  const items = isMust ? DATA.filter(i=>i.priority===1) : DATA.filter(i=>i.cat===cat);
+function openCatView(cat) {{
+  const isMust = cat === 'must';
+  const items = isMust ? DATA.filter(i => i.priority === 1) : DATA.filter(i => i.cat === cat);
   const title = isMust ? '\u5fc5\u770b\u60c5\u5831' : cat;
   document.getElementById('cat-view-title').textContent = title;
   const list = document.getElementById('cat-news-list');
   list.innerHTML = '';
-  items.forEach(item=>{{
+  items.forEach(item => {{
     const dataIdx = DATA.indexOf(item);
     const row = document.createElement('div');
-    row.className = 'news-row' + (item.priority===1?' news-row-must':'');
+    row.className = 'news-row' + (item.priority === 1 ? ' news-row-must' : '');
     row.innerHTML =
       '<div class="news-row-inner">' +
-        (item.priority===1?'<div class="row-must-bar"></div>':'') +
-        '<div class="row-cat">'+(DEPTS[item.cat]?DEPTS[item.cat].icon:'')+' '+esc(item.cat)+'</div>'+
-        '<h3 class="row-title">'+esc(item.title)+'</h3>'+
-        '<p class="row-summary">'+esc(item.summary)+'</p>'+
-        '<div class="row-footer">'+
-          '<span class="row-source">'+esc(item.source)+'</span>'+
-          '<span class="row-cta">\u95b1\u8b80\u5168\u6587 \u203a</span>'+
-        '</div>'+
+        (item.priority === 1 ? '<div class="row-must-bar"></div>' : '') +
+        '<div class="row-cat">' + (DEPTS[item.cat] ? DEPTS[item.cat].icon : '') + ' ' + esc(item.cat) + '</div>' +
+        '<h3 class="row-title">' + esc(item.title) + '</h3>' +
+        '<p class="row-summary">' + esc(item.summary) + '</p>' +
+        '<div class="row-footer">' +
+          '<span class="row-source">' + esc(item.source) + '</span>' +
+          '<span class="row-cta">\u95b1\u8b80\u5168\u6587 \u203a</span>' +
+        '</div>' +
       '</div>';
-    row.onclick=()=>openArticle(dataIdx);
+    row.onclick = () => openArticle(dataIdx);
     list.appendChild(row);
   }});
   showView('cat-view');
-  setActiveTab(isMust?'all':cat);
+  setActiveTab(isMust ? 'all' : cat);
 }}
-function closeCatView(){{ goHome(); }}
+function closeCatView() {{ goHome(); }}
 
 // ── ARTICLE VIEW ──
-function openArticle(idx){{
+function openArticle(idx) {{
   const item = DATA[idx];
-  const cat = DEPTS[item.cat]?(DEPTS[item.cat].icon+' '+item.cat):item.cat;
+  const cat = DEPTS[item.cat] ? (DEPTS[item.cat].icon + ' ' + item.cat) : item.cat;
   document.getElementById('art-cat').textContent = cat;
   document.getElementById('art-nav-cat').textContent = cat;
   document.getElementById('art-title').textContent = item.title;
@@ -613,69 +575,70 @@ function openArticle(idx){{
   document.getElementById('art-summary').textContent = item.summary;
   document.getElementById('art-summary-block').style.display = item.summary ? 'block' : 'none';
   const rawText = item.full_text || '\u5c1a\u672a\u64f7\u53d6\u5230\u5167\u6587\u5167\u5bb9';
-  const paras = rawText.split('\\n\\n').map(p=>'<p>'+esc(p.trim())+'</p>').join('');
+  const paras = rawText.split('\n\n').map(p => '<p>' + esc(p.trim()) + '</p>').join('');
   document.getElementById('art-body').innerHTML = paras;
 
-  // back button context
   const fromCat = currentView === 'cat-view';
   document.getElementById('art-back-btn').onclick = fromCat
-    ? ()=>{{ showView('cat-view'); }}
-    : ()=>closeArticle();
+    ? () => {{ showView('cat-view'); }}
+    : () => closeArticle();
 
   showView('article-view');
-  history.pushState({{view:'article', idx}}, '');
+  history.pushState({{view: 'article', idx}}, '');
 }}
-function closeArticle(){{
-  if(currentView==='article-view'){{
+function closeArticle() {{
+  if (currentView === 'article-view') {{
     const prev = history.state;
-    if(prev && prev.view==='cat-view') showView('cat-view');
+    if (prev && prev.view === 'cat-view') showView('cat-view');
     else goHome();
   }}
 }}
 
 // ── VIEW MANAGER ──
 window.currentView = 'home-view';
-let currentView = window.currentView;
-function showView(id){{
-  ['home-view','cat-view','article-view'].forEach(v=>{{
-    document.getElementById(v).style.display = v===id ? 'block' : 'none';
+var currentView = window.currentView;
+function showView(id) {{
+  ['home-view','cat-view','article-view'].forEach(v => {{
+    document.getElementById(v).style.display = v === id ? 'block' : 'none';
   }});
-  currentView = id; window.currentView = id;
-  window.scrollTo(0,0);
+  currentView = id;
+  window.currentView = id;
+  window.scrollTo(0, 0);
   document.body.style.overflow = '';
 }}
-function goHome(){{
+function goHome() {{
   showView('home-view');
   setActiveTab('all');
 }}
 
-window.addEventListener('popstate', e=>{{
-  if(currentView==='article-view') closeArticle();
-  else if(currentView==='cat-view') goHome();
+window.addEventListener('popstate', e => {{
+  if (currentView === 'article-view') closeArticle();
+  else if (currentView === 'cat-view') goHome();
 }});
-document.addEventListener('keydown', e=>{{ if(e.key==='Escape'){{
-  if(currentView==='article-view') closeArticle();
-  else if(currentView==='cat-view') goHome();
-}} }});
+document.addEventListener('keydown', e => {{
+  if (e.key === 'Escape') {{
+    if (currentView === 'article-view') closeArticle();
+    else if (currentView === 'cat-view') goHome();
+  }}
+}});
 
-// ── INIT ──
-buildGnavTabs();
-buildHighlights();
-renderBricks('all');
-showView('home-view');
-
-// ── SCROLL REVEAL ──
+// ── SCROLL REVEAL + PARALLAX + INIT ──
+// 注意：init 放在 IIFE 內部，確保 observeBricks 先定義再呼叫
 (function() {{
+  // IntersectionObserver for reveal animation
   var revealObs = new IntersectionObserver(function(entries) {{
     entries.forEach(function(entry) {{
       if (entry.isIntersecting) {{
         var d = parseInt(entry.target.dataset.delay || 0);
-        setTimeout(function() {{ entry.target.classList.add('brick-revealed'); }}, d * 90);
+        setTimeout(function() {{
+          entry.target.classList.add('brick-revealed');
+        }}, d * 90);
         revealObs.unobserve(entry.target);
       }}
     }});
   }}, {{ threshold: 0.06, rootMargin: '0px 0px -30px 0px' }});
 
+  // observeBricks 先定義
   window.observeBricks = function() {{
     document.querySelectorAll('.brick:not(.brick-revealed)').forEach(function(b, i) {{
       b.dataset.delay = i % 2;
@@ -686,9 +649,8 @@ showView('home-view');
       revealObs.observe(c);
     }});
   }};
-  window.observeBricks();
 
-  // ── HERO PARALLAX ──
+  // Hero parallax
   var heroEl = document.querySelector('.hero-block');
   var ticking = false;
   window.addEventListener('scroll', function() {{
@@ -703,8 +665,15 @@ showView('home-view');
       ticking = true;
     }}
   }}, {{ passive: true }});
-}})();
 
+  // ── INIT（在 observeBricks 定義之後才執行）──
+  buildGnavTabs();
+  buildHighlights();
+  renderBricks('all');
+  showView('home-view');
+  window.observeBricks();
+
+}})();
 </script>
 </body>
 </html>"""
@@ -712,7 +681,6 @@ showView('home-view');
     with open("index.html", "w", encoding="utf-8", errors="replace") as f:
         f.write(html)
 
-# ── SCROLL JS（獨立存放，避免 f-string {} 衝突）──────────────────
 
 # ── CSS ──────────────────────────────────────────────────────
 CSS = """
@@ -763,6 +731,8 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
   padding: 110px 24px 80px;
   border-bottom: 1px solid rgba(110,92,255,0.15);
   position: relative; overflow: hidden;
+  will-change: transform;
+  transform-origin: top center;
   transition: background 0.8s ease;
 }
 .hero-block::before {
@@ -773,12 +743,11 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
     radial-gradient(ellipse 40% 60% at 75% 60%, rgba(100,60,180,0.1) 0%, transparent 70%);
   pointer-events: none;
 }
-.hero-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tw3); margin-bottom: 20px; }
+.hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue2); margin-bottom: 20px; }
 .hero-headline { font-size: 72px; font-weight: 700; letter-spacing: -0.05em; line-height: 1.0; color: var(--tw); margin-bottom: 16px; }
 .hero-sub { font-size: 21px; color: var(--tw2); font-weight: 300; margin-bottom: 56px; letter-spacing: -0.01em; }
-.hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue2); margin-bottom: 20px; }
 .hero-kpis { display: flex; justify-content: center; gap: 72px; padding-top: 40px; border-top: 1px solid var(--border); }
-.kpi-val { font-size: 52px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.kpi-val { font-size: 52px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: var(--tw); }
 .kpi-val.red { color: var(--must2); }
 .kpi-val.blue { color: var(--blue2); }
 .kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tw3); margin-top: 8px; }
@@ -795,14 +764,41 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
   flex-shrink: 0; width: 160px; background: var(--white);
   border-radius: 18px; padding: 22px 18px; cursor: pointer;
   border: 1px solid rgba(110,92,255,0.15); scroll-snap-align: start;
-  transition: transform 0.2s, box-shadow 0.2s;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.2s ease;
 }
-.highlight-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(110,92,255,0.12); }
+.highlight-card.brick-revealed { opacity: 1; transform: translateY(0); }
+.highlight-card.brick-revealed:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(110,92,255,0.12); }
 .highlight-card.highlight-must { background: linear-gradient(135deg, #ff3b5c, #7c3aed); border-color: transparent; }
 .highlight-card.highlight-must .hl-label,
 .highlight-card.highlight-must .hl-value { color: #fff; }
 .hl-label { font-size: 13px; font-weight: 600; color: var(--tb); margin-bottom: 6px; letter-spacing: -0.01em; }
 .hl-value { font-size: 13px; color: var(--tb3); font-weight: 400; }
+
+/* ── MUST SECTION ── */
+.must-section {
+  background: linear-gradient(180deg, #0a0018 0%, #0d0520 100%);
+  padding: 0 0 2px;
+  border-bottom: 1px solid rgba(110,92,255,0.2);
+}
+.must-section-header {
+  padding: 36px 24px 20px;
+  display: flex; align-items: baseline; gap: 16px;
+}
+.must-section-label {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #f0eefa 0%, #c4b5fd 50%, #a78bfa 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.must-section-sub { font-size: 13px; color: var(--tw3); font-weight: 400; }
+.must-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 2px; }
+
+/* ── ALL SECTION ── */
+.all-section { background: #f2f2f7; }
+.all-section-header { padding: 32px 24px 16px; }
+.all-section-label { font-size: 22px; font-weight: 700; letter-spacing: -0.025em; color: var(--tb); }
 
 /* ── CATEGORY BRICKS ── */
 #brick-grid {
@@ -814,21 +810,23 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
   border-radius: 22px; min-height: 440px;
   padding: 48px 40px; display: flex; flex-direction: column;
   justify-content: flex-end; cursor: pointer; position: relative;
-  overflow: hidden; transition: transform 0.25s cubic-bezier(.25,.46,.45,.94);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.brick:hover { transform: scale(1.01); }
+.brick:hover { filter: brightness(1.05); }
+.brick.brick-revealed { opacity: 1; transform: translateY(0); }
 .brick-full { grid-column: 1 / -1; min-height: 480px; justify-content: center; align-items: flex-start; }
 .brick-dark { background: var(--dark1); }
-.brick-must-zone { background: #130828; }
-.brick-must-zone .brick-eyebrow { color: var(--blue2); }
-.brick-must-zone .brick-cta { color: var(--blue2); }
-.brick-must-zone .brick-title { color: var(--tw); }
-.brick-must-zone .brick-summary { color: var(--tw2); }
-.brick-must-zone .brick-source { color: var(--tw3); }
 .brick-light { background: var(--white); border: 1px solid var(--border-b); }
+.brick-must-zone { background: #1a0a0a; }
 
 .brick-must-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ff3b5c, #a78bfa); border-radius: 22px 22px 0 0; }
 .brick-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.brick-must-zone .brick-eyebrow { color: #ff6b60; }
 .brick-title {
   font-size: 22px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.25;
   color: var(--tw); margin-bottom: 10px;
@@ -841,15 +839,13 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .brick-full .brick-summary { -webkit-line-clamp: 4; }
+.brick-light .brick-summary { color: var(--tb2); }
+.brick-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .brick-source { font-size: 12px; color: var(--tw3); }
 .brick-light .brick-source { color: var(--tb3); }
-.brick-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .badge-must { background: var(--must); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
-.brick-light .brick-summary { color: var(--tb2); }
-.brick-cta-row { display: flex; gap: 24px; align-items: center; }
 .brick-cta { font-size: 17px; color: var(--blue); font-weight: 400; letter-spacing: -0.01em; }
-.brick-cta2 { font-size: 17px; color: var(--tw2); font-weight: 400; letter-spacing: -0.01em; }
-.brick-light .brick-cta2 { color: var(--tb2); }
+.brick-must-zone .brick-cta { color: #ff6b60; }
 
 /* ── CATEGORY VIEW ── */
 #cat-view { display: none; background: var(--bg); min-height: 100vh; }
@@ -867,7 +863,6 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
 }
 .back-btn:hover { opacity: 0.7; }
 
-/* News rows in cat-view */
 #cat-news-list { max-width: 800px; margin: 0 auto; padding: 0 24px 80px; }
 .news-row {
   background: var(--white); border-radius: 18px; margin-top: 12px;
@@ -910,89 +905,14 @@ body { background: var(--bg); font-family: 'Inter',-apple-system,'SF Pro Display
 .article-body p { font-size: 19px; line-height: 1.9; color: var(--tb); margin-bottom: 1.5em; font-weight: 400; letter-spacing: -0.01em; }
 .article-body p:last-child { margin-bottom: 0; }
 
-/* ── MUST SECTION ── */
-.must-section {
-  background: linear-gradient(180deg, #0a0018 0%, #0d0520 100%);
-  padding: 0 0 2px;
-  border-bottom: 1px solid rgba(110,92,255,0.2);
-}
-.must-section-header {
-  padding: 36px 24px 20px;
-  display: flex; align-items: baseline; gap: 16px;
-}
-.must-section-label {
-  font-size: 28px; font-weight: 700; letter-spacing: -0.03em;
-  background: linear-gradient(90deg, #f0eefa 0%, #c4b5fd 50%, #a78bfa 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.must-section-sub {
-  font-size: 13px; color: var(--tw3); font-weight: 400;
-}
-.must-grid {
-  display: grid; grid-template-columns: repeat(2,1fr); gap: 2px;
-}
-.brick-must-zone {
-  background: #1a0a0a;
-}
-.brick-must-zone .brick-eyebrow { color: #ff6b60; }
-.brick-must-zone .brick-title { color: var(--tw); }
-.brick-must-zone .brick-summary { color: var(--tw2); }
-.brick-must-zone .brick-source { color: var(--tw3); }
-.brick-must-zone .brick-cta { color: #ff6b60; }
-
-.all-section { background: #f2f2f7; }
-.all-section-label { font-size: 22px; font-weight: 700; letter-spacing: -0.025em; color: var(--tb); }
-.all-section-header {
-  padding: 32px 24px 16px;
-}
-.all-section-label {
-  font-size: 22px; font-weight: 700; letter-spacing: -0.025em; color: var(--tb);
-}
-
-/* responsive */
-/* ── SCROLL REVEAL ANIMATION ── */
-.brick {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    filter 0.3s ease;
-}
-.brick.brick-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-.highlight-card {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease,
-    box-shadow 0.2s ease;
-}
-.highlight-card.brick-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-.highlight-card.brick-revealed:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(110,92,255,0.12);
-}
-
-/* ── HERO PARALLAX ── */
-.hero-block {
-  will-change: transform;
-  transform-origin: top center;
-}
-
+/* ── RESPONSIVE ── */
 @media (max-width: 720px) {
   .hero-headline { font-size: 48px; }
   .hero-sub { font-size: 17px; }
   .hero-kpis { gap: 32px; }
   .kpi-val { font-size: 40px; }
   #brick-grid { grid-template-columns: 1fr; }
+  .must-grid { grid-template-columns: 1fr; }
   .brick { min-height: 340px; padding: 36px 28px; border-radius: 18px; }
   .brick-title { font-size: 22px; }
   .brick.brick-full .brick-title { font-size: 26px; }
