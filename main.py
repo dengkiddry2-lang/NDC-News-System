@@ -287,7 +287,8 @@ def run_dashboard():
     generate_html(all_items)
     print("✅ 已產生 index.html")
 
-# ── 4. HTML 生成 ──────────────────────────────────────────────
+
+# ── 4. HTML 生成（日經中文版風格）─────────────────────────────
 def generate_html(data):
     p_rank = {1: 0, 0: 1}
     data_sorted = sorted(data, key=lambda x: p_rank.get(x["priority"], 1))
@@ -320,134 +321,138 @@ def generate_html(data):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPC 經濟情報 — 國家發展委員會</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Source+Han+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 {CSS}
 </style>
 </head>
 <body>
 
-<!-- TOP UTILITY BAR -->
+<!-- 頂部工具列 -->
 <div id="utility-bar">
   <div class="util-inner">
-    <span class="util-org">國家發展委員會 經濟分析科</span>
+    <span class="util-org">國家發展委員會 · 經濟分析科</span>
     <span class="util-date" id="util-date"></span>
   </div>
 </div>
 
-<!-- MASTHEAD -->
+<!-- 報頭 MASTHEAD -->
 <header id="masthead">
   <div class="masthead-inner">
-    <div class="masthead-left">
-      <div class="masthead-logo">
-        <span class="logo-jp">EPC</span>
-        <div class="logo-divider"></div>
-        <div class="logo-sub">
-          <span class="logo-cn">經濟情報</span>
-          <span class="logo-en">Economic Press Clipping</span>
-        </div>
+    <div class="masthead-logo">
+      <span class="logo-main">EPC</span>
+      <div class="logo-divider"></div>
+      <div class="logo-text">
+        <span class="logo-cn">經濟情報</span>
+        <span class="logo-en">Economic Press Clipping</span>
       </div>
     </div>
     <div class="masthead-stats">
-      <div class="stat-pill must-pill" id="must-pill-btn">
-        <span class="stat-label">頭版要聞</span>
-        <span class="stat-num red" id="kpi-must">{must_total}</span>
+      <div class="stat-item must-stat" id="must-stat-btn">
+        <div class="stat-num red">{must_total}</div>
+        <div class="stat-label">頭版要聞</div>
       </div>
       <div class="stat-sep"></div>
-      <div class="stat-pill">
-        <span class="stat-label">今日總則</span>
-        <span class="stat-num" id="kpi-total">{len(data_sorted)}</span>
+      <div class="stat-item">
+        <div class="stat-num">{len(data_sorted)}</div>
+        <div class="stat-label">今日總則</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">{len(cat_counts)}</div>
+        <div class="stat-label">分類數</div>
       </div>
     </div>
   </div>
 </header>
 
-<!-- CATEGORY NAV BAR -->
-<nav id="cat-nav-bar">
-  <div class="cat-nav-inner">
-    <button class="cat-btn active" data-cat="all">全部</button>
-    <!-- filled by JS -->
+<!-- 分類導覽列 -->
+<nav id="section-nav">
+  <div class="section-nav-inner" id="section-nav-inner">
+    <button class="nav-btn active" data-cat="all" onclick="goHome()">全部</button>
   </div>
 </nav>
 
 <!-- HOME VIEW -->
 <div id="home-view">
 
-  <!-- BREAKING TICKER -->
-  <div class="ticker-wrap" id="ticker-wrap">
-    <span class="ticker-label">頭版</span>
-    <div class="ticker-track" id="ticker-track"></div>
+  <!-- 跑馬燈 -->
+  <div class="ticker-bar" id="ticker-bar">
+    <span class="ticker-tag">頭版</span>
+    <div class="ticker-body">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
   </div>
 
-  <!-- MAIN GRID -->
-  <main class="main-container" id="main-container">
+  <!-- 主版面：左主欄 + 右側欄 -->
+  <div class="layout-wrapper">
+    <div class="layout-main">
 
-    <!-- LEFT: TOP STORY + SECONDARY -->
-    <section class="col-main">
-      <div id="top-story-area"></div>
-      <div class="section-divider"></div>
-      <div id="secondary-area"></div>
-    </section>
+      <!-- 頭條 -->
+      <div id="top-story-wrap"></div>
 
-    <!-- RIGHT SIDEBAR -->
-    <aside class="col-sidebar">
-      <!-- MUST READ BOX -->
-      <div class="sidebar-box" id="must-box">
-        <div class="sidebar-box-header">
-          <span class="sbox-label red-label">今日必看</span>
-          <span class="sbox-sub">頭版 · 重點領域</span>
+      <!-- 次要新聞列表 -->
+      <div id="sub-news-wrap"></div>
+
+    </div>
+    <aside class="layout-sidebar">
+
+      <!-- 今日必看 -->
+      <div class="sidebar-block" id="must-block">
+        <div class="sb-header red-header">
+          <span class="sb-title">今日必看</span>
+          <span class="sb-sub">頭版 · 重點領域</span>
         </div>
         <div id="must-list"></div>
       </div>
-      <!-- CATEGORY SUMMARY -->
-      <div class="sidebar-box" id="cat-summary-box">
-        <div class="sidebar-box-header">
-          <span class="sbox-label">分類總覽</span>
+
+      <!-- 分類總覽 -->
+      <div class="sidebar-block">
+        <div class="sb-header">
+          <span class="sb-title">分類總覽</span>
         </div>
-        <div id="cat-summary-list"></div>
+        <div id="cat-overview"></div>
       </div>
+
     </aside>
-
-  </main>
-
-  <!-- BOTTOM SECTION: ALL NEWS BY CATEGORY -->
-  <div class="all-news-section">
-    <div class="all-news-inner" id="all-news-inner"></div>
   </div>
 
-</div><!-- end home-view -->
+  <!-- 各分類新聞區塊 -->
+  <div class="all-section">
+    <div class="all-section-inner" id="all-section-inner"></div>
+  </div>
+
+</div><!-- /home-view -->
 
 <!-- CATEGORY VIEW -->
 <div id="cat-view" style="display:none;">
-  <div class="page-nav">
-    <button class="page-back-btn" onclick="goHome()">← 返回首頁</button>
-    <span class="page-nav-title" id="cat-view-title"></span>
+  <div class="sub-nav">
+    <button class="back-btn" onclick="goHome()">&#8592; 返回首頁</button>
+    <span class="sub-nav-title" id="cat-view-title"></span>
   </div>
-  <div class="cat-view-inner">
-    <div id="cat-news-list"></div>
+  <div class="list-wrapper">
+    <div id="cat-list"></div>
   </div>
 </div>
 
 <!-- ARTICLE VIEW -->
 <div id="article-view" style="display:none;">
-  <div class="page-nav">
-    <button class="page-back-btn" id="art-back-btn" onclick="closeArticle()">← 返回</button>
-    <span class="page-nav-title" id="art-nav-cat"></span>
+  <div class="sub-nav">
+    <button class="back-btn" id="art-back-btn">&#8592; 返回</button>
+    <span class="sub-nav-title" id="art-nav-cat"></span>
   </div>
-  <article class="article-container">
-    <header class="article-header">
-      <div class="art-cat-tag" id="art-cat-tag"></div>
-      <h1 class="art-headline" id="art-title"></h1>
-      <div class="art-meta">
-        <span class="art-source" id="art-source"></span>
-      </div>
-      <div class="art-summary-box" id="art-summary-box">
-        <div class="art-summary-label">▌ 摘要重點</div>
-        <p class="art-summary-text" id="art-summary"></p>
-      </div>
-    </header>
+  <div class="article-wrapper">
+    <div class="art-cat-label" id="art-cat-label"></div>
+    <h1 class="art-title" id="art-title"></h1>
+    <div class="art-meta">
+      <span class="art-source" id="art-source"></span>
+    </div>
+    <div class="art-summary-block" id="art-summary-block">
+      <div class="art-summary-label">▌ 摘要重點</div>
+      <p class="art-summary-text" id="art-summary"></p>
+    </div>
     <div class="art-body" id="art-body"></div>
-  </article>
+  </div>
 </div>
 
 <script>
@@ -456,310 +461,269 @@ const DEPTS = {dept_json};
 const CAT_ORDER = {cat_order_json};
 const HIGHLIGHTS = {highlights_json};
 
-// ── 日期 ──
+// 日期
 (function() {{
   const now = new Date();
   const roc = now.getFullYear() - 1911;
-  const dateStr = '\u6c11\u570b' + roc + '\u5e74' + (now.getMonth()+1) + '\u6708' + now.getDate() + '\u65e5 \u661f\u671f' + ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'][now.getDay()];
-  const el = document.getElementById('util-date');
-  if(el) el.textContent = dateStr;
+  const days = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
+  document.getElementById('util-date').textContent =
+    '\u6c11\u570b' + roc + '\u5e74' + (now.getMonth()+1) + '\u6708' + now.getDate() + '\u65e5\u00a0\u661f\u671f' + days[now.getDay()];
 }})();
 
 function esc(s) {{
-  let r = String(s||'');
-  return r.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }}
 
-// ── CATEGORY NAV ──
-function buildCatNav() {{
-  const bar = document.querySelector('.cat-nav-inner');
+// ── 導覽列 ──
+function buildNav() {{
+  const bar = document.getElementById('section-nav-inner');
   CAT_ORDER.forEach(cat => {{
     const btn = document.createElement('button');
-    btn.className = 'cat-btn';
+    btn.className = 'nav-btn';
     btn.dataset.cat = cat;
     btn.textContent = DEPTS[cat] ? DEPTS[cat].short : cat;
     btn.onclick = () => openCatView(cat);
     bar.appendChild(btn);
   }});
-  document.getElementById('must-pill-btn').onclick = () => openCatView('must');
+  document.getElementById('must-stat-btn').onclick = () => openCatView('must');
 }}
 
-function setActiveNavBtn(cat) {{
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+function setActiveNav(cat) {{
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
 }}
 
-// ── TICKER ──
+// ── 跑馬燈 ──
 function buildTicker() {{
-  const mustItems = DATA.filter(i => i.priority === 1);
-  const track = document.getElementById('ticker-track');
-  if(!mustItems.length) {{ document.getElementById('ticker-wrap').style.display='none'; return; }}
-  const html = mustItems.map(item => {{
+  const items = DATA.filter(i => i.priority === 1);
+  const bar = document.getElementById('ticker-bar');
+  if (!items.length) {{ bar.style.display = 'none'; return; }}
+  const html = items.map((item, i) => {{
     const idx = DATA.indexOf(item);
-    return '<span class="ticker-item" onclick="openArticle('+idx+')">' + esc(item.title) + '</span>';
-  }}).join('<span class="ticker-sep">／</span>');
-  track.innerHTML = html + '<span class="ticker-sep">&nbsp;&nbsp;&nbsp;&nbsp;</span>' + html;
+    return `<span class="t-item" onclick="openArticle(${{idx}})">${{esc(item.title)}}</span><span class="t-sep">／</span>`;
+  }}).join('');
+  const track = document.getElementById('ticker-track');
+  track.innerHTML = html + html; // 複製一份讓捲動無縫
 }}
 
-// ── TOP STORY ──
+// ── 頭條 ──
 function buildTopStory() {{
-  const area = document.getElementById('top-story-area');
-  area.innerHTML = '';
-  const allItems = DATA;
-  if(!allItems.length) return;
-
-  // 取最優先（priority=1）的第一則，或第一則
-  const top = allItems.find(i => i.priority===1) || allItems[0];
-  const topIdx = DATA.indexOf(top);
-  const dept = DEPTS[top.cat] || {{}};
-
-  area.innerHTML = `
-    <div class="top-story" onclick="openArticle(${{topIdx}})">
-      ${{top.priority===1 ? '<div class="ts-must-bar"></div>' : ''}}
-      <div class="ts-cat-row">
-        <span class="ts-cat-tag">${{esc(top.cat)}}</span>
-        ${{top.priority===1 ? '<span class="ts-must-badge">頭版要聞</span>' : ''}}
+  const wrap = document.getElementById('top-story-wrap');
+  const top = DATA.find(i => i.priority === 1) || DATA[0];
+  if (!top) return;
+  const idx = DATA.indexOf(top);
+  wrap.innerHTML = `
+    <div class="top-story" onclick="openArticle(${{idx}})">
+      ${{top.priority===1 ? '<div class="ts-red-bar"></div>' : '<div class="ts-black-bar"></div>'}}
+      <div class="ts-meta">
+        <span class="ts-cat">${{esc(top.cat)}}</span>
+        ${{top.priority===1 ? '<span class="ts-badge">頭版要聞</span>' : ''}}
       </div>
-      <h2 class="ts-headline">${{esc(top.title)}}</h2>
+      <h2 class="ts-title">${{esc(top.title)}}</h2>
       <p class="ts-summary">${{esc(top.summary)}}</p>
       <div class="ts-footer">
-        <span class="ts-source">${{esc(top.source)}}</span>
-        <span class="ts-cta">閱讀全文 →</span>
+        <span class="ts-src">${{esc(top.source)}}</span>
+        <span class="ts-more">閱讀全文 →</span>
       </div>
-    </div>
-  `;
+    </div>`;
 }}
 
-// ── SECONDARY NEWS (below top story) ──
-function buildSecondary() {{
-  const area = document.getElementById('secondary-area');
-  area.innerHTML = '';
-  const allItems = DATA;
-  if(allItems.length < 2) return;
-
-  // 跳過第一則（已作 top story），取後面幾則
-  const items = allItems.slice(1, 7);
+// ── 次要新聞 ──
+function buildSubNews() {{
+  const wrap = document.getElementById('sub-news-wrap');
+  const items = DATA.slice(1, 8);
+  if (!items.length) return;
   const rows = items.map((item, i) => {{
     const idx = DATA.indexOf(item);
-    const dept = DEPTS[item.cat] || {{}};
     return `
-      <div class="sec-row${{item.priority===1 ? ' sec-must' : ''}}" onclick="openArticle(${{idx}})">
-        <div class="sec-row-inner">
-          ${{item.priority===1 ? '<div class="sec-must-dot"></div>' : '<div class="sec-num">'+(i+1)+'</div>'}}
-          <div class="sec-content">
-            <div class="sec-cat">${{esc(item.cat)}}</div>
-            <div class="sec-title">${{esc(item.title)}}</div>
-            <div class="sec-source">${{esc(item.source)}}</div>
-          </div>
+      <div class="sub-row${{item.priority===1?' sub-must':''}}" onclick="openArticle(${{idx}})">
+        ${{item.priority===1
+          ? '<div class="sub-dot-red"></div>'
+          : `<div class="sub-num">${{i+1}}</div>`}}
+        <div class="sub-body">
+          <div class="sub-cat">${{esc(item.cat)}}</div>
+          <div class="sub-title">${{esc(item.title)}}</div>
+          <div class="sub-src">${{esc(item.source)}}</div>
         </div>
-      </div>
-    `;
+      </div>`;
   }}).join('');
-
-  area.innerHTML = `
-    <div class="sec-header">更多要聞</div>
-    <div class="sec-list">${{rows}}</div>
-  `;
+  wrap.innerHTML = `
+    <div class="sub-header">更多要聞</div>
+    <div class="sub-list">${{rows}}</div>`;
 }}
 
-// ── SIDEBAR MUST LIST ──
+// ── 側欄：今日必看 ──
 function buildMustList() {{
   const list = document.getElementById('must-list');
-  list.innerHTML = '';
-  const mustItems = DATA.filter(i => i.priority===1);
-  if(!mustItems.length) {{
-    document.getElementById('must-box').style.display = 'none';
-    return;
-  }}
-  mustItems.slice(0, 8).forEach(item => {{
+  const items = DATA.filter(i => i.priority === 1);
+  if (!items.length) {{ document.getElementById('must-block').style.display='none'; return; }}
+  items.slice(0,8).forEach(item => {{
     const idx = DATA.indexOf(item);
     const el = document.createElement('div');
-    el.className = 'must-row';
+    el.className = 'must-item';
     el.innerHTML = `
-      <div class="must-row-cat">${{esc(item.cat)}}</div>
-      <div class="must-row-title">${{esc(item.title)}}</div>
-      <div class="must-row-src">${{esc(item.source)}}</div>
-    `;
+      <div class="mi-cat">${{esc(item.cat)}}</div>
+      <div class="mi-title">${{esc(item.title)}}</div>
+      <div class="mi-src">${{esc(item.source)}}</div>`;
     el.onclick = () => openArticle(idx);
     list.appendChild(el);
   }});
 }}
 
-// ── SIDEBAR CATEGORY SUMMARY ──
-function buildCatSummary() {{
-  const list = document.getElementById('cat-summary-list');
-  list.innerHTML = '';
+// ── 側欄：分類總覽 ──
+function buildCatOverview() {{
+  const wrap = document.getElementById('cat-overview');
   CAT_ORDER.forEach(cat => {{
     const cnt = DATA.filter(i => i.cat===cat).length;
-    if(!cnt) return;
+    if (!cnt) return;
     const must = DATA.filter(i => i.cat===cat && i.priority===1).length;
     const dept = DEPTS[cat] || {{}};
     const el = document.createElement('div');
-    el.className = 'cat-sum-row';
+    el.className = 'co-row';
     el.innerHTML = `
-      <div class="cat-sum-name">${{esc(dept.icon||'')}}\u00a0${{esc(dept.short||cat)}}</div>
-      <div class="cat-sum-right">
-        <span class="cat-sum-cnt">${{cnt}}</span>
-        ${{must ? '<span class="cat-sum-must">'+must+' 必看</span>' : ''}}
-      </div>
-    `;
+      <span class="co-name">${{esc((dept.icon||'')+'\u00a0'+(dept.short||cat))}}</span>
+      <span class="co-right">
+        <span class="co-cnt">${{cnt}}</span>
+        ${{must ? `<span class="co-must">${{must}}\u5fc5\u770b</span>` : ''}}
+      </span>`;
     el.onclick = () => openCatView(cat);
-    list.appendChild(el);
+    wrap.appendChild(el);
   }});
 }}
 
-// ── ALL NEWS SECTION (grouped by category) ──
-function buildAllNews() {{
-  const container = document.getElementById('all-news-inner');
-  container.innerHTML = '';
+// ── 各分類新聞區塊 ──
+function buildAllSections() {{
+  const container = document.getElementById('all-section-inner');
   CAT_ORDER.forEach(cat => {{
-    const items = DATA.filter(i => i.cat === cat);
-    if(!items.length) return;
+    const items = DATA.filter(i => i.cat===cat);
+    if (!items.length) return;
     const dept = DEPTS[cat] || {{}};
-
-    const section = document.createElement('div');
-    section.className = 'news-section';
-    section.innerHTML = `
-      <div class="ns-header">
-        <span class="ns-icon">${{dept.icon||''}}</span>
-        <span class="ns-title">${{esc(cat)}}</span>
-        <span class="ns-count">${{items.length}} 則</span>
-        <button class="ns-more-btn" onclick="openCatView('${{cat}}')">查看全部 →</button>
+    const sec = document.createElement('div');
+    sec.className = 'cat-section';
+    sec.innerHTML = `
+      <div class="cs-header">
+        <span class="cs-icon">${{dept.icon||''}}</span>
+        <span class="cs-title">${{esc(cat)}}</span>
+        <span class="cs-count">${{items.length}} 則</span>
+        <button class="cs-more" onclick="event.stopPropagation();openCatView('${{cat}}')">查看全部 →</button>
       </div>
-      <div class="ns-grid" id="ns-grid-${{cat.replace(/[^a-z0-9]/gi,'_')}}"></div>
-    `;
-    container.appendChild(section);
-
-    const grid = section.querySelector('.ns-grid');
-    items.slice(0, 6).forEach((item, i) => {{
+      <div class="cs-grid" id="csg-${{cat.replace(/\W/g,'_')}}"></div>`;
+    container.appendChild(sec);
+    const grid = sec.querySelector('.cs-grid');
+    items.slice(0,6).forEach((item, i) => {{
       const idx = DATA.indexOf(item);
       const card = document.createElement('div');
-      card.className = 'ns-card' + (item.priority===1?' ns-card-must':'') + (i===0?' ns-card-lead':'');
+      card.className = 'cs-card' + (item.priority===1?' cs-must':'') + (i===0?' cs-lead':'');
       card.innerHTML = `
-        ${{item.priority===1 ? '<div class="ns-must-stripe"></div>' : ''}}
-        <div class="ns-card-cat">${{esc(item.cat)}}</div>
-        <div class="ns-card-title">${{esc(item.title)}}</div>
-        ${{i===0 ? '<div class="ns-card-summary">'+esc(item.summary)+'</div>' : ''}}
-        <div class="ns-card-src">${{esc(item.source)}}</div>
-      `;
+        ${{item.priority===1 ? '<div class="cs-red-stripe"></div>' : ''}}
+        <div class="cs-card-cat">${{esc(item.cat)}}</div>
+        <div class="cs-card-title">${{esc(item.title)}}</div>
+        ${{i===0 ? `<div class="cs-card-summary">${{esc(item.summary)}}</div>` : ''}}
+        <div class="cs-card-src">${{esc(item.source)}}</div>`;
       card.onclick = () => openArticle(idx);
       grid.appendChild(card);
     }});
   }});
 }}
 
-// ── CATEGORY VIEW ──
+// ── 分類頁 ──
 function openCatView(cat) {{
-  const isMust = cat === 'must';
-  const items = isMust ? DATA.filter(i => i.priority===1) : DATA.filter(i => i.cat===cat);
-  const title = isMust ? '頭版要聞' : cat;
-  document.getElementById('cat-view-title').textContent = title;
-
-  const list = document.getElementById('cat-news-list');
+  const isMust = cat==='must';
+  const items = isMust ? DATA.filter(i=>i.priority===1) : DATA.filter(i=>i.cat===cat);
+  document.getElementById('cat-view-title').textContent = isMust ? '頭版要聞' : cat;
+  const list = document.getElementById('cat-list');
   list.innerHTML = '';
   items.forEach(item => {{
     const idx = DATA.indexOf(item);
-    const dept = DEPTS[item.cat] || {{}};
     const row = document.createElement('div');
-    row.className = 'list-row' + (item.priority===1?' list-row-must':'');
+    row.className = 'list-row' + (item.priority===1?' list-must':'');
     row.innerHTML = `
-      <div class="list-row-inner">
-        ${{item.priority===1 ? '<div class="list-must-bar"></div>' : ''}}
-        <div class="list-meta">
-          <span class="list-cat-tag">${{esc(item.cat)}}</span>
-          ${{item.priority===1 ? '<span class="list-must-tag">頭版</span>' : ''}}
+      <div class="lr-inner">
+        ${{item.priority===1 ? '<div class="lr-red-bar"></div>' : ''}}
+        <div class="lr-meta">
+          <span class="lr-cat">${{esc(item.cat)}}</span>
+          ${{item.priority===1 ? '<span class="lr-must-tag">頭版</span>' : ''}}
         </div>
-        <h3 class="list-title">${{esc(item.title)}}</h3>
-        <p class="list-summary">${{esc(item.summary)}}</p>
-        <div class="list-footer">
-          <span class="list-source">${{esc(item.source)}}</span>
-          <span class="list-cta">閱讀全文 →</span>
+        <div class="lr-title">${{esc(item.title)}}</div>
+        <div class="lr-summary">${{esc(item.summary)}}</div>
+        <div class="lr-footer">
+          <span class="lr-src">${{esc(item.source)}}</span>
+          <span class="lr-cta">閱讀全文 →</span>
         </div>
-      </div>
-    `;
+      </div>`;
     row.onclick = () => openArticle(idx);
     list.appendChild(row);
   }});
-
   showView('cat-view');
-  setActiveNavBtn(isMust ? 'all' : cat);
+  setActiveNav(isMust ? 'all' : cat);
 }}
 
-// ── ARTICLE VIEW ──
+// ── 文章頁 ──
 function openArticle(idx) {{
   const item = DATA[idx];
   const dept = DEPTS[item.cat] || {{}};
-  document.getElementById('art-cat-tag').textContent = (dept.icon||'') + ' ' + item.cat;
+  document.getElementById('art-cat-label').textContent = (dept.icon||'') + ' ' + item.cat;
   document.getElementById('art-nav-cat').textContent = item.cat;
   document.getElementById('art-title').textContent = item.title;
   document.getElementById('art-source').textContent = '來源：' + item.source;
   document.getElementById('art-summary').textContent = item.summary;
-  document.getElementById('art-summary-box').style.display = item.summary ? 'block' : 'none';
-  const rawText = item.full_text || '尚未擷取到內文內容';
-  document.getElementById('art-body').innerHTML = rawText.split('\\n\\n').map(p => '<p>' + esc(p.trim()) + '</p>').join('');
-
+  document.getElementById('art-summary-block').style.display = item.summary ? 'block' : 'none';
+  document.getElementById('art-body').innerHTML =
+    (item.full_text || '尚未擷取到內文內容').split('\\n\\n').map(p => '<p>' + esc(p.trim()) + '</p>').join('');
   const fromCat = currentView === 'cat-view';
-  document.getElementById('art-back-btn').onclick = fromCat
-    ? () => showView('cat-view')
-    : () => closeArticle();
-
+  document.getElementById('art-back-btn').onclick = fromCat ? () => showView('cat-view') : () => closeArticle();
   showView('article-view');
-  history.pushState({{view:'article', idx}}, '');
+  history.pushState({{view:'article',idx}}, '');
 }}
 
 function closeArticle() {{
-  if(history.state && history.state.view === 'cat-view') showView('cat-view');
+  if (history.state && history.state.view==='cat-view') showView('cat-view');
   else goHome();
 }}
 
-// ── VIEW MANAGER ──
+// ── View 管理 ──
 var currentView = 'home-view';
 function showView(id) {{
-  ['home-view','cat-view','article-view'].forEach(v => {{
-    document.getElementById(v).style.display = v===id ? 'block' : 'none';
-  }});
+  ['home-view','cat-view','article-view'].forEach(v =>
+    document.getElementById(v).style.display = v===id ? 'block' : 'none');
   currentView = id;
   window.scrollTo(0,0);
 }}
 function goHome() {{
   showView('home-view');
-  setActiveNavBtn('all');
+  setActiveNav('all');
 }}
 
 window.addEventListener('popstate', () => {{
-  if(currentView==='article-view') closeArticle();
-  else if(currentView==='cat-view') goHome();
+  if (currentView==='article-view') closeArticle();
+  else if (currentView==='cat-view') goHome();
 }});
 document.addEventListener('keydown', e => {{
-  if(e.key==='Escape') {{
-    if(currentView==='article-view') closeArticle();
-    else if(currentView==='cat-view') goHome();
+  if (e.key==='Escape') {{
+    if (currentView==='article-view') closeArticle();
+    else if (currentView==='cat-view') goHome();
   }}
 }});
 
-// ── INIT ──
+// ── 初始化（全部在 IIFE 內，確保 DOM 已就緒）──
 (function() {{
-  buildCatNav();
+  buildNav();
   buildTicker();
   buildTopStory();
-  buildSecondary();
+  buildSubNews();
   buildMustList();
-  buildCatSummary();
-  buildAllNews();
+  buildCatOverview();
+  buildAllSections();
   showView('home-view');
 
-  // Fade-in animation
-  const observer = new IntersectionObserver(entries => {{
+  // 淡入動畫
+  const obs = new IntersectionObserver(entries => {{
     entries.forEach(e => {{
-      if(e.isIntersecting) {{
-        e.target.classList.add('is-visible');
-        observer.unobserve(e.target);
-      }}
+      if (e.isIntersecting) {{ e.target.classList.add('visible'); obs.unobserve(e.target); }}
     }});
-  }}, {{threshold: 0.05, rootMargin: '0px 0px -20px 0px'}});
-
-  document.querySelectorAll('.ns-card, .list-row, .sec-row, .must-row').forEach((el,i) => {{
-    el.style.transitionDelay = (i % 6 * 40) + 'ms';
-    observer.observe(el);
+  }}, {{threshold: 0.05}});
+  document.querySelectorAll('.cs-card,.list-row,.sub-row,.must-item').forEach((el,i) => {{
+    el.style.transitionDelay = (i % 5 * 50) + 'ms';
+    obs.observe(el);
   }});
 }})();
 </script>
@@ -770,480 +734,202 @@ document.addEventListener('keydown', e => {{
         f.write(html)
 
 
-# ── CSS（日經中文版風格）──────────────────────────────────────
+# ── CSS（日經中文版風格）─────────────────────────────────────
 CSS = """
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --nk-red: #d0011b;
-  --nk-red2: #e8001f;
-  --nk-black: #111;
-  --nk-dark: #1a1a1a;
-  --nk-gray1: #333;
-  --nk-gray2: #555;
-  --nk-gray3: #888;
-  --nk-gray4: #aaa;
-  --nk-gray5: #ccc;
-  --nk-gray6: #e5e5e5;
-  --nk-gray7: #f0f0f0;
-  --nk-bg: #f7f7f7;
-  --nk-white: #fff;
-  --nk-border: #ddd;
-  --nk-border2: #e8e8e8;
-  --nk-must-bg: #fff8f8;
-  --nk-serif: 'Noto Serif TC', 'Source Han Serif TC', serif;
-  --nk-sans: 'Noto Sans TC', 'Helvetica Neue', sans-serif;
-  --nk-max: 1200px;
+  --red:    #d0011b;
+  --black:  #111111;
+  --dark:   #1a1a1a;
+  --g1:     #333;
+  --g2:     #555;
+  --g3:     #777;
+  --g4:     #999;
+  --g5:     #bbb;
+  --g6:     #ddd;
+  --g7:     #eeeeee;
+  --g8:     #f5f5f5;
+  --white:  #ffffff;
+  --mustbg: #fff8f8;
+  --serif:  'Noto Serif TC', 'Georgia', serif;
+  --sans:   'Noto Sans TC', 'Helvetica Neue', sans-serif;
+  --wrap:   1160px;
 }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { background: var(--g8); font-family: var(--sans); color: var(--dark); -webkit-font-smoothing: antialiased; }
 
-html { scroll-behavior: smooth; font-size: 16px; }
-body {
-  background: var(--nk-bg);
-  font-family: var(--nk-sans);
-  color: var(--nk-dark);
-  -webkit-font-smoothing: antialiased;
-  line-height: 1.6;
-}
+/* ── 頂部工具列 ── */
+#utility-bar { background: var(--black); border-bottom: 2px solid var(--red); }
+.util-inner { max-width: var(--wrap); margin: 0 auto; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; }
+.util-org { font-size: 11px; color: rgba(255,255,255,.65); letter-spacing: .06em; }
+.util-date { font-size: 11px; color: rgba(255,255,255,.4); }
 
-/* ── UTILITY BAR ── */
-#utility-bar {
-  background: var(--nk-black);
-  border-bottom: 2px solid var(--nk-red);
-}
-.util-inner {
-  max-width: var(--nk-max);
-  margin: 0 auto;
-  padding: 5px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.util-org { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: 0.08em; font-family: var(--nk-sans); font-weight: 500; }
-.util-date { font-size: 11px; color: rgba(255,255,255,0.5); }
-
-/* ── MASTHEAD ── */
-#masthead {
-  background: var(--nk-white);
-  border-bottom: 3px solid var(--nk-black);
-}
-.masthead-inner {
-  max-width: var(--nk-max);
-  margin: 0 auto;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.masthead-logo { display: flex; align-items: center; gap: 14px; }
-.logo-jp {
-  font-family: var(--nk-serif);
-  font-size: 36px;
-  font-weight: 900;
-  color: var(--nk-red);
-  letter-spacing: 0.02em;
-  line-height: 1;
-}
-.logo-divider {
-  width: 1px; height: 40px;
-  background: var(--nk-gray5);
-}
-.logo-sub { display: flex; flex-direction: column; gap: 2px; }
-.logo-cn {
-  font-family: var(--nk-serif);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--nk-black);
-  letter-spacing: 0.05em;
-}
-.logo-en { font-size: 10px; color: var(--nk-gray3); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
-
+/* ── 報頭 ── */
+#masthead { background: var(--white); border-bottom: 3px solid var(--black); }
+.masthead-inner { max-width: var(--wrap); margin: 0 auto; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
+.masthead-logo { display: flex; align-items: center; gap: 16px; }
+.logo-main { font-family: var(--serif); font-size: 40px; font-weight: 900; color: var(--red); line-height: 1; letter-spacing: .02em; }
+.logo-divider { width: 1px; height: 44px; background: var(--g6); }
+.logo-text { display: flex; flex-direction: column; gap: 3px; }
+.logo-cn { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--black); letter-spacing: .04em; }
+.logo-en { font-size: 10px; color: var(--g4); letter-spacing: .1em; text-transform: uppercase; }
 .masthead-stats { display: flex; align-items: center; gap: 0; }
-.stat-pill {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 4px 20px; cursor: default;
-}
-.must-pill { cursor: pointer; }
-.must-pill:hover .stat-num { color: var(--nk-red2); }
-.stat-label { font-size: 10px; color: var(--nk-gray3); letter-spacing: 0.06em; font-weight: 500; margin-bottom: 1px; }
-.stat-num { font-size: 24px; font-weight: 700; color: var(--nk-black); font-family: var(--nk-serif); line-height: 1; }
-.stat-num.red { color: var(--nk-red); }
-.stat-sep { width: 1px; height: 32px; background: var(--nk-gray6); }
+.stat-item { display: flex; flex-direction: column; align-items: center; padding: 0 22px; }
+.must-stat { cursor: pointer; }
+.must-stat:hover .stat-num { text-decoration: underline; }
+.stat-num { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--black); line-height: 1; }
+.stat-num.red { color: var(--red); }
+.stat-label { font-size: 10px; color: var(--g4); letter-spacing: .06em; margin-top: 3px; }
+.stat-sep { width: 1px; height: 36px; background: var(--g6); }
 
-/* ── CATEGORY NAV BAR ── */
-#cat-nav-bar {
-  background: var(--nk-white);
-  border-bottom: 1px solid var(--nk-border);
-  position: sticky; top: 0; z-index: 900;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-.cat-nav-inner {
-  max-width: var(--nk-max);
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.cat-nav-inner::-webkit-scrollbar { display: none; }
-.cat-btn {
-  padding: 10px 18px;
-  border: none;
-  background: none;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--nk-sans);
-  color: var(--nk-gray2);
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 3px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
-  letter-spacing: 0.02em;
-}
-.cat-btn:hover { color: var(--nk-black); }
-.cat-btn.active { color: var(--nk-red); border-bottom-color: var(--nk-red); font-weight: 700; }
+/* ── 分類導覽列 ── */
+#section-nav { background: var(--white); border-bottom: 1px solid var(--g6); position: sticky; top: 0; z-index: 900; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.section-nav-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; display: flex; overflow-x: auto; scrollbar-width: none; }
+.section-nav-inner::-webkit-scrollbar { display: none; }
+.nav-btn { padding: 11px 16px; border: none; background: none; font-size: 13px; font-weight: 500; font-family: var(--sans); color: var(--g3); cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: color .15s, border-color .15s; }
+.nav-btn:hover { color: var(--black); }
+.nav-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 700; }
 
-/* ── TICKER ── */
-.ticker-wrap {
-  background: var(--nk-black);
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  height: 34px;
-  border-bottom: 1px solid #222;
-}
-.ticker-label {
-  flex-shrink: 0;
-  background: var(--nk-red);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 0 14px;
-  height: 100%;
-  display: flex; align-items: center;
-  letter-spacing: 0.1em;
-  font-family: var(--nk-sans);
-}
-.ticker-track {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  animation: tickerScroll 40s linear infinite;
-  padding-left: 20px;
-}
+/* ── 跑馬燈 ── */
+.ticker-bar { background: var(--black); display: flex; align-items: center; height: 36px; overflow: hidden; border-bottom: 1px solid #2a2a2a; }
+.ticker-tag { flex-shrink: 0; background: var(--red); color: #fff; font-size: 11px; font-weight: 700; padding: 0 14px; height: 100%; display: flex; align-items: center; letter-spacing: .1em; }
+.ticker-body { flex: 1; overflow: hidden; position: relative; }
+.ticker-track { display: flex; align-items: center; white-space: nowrap; animation: scroll 45s linear infinite; padding-left: 24px; }
 .ticker-track:hover { animation-play-state: paused; }
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.ticker-item {
-  font-size: 12px;
-  color: rgba(255,255,255,0.85);
-  cursor: pointer;
-  transition: color 0.15s;
-  font-family: var(--nk-sans);
-}
-.ticker-item:hover { color: #fff; text-decoration: underline; }
-.ticker-sep { color: rgba(255,255,255,0.25); margin: 0 16px; font-size: 11px; }
+@keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.t-item { font-size: 12px; color: rgba(255,255,255,.82); cursor: pointer; transition: color .15s; }
+.t-item:hover { color: #fff; text-decoration: underline; }
+.t-sep { color: rgba(255,255,255,.22); margin: 0 14px; }
 
-/* ── MAIN LAYOUT ── */
-.main-container {
-  max-width: var(--nk-max);
-  margin: 0 auto;
-  padding: 24px 20px;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
-  align-items: start;
-}
+/* ── 主版面 ── */
+.layout-wrapper { max-width: var(--wrap); margin: 0 auto; padding: 24px 20px; display: grid; grid-template-columns: 1fr 288px; gap: 24px; align-items: start; }
 
-/* ── TOP STORY ── */
-.top-story {
-  background: var(--nk-white);
-  border: 1px solid var(--nk-border);
-  border-top: 3px solid var(--nk-black);
-  padding: 28px 32px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-.top-story:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-.ts-must-bar {
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: var(--nk-red);
-}
-.ts-cat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.ts-cat-tag {
-  font-size: 11px; font-weight: 700;
-  color: var(--nk-red);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-family: var(--nk-sans);
-  padding: 2px 8px;
-  border: 1px solid var(--nk-red);
-}
-.ts-must-badge {
-  font-size: 10px; font-weight: 700;
-  background: var(--nk-red); color: #fff;
-  padding: 2px 8px; letter-spacing: 0.06em;
-}
-.ts-headline {
-  font-family: var(--nk-serif);
-  font-size: 26px; font-weight: 700;
-  line-height: 1.45; color: var(--nk-black);
-  margin-bottom: 14px; letter-spacing: -0.01em;
-}
-.ts-summary {
-  font-size: 14px; color: var(--nk-gray2);
-  line-height: 1.8; margin-bottom: 20px;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
-.ts-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  border-top: 1px solid var(--nk-gray6); padding-top: 12px;
-}
-.ts-source { font-size: 12px; color: var(--nk-gray4); }
-.ts-cta { font-size: 13px; color: var(--nk-red); font-weight: 600; }
+/* ── 頭條 ── */
+.top-story { background: var(--white); border: 1px solid var(--g6); padding: 28px 30px; cursor: pointer; position: relative; transition: box-shadow .2s; overflow: hidden; }
+.top-story:hover { box-shadow: 0 4px 18px rgba(0,0,0,.09); }
+.ts-red-bar, .ts-black-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.ts-red-bar { background: var(--red); }
+.ts-black-bar { background: var(--black); }
+.ts-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ts-cat { font-size: 11px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 2px 8px; letter-spacing: .06em; }
+.ts-badge { font-size: 10px; font-weight: 700; background: var(--red); color: #fff; padding: 2px 8px; letter-spacing: .05em; }
+.ts-title { font-family: var(--serif); font-size: 26px; font-weight: 700; line-height: 1.5; color: var(--black); margin-bottom: 14px; }
+.ts-summary { font-size: 14px; color: var(--g2); line-height: 1.85; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ts-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--g7); padding-top: 12px; }
+.ts-src { font-size: 12px; color: var(--g5); }
+.ts-more { font-size: 13px; color: var(--red); font-weight: 600; }
 
-/* ── SECTION DIVIDER ── */
-.section-divider {
-  height: 1px; background: var(--nk-border);
-  margin: 20px 0;
-}
+/* ── 次要新聞 ── */
+.sub-header { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--g4); text-transform: uppercase; padding: 20px 0 8px; border-bottom: 2px solid var(--black); }
+.sub-list { background: var(--white); border: 1px solid var(--g6); border-top: none; }
+.sub-row { display: flex; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
+.sub-row.visible { opacity: 1; transform: none; }
+.sub-row:last-child { border-bottom: none; }
+.sub-row:hover { background: var(--g8); }
+.sub-must { background: var(--mustbg); }
+.sub-num { flex-shrink: 0; width: 36px; background: var(--black); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--sans); }
+.sub-dot-red { flex-shrink: 0; width: 36px; display: flex; align-items: center; justify-content: center; background: #fff8f8; }
+.sub-dot-red::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.sub-body { padding: 12px 16px; flex: 1; }
+.sub-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 3px; }
+.sub-title { font-size: 14px; font-weight: 600; font-family: var(--serif); color: var(--black); line-height: 1.5; margin-bottom: 3px; }
+.sub-src { font-size: 11px; color: var(--g5); }
 
-/* ── SECONDARY NEWS ── */
-.sec-header {
-  font-size: 11px; font-weight: 700;
-  letter-spacing: 0.1em; color: var(--nk-gray3);
-  text-transform: uppercase;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--nk-black);
-  margin-bottom: 0;
-}
-.sec-list { background: var(--nk-white); border: 1px solid var(--nk-border); border-top: none; }
-.sec-row {
-  border-bottom: 1px solid var(--nk-border2);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.sec-row:last-child { border-bottom: none; }
-.sec-row:hover { background: var(--nk-gray7); }
-.sec-must { background: var(--nk-must-bg); }
-.sec-row-inner { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; }
-.sec-num {
-  flex-shrink: 0; width: 22px; height: 22px;
-  background: var(--nk-black); color: #fff;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--nk-sans);
-  margin-top: 2px;
-}
-.sec-must-dot {
-  flex-shrink: 0; width: 8px; height: 8px;
-  background: var(--nk-red); border-radius: 50%;
-  margin-top: 7px;
-}
-.sec-content { flex: 1; }
-.sec-cat { font-size: 10px; color: var(--nk-red); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
-.sec-title { font-size: 14px; font-weight: 600; color: var(--nk-black); line-height: 1.45; font-family: var(--nk-serif); margin-bottom: 4px; }
-.sec-source { font-size: 11px; color: var(--nk-gray4); }
+/* ── 側欄 ── */
+.layout-sidebar { display: flex; flex-direction: column; gap: 20px; }
+.sidebar-block { background: var(--white); border: 1px solid var(--g6); border-top: 3px solid var(--black); }
+.sb-header { background: var(--g8); padding: 10px 14px; border-bottom: 1px solid var(--g6); display: flex; align-items: baseline; gap: 10px; }
+.red-header .sb-title { color: var(--red); }
+.sb-title { font-size: 13px; font-weight: 700; color: var(--black); letter-spacing: .03em; }
+.sb-sub { font-size: 11px; color: var(--g5); }
+.must-item { padding: 11px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
+.must-item.visible { opacity: 1; transform: none; }
+.must-item:last-child { border-bottom: none; }
+.must-item:hover { background: var(--mustbg); }
+.mi-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 3px; }
+.mi-title { font-size: 13px; font-weight: 600; font-family: var(--serif); color: var(--black); line-height: 1.5; margin-bottom: 3px; }
+.mi-src { font-size: 10px; color: var(--g5); }
+.co-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
+.co-row:last-child { border-bottom: none; }
+.co-row:hover { background: var(--g8); }
+.co-name { font-size: 13px; color: var(--dark); }
+.co-right { display: flex; align-items: center; gap: 8px; }
+.co-cnt { font-size: 13px; font-weight: 700; color: var(--black); }
+.co-must { font-size: 10px; background: var(--red); color: #fff; padding: 1px 6px; font-weight: 700; }
 
-/* ── SIDEBAR ── */
-.col-sidebar { display: flex; flex-direction: column; gap: 20px; }
-.sidebar-box {
-  background: var(--nk-white);
-  border: 1px solid var(--nk-border);
-  border-top: 3px solid var(--nk-black);
-}
-.sidebar-box-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--nk-border);
-  display: flex; align-items: baseline; gap: 10px;
-  background: var(--nk-gray7);
-}
-.sbox-label {
-  font-size: 13px; font-weight: 700;
-  color: var(--nk-black); letter-spacing: 0.04em;
-  font-family: var(--nk-sans);
-}
-.red-label { color: var(--nk-red); }
-.sbox-sub { font-size: 11px; color: var(--nk-gray4); }
+/* ── 各分類區塊 ── */
+.all-section { border-top: 1px solid var(--g6); background: var(--g8); padding: 32px 0 64px; }
+.all-section-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
+.cat-section { margin-bottom: 40px; }
+.cs-header { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 2px solid var(--black); margin-bottom: 1px; }
+.cs-icon { font-size: 16px; }
+.cs-title { font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--black); flex: 1; }
+.cs-count { font-size: 12px; color: var(--g5); }
+.cs-more { font-size: 12px; color: var(--red); font-weight: 600; background: none; border: 1px solid var(--red); padding: 3px 10px; cursor: pointer; font-family: var(--sans); transition: all .15s; }
+.cs-more:hover { background: var(--red); color: #fff; }
+.cs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--g6); border: 1px solid var(--g6); }
+.cs-card { background: var(--white); padding: 14px 16px; cursor: pointer; position: relative; transition: background .15s; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease, background .15s; }
+.cs-card.visible { opacity: 1; transform: none; }
+.cs-card:hover { background: var(--g8); }
+.cs-must { background: var(--mustbg); }
+.cs-lead { grid-column: 1 / -1; border-bottom: 1px solid var(--g6); }
+.cs-red-stripe { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--red); }
+.cs-card-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 5px; }
+.cs-card-title { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--black); line-height: 1.55; margin-bottom: 5px; }
+.cs-lead .cs-card-title { font-size: 18px; }
+.cs-card-summary { font-size: 13px; color: var(--g2); line-height: 1.7; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cs-card-src { font-size: 11px; color: var(--g5); }
 
-/* Must list */
-.must-row {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--nk-border2);
-  cursor: pointer; transition: background 0.15s;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.15s;
-}
-.must-row.is-visible { opacity: 1; transform: translateY(0); }
-.must-row:last-child { border-bottom: none; }
-.must-row:hover { background: var(--nk-must-bg); }
-.must-row-cat { font-size: 10px; color: var(--nk-red); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 3px; }
-.must-row-title { font-size: 13px; font-weight: 600; color: var(--nk-black); line-height: 1.5; font-family: var(--nk-serif); margin-bottom: 4px; }
-.must-row-src { font-size: 10px; color: var(--nk-gray4); }
+/* ── 次頁導覽 ── */
+.sub-nav { background: var(--white); border-bottom: 1px solid var(--g6); padding: 9px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 46px; z-index: 800; }
+.back-btn { background: none; border: none; font-size: 13px; color: var(--red); font-weight: 600; cursor: pointer; font-family: var(--sans); padding: 3px 0; }
+.back-btn:hover { opacity: .7; }
+.sub-nav-title { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--black); }
 
-/* Category summary */
-.cat-sum-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px; border-bottom: 1px solid var(--nk-border2);
-  cursor: pointer; transition: background 0.15s;
-}
-.cat-sum-row:last-child { border-bottom: none; }
-.cat-sum-row:hover { background: var(--nk-gray7); }
-.cat-sum-name { font-size: 13px; font-weight: 500; color: var(--nk-dark); }
-.cat-sum-right { display: flex; align-items: center; gap: 8px; }
-.cat-sum-cnt { font-size: 13px; font-weight: 700; color: var(--nk-black); }
-.cat-sum-must { font-size: 10px; background: var(--nk-red); color: #fff; padding: 1px 6px; font-weight: 700; }
+/* ── 分類列表頁 ── */
+.list-wrapper { max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
+.list-row { background: var(--white); border: 1px solid var(--g6); border-top: none; cursor: pointer; transition: background .15s; position: relative; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease, background .15s; }
+.list-row.visible { opacity: 1; transform: none; }
+.list-row:first-child { border-top: 2px solid var(--black); }
+.list-row:hover { background: var(--g8); }
+.list-must { background: var(--mustbg); }
+.lr-inner { padding: 18px 22px; position: relative; }
+.lr-red-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+.lr-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.lr-cat { font-size: 10px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 1px 7px; letter-spacing: .06em; }
+.lr-must-tag { font-size: 10px; font-weight: 700; background: var(--red); color: #fff; padding: 1px 7px; }
+.lr-title { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--black); line-height: 1.5; margin-bottom: 7px; }
+.lr-summary { font-size: 13px; color: var(--g2); line-height: 1.75; margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lr-footer { display: flex; justify-content: space-between; align-items: center; }
+.lr-src { font-size: 11px; color: var(--g5); }
+.lr-cta { font-size: 12px; color: var(--red); font-weight: 600; }
 
-/* ── ALL NEWS SECTION ── */
-.all-news-section {
-  background: var(--nk-bg);
-  border-top: 1px solid var(--nk-border);
-  padding: 32px 0 60px;
-}
-.all-news-inner {
-  max-width: var(--nk-max);
-  margin: 0 auto;
-  padding: 0 20px;
-}
-.news-section { margin-bottom: 40px; }
-.ns-header {
-  display: flex; align-items: center; gap: 10px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--nk-black);
-  margin-bottom: 16px;
-}
-.ns-icon { font-size: 16px; }
-.ns-title { font-size: 16px; font-weight: 700; color: var(--nk-black); font-family: var(--nk-serif); flex: 1; }
-.ns-count { font-size: 12px; color: var(--nk-gray4); font-weight: 400; }
-.ns-more-btn {
-  font-size: 12px; color: var(--nk-red); font-weight: 600;
-  background: none; border: 1px solid var(--nk-red); padding: 3px 10px;
-  cursor: pointer; font-family: var(--nk-sans); transition: all 0.15s;
-}
-.ns-more-btn:hover { background: var(--nk-red); color: #fff; }
-
-.ns-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--nk-border);
-  border: 1px solid var(--nk-border);
-}
-.ns-card {
-  background: var(--nk-white);
-  padding: 16px 18px;
-  cursor: pointer;
-  transition: background 0.15s;
-  position: relative;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.35s ease, transform 0.35s ease, background 0.15s;
-}
-.ns-card.is-visible { opacity: 1; transform: translateY(0); }
-.ns-card:hover { background: var(--nk-gray7); }
-.ns-card-must { background: var(--nk-must-bg); }
-.ns-card-lead { grid-column: 1 / -1; border-bottom: 1px solid var(--nk-border); }
-.ns-must-stripe {
-  position: absolute; top: 0; left: 0; width: 3px; height: 100%;
-  background: var(--nk-red);
-}
-.ns-card-cat { font-size: 10px; color: var(--nk-red); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 5px; }
-.ns-card-title { font-size: 14px; font-weight: 600; color: var(--nk-black); line-height: 1.5; font-family: var(--nk-serif); margin-bottom: 6px; }
-.ns-card-lead .ns-card-title { font-size: 18px; }
-.ns-card-summary { font-size: 13px; color: var(--nk-gray2); line-height: 1.7; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.ns-card-src { font-size: 11px; color: var(--nk-gray4); }
-
-/* ── PAGE NAV (cat + article views) ── */
-.page-nav {
-  background: var(--nk-white);
-  border-bottom: 1px solid var(--nk-border);
-  padding: 10px 20px;
-  display: flex; align-items: center; gap: 16px;
-  position: sticky; top: 44px; z-index: 800;
-}
-.page-back-btn {
-  background: none; border: none; font-size: 13px; color: var(--nk-red);
-  font-weight: 600; cursor: pointer; font-family: var(--nk-sans);
-  padding: 4px 0; transition: opacity 0.15s;
-}
-.page-back-btn:hover { opacity: 0.7; }
-.page-nav-title { font-size: 14px; font-weight: 700; color: var(--nk-black); font-family: var(--nk-serif); }
-
-/* ── CATEGORY VIEW LIST ── */
-.cat-view-inner {
-  max-width: 800px; margin: 0 auto; padding: 24px 20px 80px;
-}
-.list-row {
-  background: var(--nk-white);
-  border: 1px solid var(--nk-border);
-  border-top: none;
-  cursor: pointer; transition: background 0.15s;
-  position: relative;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.15s;
-}
-.list-row.is-visible { opacity: 1; transform: translateY(0); }
-.list-row:first-child { border-top: 2px solid var(--nk-black); }
-.list-row:hover { background: var(--nk-gray7); }
-.list-row-must { background: var(--nk-must-bg); }
-.list-row-inner { padding: 20px 24px; position: relative; }
-.list-must-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--nk-red); }
-.list-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.list-cat-tag { font-size: 10px; font-weight: 700; color: var(--nk-red); letter-spacing: 0.08em; border: 1px solid var(--nk-red); padding: 1px 7px; }
-.list-must-tag { font-size: 10px; font-weight: 700; background: var(--nk-red); color: #fff; padding: 1px 7px; }
-.list-title { font-size: 18px; font-weight: 700; font-family: var(--nk-serif); color: var(--nk-black); line-height: 1.5; margin-bottom: 8px; }
-.list-summary { font-size: 13px; color: var(--nk-gray2); line-height: 1.75; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.list-footer { display: flex; justify-content: space-between; align-items: center; }
-.list-source { font-size: 11px; color: var(--nk-gray4); }
-.list-cta { font-size: 12px; color: var(--nk-red); font-weight: 600; }
-
-/* ── ARTICLE VIEW ── */
-.article-container { max-width: 720px; margin: 0 auto; padding: 40px 20px 100px; }
-.article-header { border-bottom: 1px solid var(--nk-border); padding-bottom: 28px; margin-bottom: 32px; }
-.art-cat-tag {
-  display: inline-block;
-  font-size: 11px; font-weight: 700; color: var(--nk-red);
-  border: 1px solid var(--nk-red); padding: 2px 10px;
-  letter-spacing: 0.08em; margin-bottom: 14px;
-}
-.art-headline {
-  font-family: var(--nk-serif);
-  font-size: 30px; font-weight: 700;
-  line-height: 1.5; color: var(--nk-black);
-  margin-bottom: 16px; letter-spacing: -0.01em;
-}
-.art-meta { margin-bottom: 20px; }
-.art-source { font-size: 12px; color: var(--nk-gray4); }
-.art-summary-box {
-  background: var(--nk-gray7);
-  border-left: 3px solid var(--nk-red);
-  padding: 16px 20px;
-}
-.art-summary-label { font-size: 11px; font-weight: 700; color: var(--nk-red); letter-spacing: 0.08em; margin-bottom: 8px; }
-.art-summary-text { font-size: 14px; color: var(--nk-gray1); line-height: 1.8; }
-.art-body p {
-  font-size: 16px; line-height: 2; color: var(--nk-dark);
-  margin-bottom: 1.6em; font-family: var(--nk-serif);
-  letter-spacing: 0.02em;
-}
+/* ── 文章頁 ── */
+.article-wrapper { max-width: 700px; margin: 0 auto; padding: 40px 20px 100px; }
+.art-cat-label { display: inline-block; font-size: 11px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 2px 10px; letter-spacing: .08em; margin-bottom: 16px; }
+.art-title { font-family: var(--serif); font-size: 30px; font-weight: 700; line-height: 1.5; color: var(--black); margin-bottom: 14px; letter-spacing: -.01em; }
+.art-meta { margin-bottom: 18px; border-bottom: 1px solid var(--g6); padding-bottom: 14px; }
+.art-source { font-size: 12px; color: var(--g5); }
+.art-summary-block { background: var(--g8); border-left: 3px solid var(--red); padding: 14px 18px; margin-bottom: 32px; }
+.art-summary-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .08em; margin-bottom: 7px; }
+.art-summary-text { font-size: 14px; color: var(--g1); line-height: 1.85; }
+.art-body p { font-family: var(--serif); font-size: 17px; line-height: 2; color: var(--dark); margin-bottom: 1.6em; letter-spacing: .01em; }
 .art-body p:last-child { margin-bottom: 0; }
 
-/* ── RESPONSIVE ── */
+/* ── RWD ── */
 @media (max-width: 960px) {
-  .main-container { grid-template-columns: 1fr; }
-  .col-sidebar { display: none; }
-  .ns-grid { grid-template-columns: repeat(2,1fr); }
+  .layout-wrapper { grid-template-columns: 1fr; }
+  .layout-sidebar { display: none; }
+  .cs-grid { grid-template-columns: repeat(2,1fr); }
 }
 @media (max-width: 600px) {
-  .logo-jp { font-size: 28px; }
-  .logo-cn { font-size: 15px; }
-  .ts-headline { font-size: 20px; }
-  .ns-grid { grid-template-columns: 1fr; }
-  .art-headline { font-size: 22px; }
-  .art-body p { font-size: 15px; }
+  .logo-main { font-size: 30px; }
+  .logo-cn { font-size: 16px; }
   .masthead-stats { display: none; }
+  .ts-title { font-size: 20px; }
+  .cs-grid { grid-template-columns: 1fr; }
+  .art-title { font-size: 22px; }
+  .art-body p { font-size: 15px; }
 }
 """
 
