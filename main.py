@@ -331,7 +331,7 @@ def generate_html(data):
 <!-- 頂部工具列 -->
 <div id="utility-bar">
   <div class="util-inner">
-    <span class="util-org">國家發展委員會 · 經濟分析科</span>
+    <span class="util-org">國家發展委員會 · 經濟規劃科</span>
     <span class="util-date" id="util-date"></span>
   </div>
 </div>
@@ -685,6 +685,7 @@ var currentView = 'home-view';
 function showView(id) {{
   ['home-view','cat-view','article-view'].forEach(v =>
     document.getElementById(v).style.display = v===id ? 'block' : 'none');
+  document.getElementById('section-nav').style.display = id==='home-view' ? 'block' : 'none';
   currentView = id;
   window.scrollTo(0,0);
 }}
@@ -867,7 +868,7 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); -web
 .cs-card-src { font-size: 11px; color: var(--g5); }
 
 /* ── 次頁導覽 ── */
-.sub-nav { background: var(--white); border-bottom: 1px solid var(--g6); padding: 9px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 46px; z-index: 800; }
+.sub-nav { background: var(--white); border-bottom: 1px solid var(--g6); padding: 9px 20px; display: flex; align-items: center; gap: 14px; }
 .back-btn { background: none; border: none; font-size: 13px; color: var(--red); font-weight: 600; cursor: pointer; font-family: var(--sans); padding: 3px 0; }
 .back-btn:hover { opacity: .7; }
 .sub-nav-title { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--black); }
