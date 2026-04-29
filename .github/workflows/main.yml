@@ -1,9 +1,10 @@
 name: NDC News Automation
+
 on:
   push:
     paths:
-      - 'data/*.pdf' # 當你往 data 資料夾丟 PDF 時觸發
-  workflow_dispatch: # 讓你可以手動按按鈕執行
+      - 'data/*.pdf'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,15 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - run: pip install pdfplumber
-      - run: python main.py
-      - name: Deploy to Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          publish_filename: index.html
+
+      - name: Install dependencies
+        run: pip install pdfplumber
+
+      - name: Run main.py
+        run: python main.py
+
+      - name: Commit index.html
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add index.html
+          git commit -m "Auto update index.html" || echo "No changes"
+          git push
