@@ -10,72 +10,211 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --red: #d0011b; --black: #111111; --dark: #1a1a1a;
-  --g1: #333; --g2: #555; --g3: #777; --g4: #999; --g5: #bbb; --g6: #ddd; --g7: #eeeeee; --g8: #f5f5f5;
-  --white: #ffffff; --mustbg: #fff8f8;
-  --serif: 'Noto Serif TC', serif; --sans: 'Noto Sans TC', sans-serif; --wrap: 1160px;
+  --red:    #d0011b;
+  --black:  #111111;
+  --dark:   #1a1a1a;
+  --g1:     #333;
+  --g2:     #555;
+  --g3:     #777;
+  --g4:     #999;
+  --g5:     #bbb;
+  --g6:     #ddd;
+  --g7:     #eeeeee;
+  --g8:     #f5f5f5;
+  --white:  #ffffff;
+  --mustbg: #fff8f8;
+  --serif:  'Noto Serif TC', 'Georgia', serif;
+  --sans:   'Noto Sans TC', 'Helvetica Neue', sans-serif;
+  --wrap:   1160px;
 }
-body { background: var(--g8); font-family: var(--sans); color: var(--dark); line-height: 1.6; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { background: var(--g8); font-family: var(--sans); color: var(--dark); -webkit-font-smoothing: antialiased; }
+
+/* ── 頂部工具列 ── */
 #utility-bar { background: var(--black); border-bottom: 2px solid var(--red); }
-.util-inner { max-width: var(--wrap); margin: 0 auto; padding: 5px 20px; display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,.5); }
+.util-inner { max-width: var(--wrap); margin: 0 auto; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; }
+.util-org { font-size: 11px; color: rgba(255,255,255,.65); letter-spacing: .06em; }
+.util-date { font-size: 11px; color: rgba(255,255,255,.4); }
+
+/* ── 報頭 ── */
 #masthead { background: var(--white); border-bottom: 3px solid var(--black); }
-.masthead-inner { max-width: var(--wrap); margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-.logo-main { font-family: var(--serif); font-size: 38px; font-weight: 900; color: var(--red); }
-.logo-cn { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--black); }
-.masthead-stats { display: flex; align-items: center; text-align: center; }
-.stat-item { padding: 0 15px; }
-.stat-num { font-family: var(--serif); font-size: 24px; font-weight: 700; }
+.masthead-inner { max-width: var(--wrap); margin: 0 auto; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
+.masthead-logo { display: flex; align-items: center; gap: 16px; }
+.logo-main { font-family: var(--serif); font-size: 40px; font-weight: 900; color: var(--red); line-height: 1; letter-spacing: .02em; }
+.logo-divider { width: 1px; height: 44px; background: var(--g6); }
+.logo-text { display: flex; flex-direction: column; gap: 3px; }
+.logo-cn { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--black); letter-spacing: .04em; }
+.logo-en { font-size: 10px; color: var(--g4); letter-spacing: .1em; text-transform: uppercase; }
+.masthead-stats { display: flex; align-items: center; gap: 0; }
+.stat-item { display: flex; flex-direction: column; align-items: center; padding: 0 22px; }
+.must-stat { cursor: pointer; }
+.must-stat:hover .stat-num { text-decoration: underline; }
+.stat-num { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--black); line-height: 1; }
 .stat-num.red { color: var(--red); }
-.stat-label { font-size: 10px; color: var(--g4); }
-#section-nav { background: var(--white); border-bottom: 1px solid var(--g6); position: sticky; top: 0; z-index: 99; }
-.section-nav-inner { max-width: var(--wrap); margin: 0 auto; display: flex; overflow-x: auto; }
-.nav-btn { padding: 12px 15px; border: none; background: none; font-size: 13px; font-weight: 500; color: var(--g3); cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; }
+.stat-label { font-size: 10px; color: var(--g4); letter-spacing: .06em; margin-top: 3px; }
+.stat-sep { width: 1px; height: 36px; background: var(--g6); }
+
+/* ── 分類導覽列 ── */
+#section-nav { background: var(--white); border-bottom: 1px solid var(--g6); position: sticky; top: 0; z-index: 900; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.section-nav-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; display: flex; overflow-x: auto; scrollbar-width: none; }
+.section-nav-inner::-webkit-scrollbar { display: none; }
+.nav-btn { padding: 11px 16px; border: none; background: none; font-size: 13px; font-weight: 500; font-family: var(--sans); color: var(--g3); cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: color .15s, border-color .15s; }
+.nav-btn:hover { color: var(--black); }
 .nav-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 700; }
-.ticker-bar { background: var(--black); display: flex; height: 32px; align-items: center; overflow: hidden; }
-.ticker-tag { background: var(--red); color: white; font-size: 11px; padding: 0 10px; height: 100%; display: flex; align-items: center; }
-.ticker-track { display: flex; white-space: nowrap; animation: scroll 40s linear infinite; }
+
+/* ── 跑馬燈 ── */
+.ticker-bar { background: var(--black); display: flex; align-items: center; height: 36px; overflow: hidden; border-bottom: 1px solid #2a2a2a; }
+.ticker-tag { flex-shrink: 0; background: var(--red); color: #fff; font-size: 11px; font-weight: 700; padding: 0 14px; height: 100%; display: flex; align-items: center; letter-spacing: .1em; }
+.ticker-body { flex: 1; overflow: hidden; position: relative; }
+.ticker-track { display: flex; align-items: center; white-space: nowrap; animation: scroll 45s linear infinite; padding-left: 24px; }
+.ticker-track:hover { animation-play-state: paused; }
 @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-.t-item { color: rgba(255,255,255,.8); font-size: 12px; padding: 0 10px; cursor: pointer; }
-.layout-wrapper { max-width: var(--wrap); margin: 20px auto; display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 0 20px; }
-.top-story { background: var(--white); padding: 25px; border: 1px solid var(--g6); cursor: pointer; position: relative; }
-.ts-red-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--red); }
-.ts-black-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--black); }
-.ts-title { font-family: var(--serif); font-size: 24px; margin: 10px 0; }
-.ts-summary { font-size: 14px; color: var(--g2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.sub-header { font-size: 12px; font-weight: 700; color: var(--g4); margin: 15px 0 5px; }
-.sub-list { background: var(--white); border: 1px solid var(--g6); }
-.sub-row { display: flex; border-bottom: 1px solid #eee; cursor: pointer; padding: 10px; }
-.sub-num { width: 25px; color: var(--g5); font-weight: 700; }
-.sub-dot-red::after { content: '●'; color: var(--red); font-size: 10px; padding-right: 10px; }
-.sub-title { font-size: 14px; font-weight: 600; font-family: var(--serif); }
-.sidebar-block { background: var(--white); border: 1px solid var(--g6); border-top: 3px solid var(--black); margin-bottom: 20px; }
-.sb-header { padding: 8px 12px; background: var(--g8); border-bottom: 1px solid var(--g6); }
-.sb-title { font-size: 13px; font-weight: 700; }
-.must-item { padding: 10px 12px; border-bottom: 1px solid #eee; cursor: pointer; }
-.mi-title { font-size: 13px; font-family: var(--serif); font-weight: 600; }
-.cat-section { margin: 40px auto; max-width: var(--wrap); padding: 0 20px; }
-.cs-header { display: flex; align-items: center; border-bottom: 2px solid var(--black); padding-bottom: 5px; }
-.cs-title { font-family: var(--serif); font-size: 18px; font-weight: 700; flex: 1; }
-.cs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--g6); border: 1px solid var(--g6); }
-.cs-card { background: var(--white); padding: 15px; cursor: pointer; }
-.cs-lead { grid-column: 1 / -1; }
-.cs-card-title { font-family: var(--serif); font-size: 15px; font-weight: 600; }
-.sub-nav { background: var(--white); padding: 10px 20px; border-bottom: 1px solid var(--g6); position: sticky; top: 0; display: flex; align-items: center; }
-.article-wrapper { max-width: 700px; margin: 40px auto; padding: 0 20px; }
-.art-title { font-family: var(--serif); font-size: 28px; line-height: 1.4; margin-bottom: 20px; }
-.art-body p { margin-bottom: 20px; font-size: 17px; font-family: var(--serif); }
+.t-item { font-size: 12px; color: rgba(255,255,255,.82); cursor: pointer; transition: color .15s; }
+.t-item:hover { color: #fff; text-decoration: underline; }
+.t-sep { color: rgba(255,255,255,.22); margin: 0 14px; }
+
+/* ── 主版面 ── */
+.layout-wrapper { max-width: var(--wrap); margin: 0 auto; padding: 24px 20px; display: grid; grid-template-columns: 1fr 288px; gap: 24px; align-items: start; }
+
+/* ── 頭條 ── */
+.top-story { background: var(--white); border: 1px solid var(--g6); padding: 28px 30px; cursor: pointer; position: relative; transition: box-shadow .2s; overflow: hidden; }
+.top-story:hover { box-shadow: 0 4px 18px rgba(0,0,0,.09); }
+.ts-red-bar, .ts-black-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.ts-red-bar { background: var(--red); }
+.ts-black-bar { background: var(--black); }
+.ts-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ts-cat { font-size: 11px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 2px 8px; letter-spacing: .06em; }
+.ts-badge { font-size: 10px; font-weight: 700; background: var(--red); color: #fff; padding: 2px 8px; letter-spacing: .05em; }
+.ts-title { font-family: var(--serif); font-size: 26px; font-weight: 700; line-height: 1.5; color: var(--black); margin-bottom: 14px; }
+.ts-summary { font-size: 14px; color: var(--g2); line-height: 1.85; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ts-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--g7); padding-top: 12px; }
+.ts-src { font-size: 12px; color: var(--g5); }
+.ts-more { font-size: 13px; color: var(--red); font-weight: 600; }
+
+/* ── 次要新聞 ── */
+.sub-header { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--g4); text-transform: uppercase; padding: 20px 0 8px; border-bottom: 2px solid var(--black); }
+.sub-list { background: var(--white); border: 1px solid var(--g6); border-top: none; }
+.sub-row { display: flex; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
+.sub-row:last-child { border-bottom: none; }
+.sub-row:hover { background: var(--g8); }
+.sub-must { background: var(--mustbg); }
+.sub-num { flex-shrink: 0; width: 36px; background: var(--black); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--sans); }
+.sub-dot-red { flex-shrink: 0; width: 36px; display: flex; align-items: center; justify-content: center; background: #fff8f8; }
+.sub-dot-red::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.sub-body { padding: 12px 16px; flex: 1; }
+.sub-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 3px; }
+.sub-title { font-size: 14px; font-weight: 600; font-family: var(--serif); color: var(--black); line-height: 1.5; margin-bottom: 3px; }
+.sub-src { font-size: 11px; color: var(--g5); }
+
+/* ── 側欄 ── */
+.layout-sidebar { display: flex; flex-direction: column; gap: 20px; }
+.sidebar-block { background: var(--white); border: 1px solid var(--g6); border-top: 3px solid var(--black); }
+.sb-header { background: var(--g8); padding: 10px 14px; border-bottom: 1px solid var(--g6); display: flex; align-items: baseline; gap: 10px; }
+.red-header .sb-title { color: var(--red); }
+.sb-title { font-size: 13px; font-weight: 700; color: var(--black); letter-spacing: .03em; }
+.sb-sub { font-size: 11px; color: var(--g5); }
+.must-item { padding: 11px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
+.must-item:last-child { border-bottom: none; }
+.must-item:hover { background: var(--mustbg); }
+.mi-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 3px; }
+.mi-title { font-size: 13px; font-weight: 600; font-family: var(--serif); color: var(--black); line-height: 1.5; margin-bottom: 3px; }
+.mi-src { font-size: 10px; color: var(--g5); }
+.co-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-bottom: 1px solid #ebebeb; cursor: pointer; transition: background .15s; }
+.co-row:last-child { border-bottom: none; }
+.co-row:hover { background: var(--g8); }
+.co-name { font-size: 13px; color: var(--dark); }
+.co-right { display: flex; align-items: center; gap: 8px; }
+.co-cnt { font-size: 13px; font-weight: 700; color: var(--black); }
+.co-must { font-size: 10px; background: var(--red); color: #fff; padding: 1px 6px; font-weight: 700; }
+
+/* ── 各分類區塊 ── */
+.all-section { border-top: 1px solid var(--g6); background: var(--g8); padding: 32px 0 64px; }
+.all-section-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
+.cat-section { margin-bottom: 40px; }
+.cs-header { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 2px solid var(--black); margin-bottom: 1px; }
+.cs-icon { font-size: 16px; }
+.cs-title { font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--black); flex: 1; }
+.cs-count { font-size: 12px; color: var(--g5); }
+.cs-more { font-size: 12px; color: var(--red); font-weight: 600; background: none; border: 1px solid var(--red); padding: 3px 10px; cursor: pointer; font-family: var(--sans); transition: all .15s; }
+.cs-more:hover { background: var(--red); color: #fff; }
+.cs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--g6); border: 1px solid var(--g6); }
+.cs-card { background: var(--white); padding: 14px 16px; cursor: pointer; position: relative; transition: background .15s; }
+.cs-card:hover { background: var(--g8); }
+.cs-must { background: var(--mustbg); }
+.cs-lead { grid-column: 1 / -1; border-bottom: 1px solid var(--g6); }
+.cs-red-stripe { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--red); }
+.cs-card-cat { font-size: 10px; color: var(--red); font-weight: 700; letter-spacing: .06em; margin-bottom: 5px; }
+.cs-card-title { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--black); line-height: 1.55; margin-bottom: 5px; }
+.cs-lead .cs-card-title { font-size: 18px; }
+.cs-card-summary { font-size: 13px; color: var(--g2); line-height: 1.7; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cs-card-src { font-size: 11px; color: var(--g5); }
+
+/* ── 次頁導覽 ── */
+#cat-view { min-height: 100vh; background: #f5f5f5; }
+#article-view { min-height: 100vh; background: #ffffff; }
+.sub-nav { background: var(--white); border-bottom: 1px solid var(--g6); padding: 9px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 800; }
+.back-btn { background: none; border: none; font-size: 13px; color: var(--red); font-weight: 600; cursor: pointer; font-family: var(--sans); padding: 3px 0; }
+.back-btn:hover { opacity: .7; }
+.sub-nav-title { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--black); }
+
+/* ── 分類列表頁 ── */
+.list-wrapper { max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
+.list-row { background: #ffffff; border: 1px solid #dddddd; border-top: none; cursor: pointer; transition: background .15s; position: relative; }
+.list-row:first-child { border-top: 2px solid #111111; }
+.list-row:hover { background: #f5f5f5; }
+.list-must { background: #fff8f8; }
+.lr-inner { padding: 18px 22px; position: relative; }
+.lr-red-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #d0011b; }
+.lr-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.lr-cat { font-size: 10px; font-weight: 700; color: #d0011b; border: 1px solid #d0011b; padding: 1px 7px; letter-spacing: .06em; }
+.lr-must-tag { font-size: 10px; font-weight: 700; background: #d0011b; color: #fff; padding: 1px 7px; }
+.lr-title { font-family: var(--serif); font-size: 18px; font-weight: 700; color: #111111; line-height: 1.5; margin-bottom: 7px; }
+.lr-summary { font-size: 13px; color: #555555; line-height: 1.75; margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lr-footer { display: flex; justify-content: space-between; align-items: center; }
+.lr-src { font-size: 11px; color: #bbbbbb; }
+.lr-cta { font-size: 12px; color: #d0011b; font-weight: 600; }
+
+/* ── 文章頁 ── */
+.article-wrapper { max-width: 700px; margin: 0 auto; padding: 40px 20px 100px; }
+.art-cat-label { display: inline-block; font-size: 11px; font-weight: 700; color: var(--red); border: 1px solid var(--red); padding: 2px 10px; letter-spacing: .08em; margin-bottom: 16px; }
+.art-title { font-family: var(--serif); font-size: 30px; font-weight: 700; line-height: 1.5; color: var(--black); margin-bottom: 14px; letter-spacing: -.01em; }
+.art-meta { margin-bottom: 18px; border-bottom: 1px solid var(--g6); padding-bottom: 14px; }
+.art-source { font-size: 12px; color: var(--g5); }
+.art-summary-block { background: var(--g8); border-left: 3px solid var(--red); padding: 14px 18px; margin-bottom: 32px; }
+.art-summary-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .08em; margin-bottom: 7px; }
+.art-summary-text { font-size: 14px; color: var(--g1); line-height: 1.85; }
+.art-body p { font-family: var(--serif); font-size: 17px; line-height: 2; color: var(--dark); margin-bottom: 1.6em; letter-spacing: .01em; }
+.art-body p:last-child { margin-bottom: 0; }
+
+/* ── RWD ── */
+@media (max-width: 960px) {
+  .layout-wrapper { grid-template-columns: 1fr; }
+  .layout-sidebar { display: none; }
+  .cs-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 600px) {
+  .logo-main { font-size: 30px; }
+  .logo-cn { font-size: 16px; }
+  .masthead-stats { display: none; }
+  .ts-title { font-size: 20px; }
+  .cs-grid { grid-template-columns: 1fr; }
+  .art-title { font-size: 22px; }
+  .art-body p { font-size: 15px; }
+}
 
 </style>
 </head>
 <body>
 
+<!-- 頂部工具列 -->
 <div id="utility-bar">
   <div class="util-inner">
-    <span class="util-org">國家發展委員會 · 經濟發展處</span>
+    <span class="util-org">國家發展委員會 · 經濟規劃科</span>
     <span class="util-date" id="util-date"></span>
   </div>
 </div>
 
+<!-- 報頭 MASTHEAD -->
 <header id="masthead">
   <div class="masthead-inner">
     <div class="masthead-logo">
@@ -96,17 +235,26 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); line
         <div class="stat-num">72</div>
         <div class="stat-label">今日總則</div>
       </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-num">5</div>
+        <div class="stat-label">分類數</div>
+      </div>
     </div>
   </div>
 </header>
 
+<!-- 分類導覽列 -->
 <nav id="section-nav">
   <div class="section-nav-inner" id="section-nav-inner">
     <button class="nav-btn active" data-cat="all" onclick="goHome()">全部</button>
   </div>
 </nav>
 
+<!-- HOME VIEW -->
 <div id="home-view">
+
+  <!-- 跑馬燈 -->
   <div class="ticker-bar" id="ticker-bar">
     <span class="ticker-tag">頭版</span>
     <div class="ticker-body">
@@ -114,12 +262,20 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); line
     </div>
   </div>
 
+  <!-- 主版面：左主欄 + 右側欄 -->
   <div class="layout-wrapper">
     <div class="layout-main">
+
+      <!-- 頭條 -->
       <div id="top-story-wrap"></div>
+
+      <!-- 次要新聞列表 -->
       <div id="sub-news-wrap"></div>
+
     </div>
     <aside class="layout-sidebar">
+
+      <!-- 今日必看 -->
       <div class="sidebar-block" id="must-block">
         <div class="sb-header red-header">
           <span class="sb-title">今日必看</span>
@@ -127,25 +283,37 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); line
         </div>
         <div id="must-list"></div>
       </div>
+
+      <!-- 分類總覽 -->
       <div class="sidebar-block">
-        <div class="sb-header"><span class="sb-title">分類總覽</span></div>
+        <div class="sb-header">
+          <span class="sb-title">分類總覽</span>
+        </div>
         <div id="cat-overview"></div>
       </div>
+
     </aside>
   </div>
+
+  <!-- 各分類新聞區塊 -->
   <div class="all-section">
     <div class="all-section-inner" id="all-section-inner"></div>
   </div>
-</div>
 
+</div><!-- /home-view -->
+
+<!-- CATEGORY VIEW -->
 <div id="cat-view" style="display:none;">
   <div class="sub-nav">
     <button class="back-btn" onclick="goHome()">&#8592; 返回首頁</button>
     <span class="sub-nav-title" id="cat-view-title"></span>
   </div>
-  <div class="list-wrapper"><div id="cat-list"></div></div>
+  <div class="list-wrapper">
+    <div id="cat-list"></div>
+  </div>
 </div>
 
+<!-- ARTICLE VIEW -->
 <div id="article-view" style="display:none;">
   <div class="sub-nav">
     <button class="back-btn" id="art-back-btn">&#8592; 返回</button>
@@ -154,7 +322,9 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); line
   <div class="article-wrapper">
     <div class="art-cat-label" id="art-cat-label"></div>
     <h1 class="art-title" id="art-title"></h1>
-    <div class="art-meta"><span id="art-source"></span></div>
+    <div class="art-meta">
+      <span class="art-source" id="art-source"></span>
+    </div>
     <div class="art-summary-block" id="art-summary-block">
       <div class="art-summary-label">▌ 摘要重點</div>
       <p class="art-summary-text" id="art-summary"></p>
@@ -167,19 +337,22 @@ body { background: var(--g8); font-family: var(--sans); color: var(--dark); line
 const DATA = [{"title": "Fed凍利率 美債息勁揚 決策委員意見陷入分歧，市場放棄降息押注，評估明年升息可能性", "source": "工商時報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "美國聯邦公開市場委員會（FOMC）結束為期二日的決策會議，會後一如外界預期宣布利率按兵不動，不過最引人關注的是這次出現罕見分歧，創1992年以來異議人數最多的一次，凸顯Fed內部對未來貨幣政策已徹底分裂。交易員因此重新評估利率走向，放棄今年降息的押注，重新定價明年升息的可能性。受此影響美債全面下跌，殖利率聞訊勁揚，30年期公債殖利率創去年7月來首度觸及5％，反映市場對金融環境轉趨緊縮的預期。", "full_text": "美國聯邦公開市場委員會（FOMC）結束為期二日的決策會議，會後一如外界預期宣布利率按兵不動，不過最引人關注的是這次出現罕見分歧，創1992年以來異議人數最多的一次，凸顯Fed內部對未來貨幣政策已徹底分裂。交易員因此重新評估利率走向，放棄今年降息的押注，重新定價明年升息的可能性。受此影響美債全面下跌，殖利率聞訊勁揚，30年期公債殖利率創去年7月來首度觸及5％，反映市場對金融環境轉趨緊縮的預期。\n\n與Fed 短期利率政策密切的2年期公債殖利率漲逾9個基點，至3.937％；10 年期公債殖利率上漲逾6個基點至4.416％。美債價格與殖利率呈反向走勢。\n\n據CME Fedwatch資料，交易員押注2026全年利率持平可能性達八成以上，對於2027年4月前升息的機率跳升至44％，遠高於聯準會（Fe d）公布決議前的8％。FOMC結束決策會議後，將聯邦基金利率維持在3.50至3.75％的目標區間，此為連續三次按兵不動。會後聲明顯示Fed決策核心呈現34年來最分裂的一次，投反對票人數由前次的一人增至四人，一位是大家熟悉的面孔：聯準會理事米蘭（Stephen Miran），自去年9月加入聯準會以來，已第六次對維持利率不變的決定投反對票。\n\n出乎意料的是另有三位委員投下反對票，分別是克利夫蘭聯準銀行總裁哈馬克（Beth Hammack）、達拉斯聯準銀行總裁蘿根（Lorie L ogan）、和明尼亞波利斯聯準銀行總裁卡什卡里（Neel Kashkari）。他們雖然支持利率不變，但不支持聲明中暗示寬鬆傾向的措辭。此次聲明表示：「在考慮聯邦基金利率目標區間進一步調整的幅度和時機，委員會將仔細評估最新數據、不斷變化的經濟前景以及風險平衡。」 過去三次聲明均使用上述內容，應該是三位委員抱持異議的原因，畢竟前幾次提到的「進一步調整」，都是暗示利率下行，但他們均表示擔憂，認為通膨過高，不應再發出降息訊號。聯準會主席鮑爾在會後記者會坦言，三位持反對意見的委員代表「核心立場正朝向更中性的位置移動」。"}, {"title": "美伊恐再爆軍事衝突 布蘭特期油飆4年新高", "source": "工商時報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "美國媒體Axios報導，美國軍方將向美總統川普彙報對伊朗採取的軍事行動，內容涵蓋三套從有限打擊到動用特種部隊控制核材料的高度敏感選項，此消息引爆市場恐慌，布蘭特原油期價飆上每桶126美元的4年新高，也創下伊朗戰爭爆發以來高點。Axios引述消息，美軍目前至少準備了三套備選方案，第一套方案包括攻擊基礎設施目標，希望能藉此打破談判僵局。第二套方案聚焦於攻取荷姆茲海峽部分控制權，確保全球航運與能源運輸流通。", "full_text": "美國媒體Axios報導，美國軍方將向美總統川普彙報對伊朗採取的軍事行動，內容涵蓋三套從有限打擊到動用特種部隊控制核材料的高度敏感選項，此消息引爆市場恐慌，布蘭特原油期價飆上每桶126美元的4年新高，也創下伊朗戰爭爆發以來高點。Axios引述消息，美軍目前至少準備了三套備選方案，第一套方案包括攻擊基礎設施目標，希望能藉此打破談判僵局。第二套方案聚焦於攻取荷姆茲海峽部分控制權，確保全球航運與能源運輸流通。\n\n這可能涉及地面部隊部署，規模、風險與複雜度都遠高於單純空襲行動，若採此方案，衝突層級將會升高。第三套方案即由美軍特種部隊直接介入，控制伊朗境內高濃縮鈾庫存。此舉將直接觸及伊朗核能力，可能被視為踩踏伊朗紅線，軍事風險極高。\n\n眼見美伊可能再爆發軍事衝突，布蘭特原油6月期貨暴漲6.84％，至每桶126.10美元，飆至2022年初以來最高水位；美國西德州中級原油勁升3.14％至110.24美元。"}, {"title": "台灣首季GDP成長13.69％ 39年最高", "source": "工商時報 A01 要聞", "cat": "台灣總體經濟與數據", "priority": 1, "summary": "主計總處 30 日公布首季 GDP 概估指出，受惠於出口成長超乎預期，今年 Q1 經濟成長達 13.69％，高於原預測，也比去年Q4的12.65％更高，創民國76年Q3以來最高，為近39年單季最高。主計總處於每季結束後次一個月底，會先依據已有的資料估算GDP，稱為「概估統計」。隔一個月再根據更多的資料修正為「初步統計」，本次公布的是概估統計，不進行預測。", "full_text": "主計總處 30 日公布首季 GDP 概估指出，受惠於出口成長超乎預期，今年 Q1 經濟成長達 13.69％，高於原預測，也比去年Q4的12.65％更高，創民國76年Q3以來最高，為近39年單季最高。主計總處於每季結束後次一個月底，會先依據已有的資料估算GDP，稱為「概估統計」。隔一個月再根據更多的資料修正為「初步統計」，本次公布的是概估統計，不進行預測。\n\n綜合統計處專門委員江心怡說，因國外雲端、AI 等基礎建設需求強勁，台灣又是高階晶片主要的生產基地，隨晶片、資通產品出口大幅成長，首季商品出口比原預測高出148億美元，出口熱絡是Q1經濟成長達到13.69％的主因。出口成長也帶動民間投資、消費的擴張，兩者皆高於原預測。江心怡說，Q1資本形成年增率5.20％創近四季最高，另海關統計顯示首季資本設備進口成長33％，據此研判民間投資持續擴張。\n\n至於消費也超預期，首季民間消費成長4.89％，創近十季的高點。主計總處研究，Q1民間消費之所以有好的表現，是因這一季下雨天數比去年同期少10天，晴天多，國人出遊意願自然提高，大年初一至初六平均每日於國內出遊人數比去年同期成長125％，加以首季股市成交值年增117％帶來的財富效果，使首季民間消費成長率創近十季最高，比原預測高出2.02個百分點。不過，首季出口強勁，主要來自電子零組件（半導體）、資通產品的貢獻，兩者占出口已達78.5％，至於傳統產業的出口仍然疲弱，這有可能是受中東戰事的影響，但確切的情況如何？\n\n仍需持續觀察。江心怡說，上次經濟成長比本季高的年代是民國76年Q2的14.25％，本季經濟成長13.69％是創近39年單季最高，主計總處5月29日將召開「國民所得評審會議」公布首季GDP初步統計並修正經濟預測，屆時會把中東戰事影響納入評估。"}, {"title": "台股4月寫8紀錄 5月先震後跳", "source": "工商時報 A01 要聞", "cat": "台灣產業與投資動向", "priority": 1, "summary": "台股30日持續高檔震盪，於5月1日連假前夕漲多拉回，最後一盤受台積電與聯電等大型權值股摜殺，爆出981億元今年第三大尾盤量下殺352點，終場加權指數下跌376點收38,926點，跌破5日線與39,000 點，但台股4月仍創突破40,000點大關、單月最大漲點、市值躍升全球第六大、成交量創高等八大歷史紀錄。展望5月，統一投顧董事長黎方國、富邦投顧董事長陳奕光、華南投顧董事長呂仁傑及台新投顧總經理黃文清認為，台股走勢預測為先震盪後向上，有望...", "full_text": "台股30日持續高檔震盪，於5月1日連假前夕漲多拉回，最後一盤受台積電與聯電等大型權值股摜殺，爆出981億元今年第三大尾盤量下殺352點，終場加權指數下跌376點收38,926點，跌破5日線與39,000 點，但台股4月仍創突破40,000點大關、單月最大漲點、市值躍升全球第六大、成交量創高等八大歷史紀錄。展望5月，統一投顧董事長黎方國、富邦投顧董事長陳奕光、華南投顧董事長呂仁傑及台新投顧總經理黃文清認為，台股走勢預測為先震盪後向上，有望突破 40,000 點，惟盤勢震盪加劇，須關注習川會、 美伊情勢、輝達財報及聯準會主席動向。第一金投顧董事長黃詣庭、兆豐國際投顧研究部副總經理黃國偉說，支撐可先關注月線36,644點到前波大量低點37,164點之間。\n\n4月台股寫八大驚奇紀錄：一、加權指數創單月最大漲點達7,203點或22.71％，今年累漲點4月逾萬點，櫃買指數亦創單月最大漲點達7 6.85點或24.97％；二、加權指數最高10,194點與櫃買指數最高404. 55同刷歷史新高；三、加權指數4月漲幅為費半、韓國後為全球主要股市第三。\n\n四是市櫃合計市值創新高139.74兆元，躍全球第六大股市。五、集中市場單月累計成交量首越19兆創新高，共8個交易日兆元天量，全月交易量達19.14兆元；六、史上最多檔千金檔紀錄：盤中 50千金、收盤寫48檔新紀錄。\n\n七、上市及上櫃融資餘額增額創單月新高，4月上市融資餘額增加 791.80億元，月增20.74％；4月上櫃融資餘額增加425.96億元，月增 30.90％，30日上櫃融資餘額1,804.38億元，再創高。八、法人買超金額創高：外資單日買超金額最高達1,177.73億元為史上第二；\n\n自營商單日買超358.68億元為歷史新高。"}, {"title": "台股5月天 預見五動能 上市櫃獲利可期、520行情加持、主被動式ETF滾雪球效應…短線震盪後有望再上攻", "source": "經濟日報 A01 要聞", "cat": "台灣產業與投資動向", "priority": 1, "summary": "台股4月超狂，加權指數狂飆7,203點，兩度突破4萬點大關。儘管近日受國際油價波動影響，但法人指出，隨5月「五大利多」接棒，台股在「戴維斯雙擊」效應、Computex等題材支撐下，短線震盪後仍有望蓄勢挑戰41,000點再締新猷。綜合富邦投顧董事長陳奕光、第一金投顧董事長黃詣庭、台新投顧總經理黃文清等看法，邁入 5月，市場焦點轉向基本面與政策利多，五大利多支柱將成為台股續強底氣，首先是上市櫃公司獲利有望在第 1 季增長至 1.5 兆元，全...", "full_text": "台股4月超狂，加權指數狂飆7,203點，兩度突破4萬點大關。儘管近日受國際油價波動影響，但法人指出，隨5月「五大利多」接棒，台股在「戴維斯雙擊」效應、Computex等題材支撐下，短線震盪後仍有望蓄勢挑戰41,000點再締新猷。綜合富邦投顧董事長陳奕光、第一金投顧董事長黃詣庭、台新投顧總經理黃文清等看法，邁入 5月，市場焦點轉向基本面與政策利多，五大利多支柱將成為台股續強底氣，首先是上市櫃公司獲利有望在第 1 季增長至 1.5 兆元，全年獲利有望挑戰6兆元，創歷史新高；\n\n其次是隨上市櫃公司首季財報陸續出爐，獲利成長將帶動本益比評價拉高，將形成推動股價漲升動能，此為戴維斯雙擊效應。第三是台股主被動式ETF與共同基金的滾雪球效應，持續滾入的存股資金，將帶動投信買盤，為市場提供下檔支撐。第四是5月可望有520行情，過去十年的5月上漲機率近八成。\n\n第五是Computex行情，隨6月電腦展將屆，5月有機會搶先反映AI題材。不過，法人圈也提醒，台股短線漲幅已大，基本面利多漸失效應，5月行情有內部隱憂與國際變數，可能讓盤勢震盪加大。隱憂包括大盤短線乖離均線過大、KD出現高檔交叉向下、融資餘額居高不下、外資隨新台幣貶值趨勢轉趨保守；\n\n國際局勢變數更可能是 5 月震盪導火線，不確定因素包含國際油價走勢、若美債殖利率走高將打擊、聯準會主席將換人、SpaceX及OpenAI大規模募資對市場資金影響。展望後市，法人提醒指數下檔支撐先看 37,000 點整數關卡與月線附近。待台積電站回均線，大盤有望重拾漲勢，再度挑戰40,000點並進一步攻擊41,000點目標。"}, {"title": "上季GDP成長衝13.69% 攀39年高點 出口、民間投資等三大支柱強韌 表現優於陸、星、韓", "source": "經濟日報 A01 要聞", "cat": "台灣總體經濟與數據", "priority": 1, "summary": "主計總處昨（30）日公布經濟概估，今年第1季經濟成長率達13.69%，較2月預測大幅上修2.23個百分點，創1987年第3季以來、近39年單季高點，成長力道優於預期，表現優於陸、星、韓。針對外界關注2月底爆發的中東戰事對國內經濟影響，主計總處綜合統計處專門委員江心怡表示，依目前掌握的3月部分數據初步來看，尚未顯現明顯衝擊，後續仍須持續觀察。江心怡表示，第1季經濟成長優於預期，主要來自出口、民間投資及民間消費三大支柱同步貢獻，其中又以出口...", "full_text": "主計總處昨（30）日公布經濟概估，今年第1季經濟成長率達13.69%，較2月預測大幅上修2.23個百分點，創1987年第3季以來、近39年單季高點，成長力道優於預期，表現優於陸、星、韓。針對外界關注2月底爆發的中東戰事對國內經濟影響，主計總處綜合統計處專門委員江心怡表示，依目前掌握的3月部分數據初步來看，尚未顯現明顯衝擊，後續仍須持續觀察。江心怡表示，第1季經濟成長優於預期，主要來自出口、民間投資及民間消費三大支柱同步貢獻，其中又以出口動能最關鍵。\n\n她指出，近年國際間AI基礎建設需求強勁，雲端服務業者持續擴充設備，再加上輝達伺服器等新一代高階產品進入量產階段，推升整體外需表現。依主計總處統計，第1季電子零組件及資通視聽產品占出口比重高達78.5%，帶動商品出口明顯擴張，讓第1季商品出口規模達到1,957億美元，較原先預估多出148億美元，推升整體出口實質成長35.25%，較原預測大增9.87個百分點。進口同樣明顯擴張。\n\n江心怡指出，原先預估第1季進口1,301億美元，實際概估達1,428億美元，增加127億美元，讓第1季實質進口成長27.07%。在輸出與輸入相抵後，國外淨需求對經濟成長貢獻達9.62個百分點，成為支撐經濟擴張最大來源。內需方面也穩健成長。\n\n第1季民間消費成長4.89%，政府消費成長3.91%，民間投資也在新興科技應用需求帶動下持續擴張，資本形成成長5.2%，為近四季最高，顯示企業資本支出動能仍強。主計總處指出，今年第1季主要經濟體成長率，中國大陸5%、南韓3.6%、新加坡4.6%，台灣表現明顯領先。台經院昨日也公布3月製造業景氣燈號，由低迷的黃藍燈轉為持平的綠燈。\n\n台經院分析，受春節過後廠商庫存回補需求拉抬，加上企業因應戰事不確定性加強備貨，讓進出口、外銷訂單與生產指數年增率同步擴大。"}, {"title": "內需消費 明顯回升", "source": "經濟日報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "主計總處昨（30）日公布今年第1季GDP成長率為13.69%，其中民間消費成為首季經濟成長的一大亮點。主計總處指出，受到普發現金效應、股市上揚帶來財富效果，內需有撐，成為推升經濟成長的動力之一。今年第1季民間消費實質成長4.89%，寫下2023年第4季以來、近十季的新高，顯示內需消費動能明顯回升。", "full_text": "主計總處昨（30）日公布今年第1季GDP成長率為13.69%，其中民間消費成為首季經濟成長的一大亮點。主計總處指出，受到普發現金效應、股市上揚帶來財富效果，內需有撐，成為推升經濟成長的動力之一。今年第1季民間消費實質成長4.89%，寫下2023年第4季以來、近十季的新高，顯示內需消費動能明顯回升。\n\n主計總處綜合統計處專門委員江心怡表示，首季民間消費受多重因素帶動，除了先前預估的普發現金政策效益外，還有股市上揚帶來的財富效果，及天氣轉好，帶動連假消費等因素交互影響。在金融市場方面，江心怡表示，今年第1季股市交易熱絡，成交值年增達117.2%，帶動財富外溢效果，進一步推升消費意願。另外，普發現金領取期限至昨日截止，據財政部先前統計，已有超過 2,330萬人領取，有助消費。\n\n天候條件也提供助力。江心怡指出，今年第1季降雨天數較去年減少約十天，氣候穩定有利外出活動，此外，今年農曆春節與228連假間隔較短，形成連假延續效果，進一步刺激出遊潮。主計總處引用觀光署數據指出，今年農曆春節期間（大年初一至初六），國內平均每日出遊人次達 64.5萬人，較去年同期28.7萬人大幅成長125%，顯示國旅市場明顯升溫，且第1季國人出國人次年增19.42%，也帶動相關消費支出增加。"}, {"title": "彭博：川普擬恢復攻擊伊朗 聽取軍事行動新方案 未來兩周發動可能性高 迄今耗資250億美元", "source": "經濟日報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "美國總統川普傳出打算在4月30日聽取一場有關對伊朗潛在軍事行動新方案的簡報，由美國中央司令部（CENTCOM）司令庫柏上將負責，顯示川普正認真考慮恢復大規模作戰行動，可能為打破談判僵局，也可能是在結束戰爭前發動最後一擊。彭博資訊則報導，川普顯然打算恢復攻擊伊朗，未來兩周發動的可能性最高。稍早，美國國防部長赫塞斯29日出席伊朗戰爭以來首次國會聽證會時，五角大廈首次指出，這場戰爭迄今已耗資250億美元；", "full_text": "美國總統川普傳出打算在4月30日聽取一場有關對伊朗潛在軍事行動新方案的簡報，由美國中央司令部（CENTCOM）司令庫柏上將負責，顯示川普正認真考慮恢復大規模作戰行動，可能為打破談判僵局，也可能是在結束戰爭前發動最後一擊。彭博資訊則報導，川普顯然打算恢復攻擊伊朗，未來兩周發動的可能性最高。稍早，美國國防部長赫塞斯29日出席伊朗戰爭以來首次國會聽證會時，五角大廈首次指出，這場戰爭迄今已耗資250億美元；\n\n這是川普政府對這場已持續兩個月、鮮少獲公眾支持的軍事行動，迄今最具體的官方成本估算。Axios報導，知情人士透露，CENTCOM準備對伊朗發動一波「短暫且強力」的打擊計畫，攻擊目標可能包括基礎設施，旨在打破談判僵局，並促使伊朗重返談判桌，在核問題上展現更多彈性。另一項方案是，奪取荷莫茲海峽部分區域的控制權，以重新開放商業航運。\n\n一名消息人士指出，此類行動可能涉及地面部隊。此外，過去曾被討論，也可能在此次簡報中提出的另一選項，是動用特種部隊，確保伊朗高濃縮鈾庫存的安全。川普前一天告訴Axios，他認為對伊朗的海上封鎖「某種程度上比轟炸更有效」。\n\n消息人士指出，川普目前將封鎖視為主要施壓手段，但若伊朗仍不讓步，不排除動用軍事行動。美軍參謀首長聯席會議主席凱恩上將傳出也將另據彭博資訊報導，美國未來兩周恢復攻擊的可能性最高，且美國軍方已要求將極音速飛彈部署至中東，這將是美國首次在該區域部署此類武器。伊朗官員態度依然強硬。\n\n最高領袖軍事顧問雷札伊表示，若美國持續封鎖，伊朗將做出回應。國會議長卡利巴夫則指控川普，試圖透過經濟壓力與內部分裂迫使伊朗屈服。伊朗最高領袖穆吉塔巴尼30日更透過書面聲明表示，美國人在波斯灣唯一的容身之處，就是「沉入海中」，伊斯蘭共和國將守護其「核能與飛彈能力」視為國家資產。"}, {"title": "布蘭特油價 攀高後回落", "source": "經濟日報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "國際油價在4月最後一天衝上四年高點，因美伊衝突似有升級可能，然而最新經濟數據顯示，戰爭對經濟造成的損失開始浮現，布蘭特原油價格從四年高點回落，一度跌逾 4%。另外由於布蘭特 6 月期貨即將到期，交易清淡，也可能是波動加劇的因素。布蘭特6月期貨30日一度大漲7.1%到每桶126.41美元，創2022年俄羅斯入侵烏克蘭後新高，截至29日收盤布蘭特已連續八個交易日上漲，累計飆漲30%。", "full_text": "國際油價在4月最後一天衝上四年高點，因美伊衝突似有升級可能，然而最新經濟數據顯示，戰爭對經濟造成的損失開始浮現，布蘭特原油價格從四年高點回落，一度跌逾 4%。另外由於布蘭特 6 月期貨即將到期，交易清淡，也可能是波動加劇的因素。布蘭特6月期貨30日一度大漲7.1%到每桶126.41美元，創2022年俄羅斯入侵烏克蘭後新高，截至29日收盤布蘭特已連續八個交易日上漲，累計飆漲30%。\n\n西德州原油期貨也同步走高。據Axios報導，川普預定4月30日聽取美國中央司令部關於對伊朗新一輪潛在軍事選項的簡報。川普稍早告訴Axios，在與伊朗達成解決核問題協議前，不會解除對伊朗港口的海上封鎖。\n\n目前，伊朗方面也沒有表現出任何讓步跡象。在此同時，30日公布的數據顯示，歐元區經濟在年初意外放緩，上季國內生產毛額（GDP）僅微幅成長0.1%，比市場預估的 0.2%更少，反映出伊朗戰爭引發能源成本飆升，而接下來可能出現停滯性通膨，進而拖累石油需求。交易員警告，更大的衝擊還在後頭。\n\n布蘭特一度應聲下跌4.3%，至每桶113美元。西德州原油同步走軟。哥倫比亞大學全球能源政策中心高級研究學者凱倫．楊（音譯）接受彭博電視訪問時表示，市場正意識到，荷莫茲海峽運輸問題還沒有任何解決方案，「價格壓力必須持續增加，直到達到某種程度的需求破壞為止」。"}, {"title": "出口帶動 首季GDP成長13.69% 近39年新高 遠高於中國5％、新加坡4.6％、南韓3.6％", "source": "自由時報 A01 焦點新聞", "cat": "國際經濟情勢", "priority": 1, "summary": "主計總處昨公布第一季經濟成長率概估十三．六九％、較二月預測增加二．二三個百分點，創近三十九年單季最高，且遠高於中國的五％、新加坡四．六％、南韓三．六％。主計總處專門委員江心怡表示，第一季 GDP（國內生產毛額）大幅上修，主因出口強勁帶動國內生產及投資，民間消費也很好；至於中東戰火的影響，從三月數據來看並不明顯。", "full_text": "主計總處昨公布第一季經濟成長率概估十三．六九％、較二月預測增加二．二三個百分點，創近三十九年單季最高，且遠高於中國的五％、新加坡四．六％、南韓三．六％。主計總處專門委員江心怡表示，第一季 GDP（國內生產毛額）大幅上修，主因出口強勁帶動國內生產及投資，民間消費也很好；至於中東戰火的影響，從三月數據來看並不明顯。\n\nAI需求火燙相關產品出口強勁主計總處指出，AI應用快速擴張，大幅提升算力需求，帶動AI基礎設施相關產品出口，第一季商品出口年增五十一．一％，較預測高出一四八億美元，三角貿易表現亦佳；併計商品及服務，概估第一季輸出實質成長三十五．二五％、上修九．八七個百分點；輸入成長二十七．○七％、上修十二．四九個百分點。\n\n輸出與輸入相抵，國外淨需求對經濟成長貢獻九．六二個百分點。股市創高推升財富民間消費佳投資方面，我國為高階AI晶片、伺服器及零組件主要製造基地，隨AI需求強勁，國內廠商加速擴增產能、持續投入研發，概估第一季資本形成（含政府、公營與民間固定投資及存貨變動）實質成長五．二％、上修四．八六個百分點，對經濟成長貢獻一．三八個百分點。至於民間消費，江心怡表示，政府普發現金效益延續、股市創高推升財富效果，加上業者促銷激勵相關消費增長，跨境旅遊熱潮延續帶動國人國外消費；\n\n概估第一季民間消費實質成長四．八九％、上修二．○二個百分點，增幅為近十季新高。"}, {"title": "趙少康追擊：誰指使季麟連嗆韓 有計畫開砲 指使人應出來解釋", "source": "自由時報 A01 焦點新聞", "cat": "國際經濟情勢", "priority": 1, "summary": "國民黨副主席季麟連不滿立法院長韓國瑜支持八○○○億軍購版本，日前在中常會表明「建議開除黨籍」，前中廣董事長趙少康昨受訪質疑，「是誰叫季麟連這樣做的？背後有沒有影武者？」若有人指使，請指使人出來解釋清楚；", "full_text": "國民黨副主席季麟連不滿立法院長韓國瑜支持八○○○億軍購版本，日前在中常會表明「建議開除黨籍」，前中廣董事長趙少康昨受訪質疑，「是誰叫季麟連這樣做的？背後有沒有影武者？」若有人指使，請指使人出來解釋清楚；\n\n如果沒有，不是開除季的黨籍就是解除季的副主席職務。如果沒有人指使季跑出來亂講不是開除季就是解除副主席職趙少康表示，季麟連應該道歉，但光道歉還不足，因為季麟連的講話不是臨時起意，是有計畫的，「那誰叫他這樣做的？背後有沒有影武者叫他做這個事情？」 趙少康說，季麟連指責國民黨目前政治職位最高的立法院長，說韓賣黨求榮，建議開除黨籍。韓國瑜是不分區立委，開除黨籍就和前民眾黨立委李貞秀一樣沒有立委身份了，立法院長也做不了，「你在講些什麼？副主席有這麼大嗎？\n\n副主席是民選出來的嗎？是黨員直選出來的嗎？」居然說要開除立法院長黨籍，到底後面有沒有人指使他？\n\n「如果有人指使季麟連，指使人出來解釋清楚，為什麼要指使他講這個話？」趙少康說，如果沒有指使，季麟連自己跑出來亂講，重的就應該開除季的黨籍，輕的也要解除副主席職務，這是最起碼的要求。趙少康說，隨便指控人家賣黨，這多重啊！\n\n完全沒有真憑實據，而且韓國瑜求了什麼榮？是要幹總統、幹黨主席嗎？不能這樣隨便污衊一個立法院長。\n\n趙少康並質疑，前天黨團大會討論完軍購案後，為什麼總召傅崐萁不表決？因為你的三八○○億+N不會通過就要拖，拖到最後大家受不了了，非要支持這個版本，傅崐萁才要表決通過嗎？國民黨怎麼會墮落到這個地步？"}, {"title": "當詐團車手 取走裝滿現鈔行李箱 灌漿工判刑5年半3594萬全賠", "source": "自由時報 A01 焦點新聞", "cat": "國際經濟情勢", "priority": 1, "summary": "以灌漿為業的劉姓工人，二○二三年加入詐欺集團擔任車手，詐團以假投資虛擬貨幣手法向劉姓女子騙取三五九四萬元，劉男出面取款時，取走裝滿現鈔的大行李箱交給上游成員。劉男落網後，台中地院將他判刑五年六月；民事部分，法官認為，劉男所為與劉女所受的損害有因果關係，判決全額賠償三五九四萬元。", "full_text": "以灌漿為業的劉姓工人，二○二三年加入詐欺集團擔任車手，詐團以假投資虛擬貨幣手法向劉姓女子騙取三五九四萬元，劉男出面取款時，取走裝滿現鈔的大行李箱交給上游成員。劉男落網後，台中地院將他判刑五年六月；民事部分，法官認為，劉男所為與劉女所受的損害有因果關係，判決全額賠償三五九四萬元。\n\n判決指出，廿二歲劉男於二○二三年六月間加入暱稱「郭總」的詐騙集團擔任車手，該集團佯稱可透過投資虛擬貨幣獲利，一名劉姓女子誤信，與詐團相約面交。假冒虛幣交易專員收款轉交同夥法官認定害人損失須負賠償責任劉男在「郭總」指示下，同年六月八日假冒虛幣交易專員，搭車前往劉女的台中市住處收走三五九四萬元，並將裝滿現金的大行李箱，轉交給開車來收款的同夥。劉女後來驚覺受騙，報警查獲劉男，刑事部分依三人以上共同詐欺取財罪，將劉男判刑五年六月。\n\n劉女提出附帶民事賠償，中院法官認為，劉男犯案時已廿二歲，擔任工程灌漿工作，並非初出社會，且是智識正常、具備相當工作經驗的人，對於詐騙犯行不能推諉說不知情；劉男對面試者「郭老闆」真實姓名年籍毫無所悉，雙方也未簽立任何書面契約，與一般應徵工作常情不符；劉男對於虛擬貨幣買賣無任何相關知識，卻能輕易拿到三萬五千元月薪，顯與一般行情不符。\n\n法官認定劉男所為對於劉女的損害結果，具有相當因果關係，可認定為共同行為人，須連帶負損害賠償責任，依此判決劉男全額賠償三五九四萬元給被害人，可上訴。"}, {"title": "台南女警 車禍遇死劫 未碰撞卻釀禍 違停校車駕駛法辦", "source": "自由時報 A01 焦點新聞", "cat": "國際經濟情勢", "priority": 1, "summary": "於上月廿八日休假日騎機車，在中華醫事科技大學違規停放的校車後方停等時，被同向騎車的戴姓女大學生追撞倒地，再被後方駛來的南英商工校車輾斃。警方分析過去台南有一件違停車輛導致的死亡車禍，違停車駕駛被法官認定為同案被告判刑，故本案除戴女及輾死被害人的駕駛外，一併將違停車駕駛依過失致死罪移送法辦。由於華醫科大校車未與相關人車發生碰撞，僅單純違規停車，因而警方內部有一派認為，單純違停車輛與車禍致死案無關；", "full_text": "於上月廿八日休假日騎機車，在中華醫事科技大學違規停放的校車後方停等時，被同向騎車的戴姓女大學生追撞倒地，再被後方駛來的南英商工校車輾斃。警方分析過去台南有一件違停車輛導致的死亡車禍，違停車駕駛被法官認定為同案被告判刑，故本案除戴女及輾死被害人的駕駛外，一併將違停車駕駛依過失致死罪移送法辦。由於華醫科大校車未與相關人車發生碰撞，僅單純違規停車，因而警方內部有一派認為，單純違停車輛與車禍致死案無關；\n\n另有交警認為，三年前台南發生占用慢車道的違停貨車未遭碰撞，但一輛機車為閃避貨車，遭後方曳引車輾死，台南地院認為貨車駕駛也觸犯過失致死罪，將他判刑。警方內部討論後，認為先有華醫科大校車違停阻礙通行，鄭女為此停等才肇致後來的死亡受害結果，因而傾向認定違停校車與車禍具有因果關係，通知違停車駕駛接受調查後送辦。"}, {"title": "民雄農工「電、水、電腦」複合人才 業界搶要", "source": "自由時報 A01 焦點新聞", "cat": "國際經濟情勢", "priority": 1, "summary": "嘉義縣國立民雄農工電機科推動「一專多能」教學，學生利用課後及假日時間進行高強度術科練習，如彎管、配線邏輯及壓力測試等，今年有8位應屆畢業生取得個人雙乙級證照、5位通過「2張乙級加4張丙級」證照。校方表示，「證照達人」掌握居家電力裝配、自來水配管及電腦裝修等技術，兼具「電、水、電腦」專長，具備跨領域整合與實作解決問題能力，有機會成為業界爭相預約的複合型技術人才。", "full_text": "嘉義縣國立民雄農工電機科推動「一專多能」教學，學生利用課後及假日時間進行高強度術科練習，如彎管、配線邏輯及壓力測試等，今年有8位應屆畢業生取得個人雙乙級證照、5位通過「2張乙級加4張丙級」證照。校方表示，「證照達人」掌握居家電力裝配、自來水配管及電腦裝修等技術，兼具「電、水、電腦」專長，具備跨領域整合與實作解決問題能力，有機會成為業界爭相預約的複合型技術人才。"}, {"title": "氣候變遷委員會聚焦國土調適 國家戰略統籌 水治理投5531億元", "source": "聯合報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "為了因應極端氣候導致的風險，經濟部昨在國家氣候變遷對策委員會中表示，自今年起至二○三一年，規畫投入五五三一億元，推動跨部會流域治理，將水治理納入國家戰略統籌。此外，針對賴清德總統支持重啟核三，五位民間委員昨在會中提案，要求召開全社會防衛韌性委員會與氣候變遷對策委員會聯席會議；總統府回應，將由行政院秘書長張惇涵邀集討論，研議聯席會議。", "full_text": "為了因應極端氣候導致的風險，經濟部昨在國家氣候變遷對策委員會中表示，自今年起至二○三一年，規畫投入五五三一億元，推動跨部會流域治理，將水治理納入國家戰略統籌。此外，針對賴清德總統支持重啟核三，五位民間委員昨在會中提案，要求召開全社會防衛韌性委員會與氣候變遷對策委員會聯席會議；總統府回應，將由行政院秘書長張惇涵邀集討論，研議聯席會議。\n\n跨域整合推新治理模式賴總統昨主持國家氣候變遷對策委員會，此次會議聚焦「國土調適」。經濟部次長賴建信報告「水及流域永續發展行動計畫」表示，此次行動計畫提出三大治理創新，包括由國家層級戰略統籌，強化中央與地方一致性；導入科學分析與空間圖資套疊，推動循證治理以精準掌握土石流潛勢區與高用水產業分布；\n\n並打破部會分工界線，推動跨域整合的國家治理模式。賴建信說，計畫將以「有水無災、用水有度、水清魚游」為目標，分別針對四大面向設定指標，集水區治理由農業部主責，目標將土砂災害警戒涵蓋率提升至百分之九十六；水資源調度由經濟部推動「珍珠串計畫」強化管網聯通，提升每日調度能力至三二三萬噸，並將漏水率降至百分之十以下。\n\n韌性供水不會分區輪供賴建信說，全案總經費五五三一億元，將在今年至二○三一年執行，涵蓋水土林保育、水資源利用、系統性治水及水質改善等四類別；其中二八二九億元已核定，另二七○二億元將分年爭取，平均每年投入約九二二億元。賴建信說，今天春雨下得非常大，實屬少見；\n\n過去有百年大旱，未來也可能發生，在投入國家級水治理行動計畫後，未來遭遇百年大旱時，供水更有韌性，不會進入分區輪流供水。已有前瞻為何再編預算不過，對於經濟部預計要再規畫投入五五三一億元治水，內政部前部長、國民黨智庫副董事長李鴻源質疑，前總統蔡英文曾編列八八○○億元前瞻預算，其中水建設兩千餘億元，如果過去做得很好，為什麼還要再編五千多億元？「若因沒做好才要編，把錢丟給同一批執行者，成效還會變好嗎？」 重啟核三研議聯席會議此外，五位民間委員李根政、黃品涵、陳惠萍、雷雅淇和趙家緯昨發表聯合聲明，並在會中提案，指賴總統以未來ＡＩ用電需求及國際碳管制要求為由，認為重啟核三有其必要，要求政府充分揭露相關資訊，由國家氣候變遷對策委員會舉辦公開論壇，並召集全社會防衛韌性委員會與國家氣候變遷對策委員會聯席會議，推演能源安全情境。總統府發言人郭雅慧會後轉述，賴總統表示，關於核能議題，政府主張一向都是「核安無虞、核廢有解、社會有共識」，正確資訊的共享是社會溝通重要的一環，政府會持續加強，至於聯席會議，他請張惇涵邀集兩委員會的執行秘書與相關部會，研議如何進行。不過，民間委員轉述，總統對於舉辦公開論壇並未正面回應。"}, {"title": "促進生育「0到6歲國家養」擬擴大 不排除延伸適用年齡 放寬彈性育嬰留停對象 政院近期定案", "source": "聯合報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "台灣少子化問題嚴峻，國發會主委葉俊顯昨透露，府院近期應會有重大宣布，相關政策不排除擴大「○到六歲國家一起養」，甚至延伸適用年齡，公布的時間不會等太久。行政院人士指出，政府非常重視少子女化議題，根據目前已公布的少子女化對策計畫二點○，除了生、養、教育之外，政府也會從居住、職場等共五大面向著手，持續強化支持力道，從根本面延緩少子女化現象。據了解，部分政策走向已經陸續揭露，包括勞動部下半年將修法，擴大彈性育嬰留停的適用對象至六歲以下，隨適用年...", "full_text": "台灣少子化問題嚴峻，國發會主委葉俊顯昨透露，府院近期應會有重大宣布，相關政策不排除擴大「○到六歲國家一起養」，甚至延伸適用年齡，公布的時間不會等太久。行政院人士指出，政府非常重視少子女化議題，根據目前已公布的少子女化對策計畫二點○，除了生、養、教育之外，政府也會從居住、職場等共五大面向著手，持續強化支持力道，從根本面延緩少子女化現象。據了解，部分政策走向已經陸續揭露，包括勞動部下半年將修法，擴大彈性育嬰留停的適用對象至六歲以下，隨適用年齡延長，卅天的彈性化留停天數也擬增加；\n\n此外，衛福部兒童及少年未來教育與發展帳戶也擬擴大適用對象，從原先的低收、中低收，放寬至近貧兒少，金額將依對象有不同加碼。立法院經濟委員會昨審查國發會及所屬單位預算，立委關注國內少子化危機，由於台灣生育率持續探底，去年總生育率僅約○點六九五人，成為全球最低，人口更是連續廿六個月負成長，反觀南韓雖然同樣面臨少子化問題，但二○二四年推出延長育嬰假、企業生育補助免稅等政策，生育率止跌回升至○點七五。民進黨立委蔡易餘表示，南韓為解決少子化危機，將育嬰假總時長從一年延長至一年半，若雙親共同請育嬰假，全薪補助由三個月增至六個月等措施，同時賦予企業義務與獎勵，台灣雖然有「○到六歲國家一起養」政策，目前仍看不出成效。\n\n葉俊顯指出，南韓在一九九○年代初期曾出現一波小幅人口增長潮，目前該世代正進入生育年齡。他坦言，南韓在鼓勵生育方面提供的社會支持，相較之下比台灣多。葉俊顯表示，府院已多次召開會議，國發會也持續參與協調，府院近期應會有重大宣布，有望推出一系列措施，不排除擴大「○到六歲國家一起養」，甚至可能延伸適用年齡，整體新措施方向接近南韓政策，可能是擴大男性育嬰假等，同時也將評估減輕企業負擔，讓勞工更安心請照顧假。\n\n國發會官員表示，對於政策的加碼方向，目前行政院還在研議中，但南韓的生育率回升，行政團隊也會參考，其中適用年齡延長是肯定的方向，如歐洲國家就有到十八歲的，政策內容也會加碼，但目前行政團隊都還在討論中，尚未定案，但公布時間點絕對不會太久。知情人士說，相關方案仍待總統府最終拍板，身兼民進黨主席的賴清德總統也已在中常會表示，近期會找立委到中央黨部開會，聽取各方對少子女化問題的意見。"}, {"title": "接受外媒專訪 認有助與北京建立信任 盼訪美時拜會美國總統 鄭麗文支持川普說反對台獨", "source": "中國時報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "國民黨主席鄭麗文計畫訪美行程前接受美媒專訪，她提到，希望能拜會美國總統川普，討論如何透過對話，避免與大陸發生衝突，並指出她支持川普表態「反對台灣宣布獨立」，認為這有助於建立與北京的互信，改善兩岸關係。綠委陳培瑜痛批，鄭麗文是在幫她自己與中國的政治交易鋪路；藍委賴士葆則強調，根據憲法及九二共識，中華民國本來就是反對台獨。", "full_text": "國民黨主席鄭麗文計畫訪美行程前接受美媒專訪，她提到，希望能拜會美國總統川普，討論如何透過對話，避免與大陸發生衝突，並指出她支持川普表態「反對台灣宣布獨立」，認為這有助於建立與北京的互信，改善兩岸關係。綠委陳培瑜痛批，鄭麗文是在幫她自己與中國的政治交易鋪路；藍委賴士葆則強調，根據憲法及九二共識，中華民國本來就是反對台獨。\n\n國民黨新聞稿無此內容鄭麗文計畫6月訪美，會見美國官員及與台胞見面。國民黨昨發出鄭麗文接受外媒專訪內容，題為《台灣在野黨領袖在與習近平罕見會晤後，正著眼與川普會面》。鄭表示，大陸國家主席習近平會支持她訪美。\n\n她亦證實已請求與川普會面，但也直言促成此事「可能非常困難」。報導更談及鄭麗文對即將舉行的「川習會」看法，表示她會支持川普反對台灣宣布獨立的立場，此舉有助於與北京建立信任，改善兩岸關係；不過，國民黨發給媒體的中文新聞稿中，無這段內容。\n\n據了解，雙方原要同步發出新聞，但因外媒先上線，國民黨緊接著於昨晚8時41分發出新聞稿，內容未寫「鄭麗文支持川普反對台獨」，僅提到中國大陸會重申「一個中國、反對台獨」的政治底線，但她不希望台灣成為談判桌上的交易標的。國民黨文傳會主委尹乃菁指出，整個專訪約1小時，觸及內容相當多，也有非常深入的討論，所以國民黨提供的新聞稿是濃縮版，不是刻意省略部分內容。至於外媒寫鄭麗文「支持川普說出反對台獨」，尹乃菁則說，採訪是中文對談，鄭原話是：「所以川普總統如果這樣子講的話，跟國民黨主張反對台獨是剛好符合的」，「符合」與「支持」還是有語意上的差異。\n\n稱九二共識反台獨符合主張根據國民黨提供的對談稿，外媒記者詢問「川習會」在即，鄭麗文是否支持川普從「不支持台獨」到「反對台獨」？鄭麗文先是說，川普總統會不會從不支持台獨到變成反對台獨，我們不得而知，但這個是屬於政治底線，而不是政治交易，不希望台灣成為被交易的標的。則說，「從不支持到反對，語氣上的確有一個很大的不同」、「如果台獨已經不是選項，相信兩岸關係會很快速地得到改善。」 總統考量是什麼，態度是什麼？因為對我們（國民黨）來講，回到九二共識、反對台獨，這本來就是我們的立場，也因此能夠順利的有「鄭習會」。所以川普總統如果這樣子講的話，「跟我們的主張是剛好符合的。」 賴士葆表示，鄭麗文的說法與日前「鄭習會」時強調「中華民國、 反對台獨」非常一致，若川普真的明確表達「反對台獨」，反而對民進黨政府來講就有壓力了，某種程度是要強迫民進黨表態。綠批壓力甩台灣鄭幫自己鋪路賴強調，無論是在憲法或是九二共識，中華民國本來就是反對台獨，鄭麗文的說法只是把這個概念講得更精準，更能代表要捍衛中華民國。陳培瑜則認為，鄭麗文這段話表面在講和平，其實是把壓力全部丟回台灣。\n\n台海會緊張，是中國長期用軍事跟外交施壓，現在卻反過來要台灣先表態，甚至覺得美國把話講重一點會比較好，這是沒辦法掌握台灣主體性的人才會說出來的話。陳培瑜說，鄭麗文一邊說台灣不能被當籌碼，一邊又樂見別人替台灣定義立場，「嘴上說不要被交易，做法卻是在幫她自己與中國的政治交易鋪路」；陳強調，維持現狀、守住民主才是多數人的共識。"}, {"title": "赫格塞斯稱 美無意改變台海現況 通話盧比歐 王毅：台灣問題是中美最大風險點", "source": "中國時報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "美陸元首川習會倒數，大陸外長王毅昨與美國國務卿盧比歐通話，王毅強調，台灣問題事關中國的核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇，為中美合作打開新的空間；此外，美國戰爭部長赫格塞斯4月29日出席眾院聽證會，提到美中關係時，他表示川普政府尋求與大陸建立穩定和平的關係，重申美國無意改變台灣現況。", "full_text": "美陸元首川習會倒數，大陸外長王毅昨與美國國務卿盧比歐通話，王毅強調，台灣問題事關中國的核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇，為中美合作打開新的空間；此外，美國戰爭部長赫格塞斯4月29日出席眾院聽證會，提到美中關係時，他表示川普政府尋求與大陸建立穩定和平的關係，重申美國無意改變台灣現況。\n\n據新華社報導，王毅在與盧比歐通話時表示，元首外交始終是中美關係的「定盤星」。在習近平和川普戰略引領下，中美關係總體保持了穩定，這符合兩國人民根本利益，也符合國際社會普遍期待。他表示，雙方要維護好來之不易的穩定局面，籌備好重要高層互動議程，擴大合作面、管控分歧點，探索構建具有戰略性、建設性、穩定性的中美關係，實現相互尊重、和平共處、合作共贏。\n\n王毅強調，「台灣問題事關中國的核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇，為中美合作打開新的空間，為世界和平作出應盡努力」；據新華社報導，盧比歐表示，「美中關係是世界上最重要的雙邊關係，元首外交是美中關係的核心。\n\n雙方要保持溝通協調，相互尊重、妥處分歧，為美中高層互動積累成果，尋求美中關係的戰略穩定。」 王毅與盧比歐通上電話，為中美關係定調，這也意味川普5月中的北京行，應無懸念。此外，美國眾議院軍事委員會4月29日就2027年度國防預算舉行聽證會，邀請赫格塞斯、凱恩，以及戰爭部首席財務官赫斯特出席。\n\n赫格塞斯作證的書面報告提及，在美國總統川普的指示下，戰爭部正全力推動「美國優先」、「以實力謀和平」議程。除了保護美國本土，他指出，戰爭部的第2項工作重點，是遏制大陸在印太地區的影響力，即以實力謀和平，而非對抗。赫格塞斯表示，在川普領導下，美中關係比過去任何時候，都更加良好穩固，兩國領袖今年互訪，展開國是訪問，將為雙方關係帶來更多進展的機會。\n\n赫格塞斯強調，美國將保持強大，但不會採取對抗姿態，「我們不會試圖支配或羞辱中國。我們也無意改變台灣現狀。」 針對大陸的部分，赫格塞斯指出，戰爭部的職責是確保北京看到美國毋庸置疑的軍事實力，這種實力在必要時，可以捍衛美國的國家利益。\n\n在美國明確表達和平意圖之際，他也堅持，大陸必須尊重美國在印太地區長久以來的利益。"}, {"title": "沖之鳥礁日機抵近山東艦 共軍強力壓制 殲-15示警：任何轉彎都在我導彈射程內", "source": "中國時報 A01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "日本近期軍事動作頻頻，讓北京的反日宣傳再升溫，大陸國安部昨發文細數日本修憲、擴軍等行為，批評「新型軍國主義」抬頭，大陸學者也進一步透露，共軍航母山東艦日前在航行期間，於沖之鳥礁附近遭遇日本反潛巡邏機抵近偵察，共軍警告日本「你方任何一次轉彎都在我導彈射程之內」，讓日本不再靠近。新浪新聞「環球專事」欄目報導，大陸海疆專家王曉鵬透露，共軍航空母艦山東艦日前在航行期間，於沖之鳥礁附近遭遇日本自衛隊P -3C反潛巡邏機偵察。共軍隨即派出殲-15艦...", "full_text": "日本近期軍事動作頻頻，讓北京的反日宣傳再升溫，大陸國安部昨發文細數日本修憲、擴軍等行為，批評「新型軍國主義」抬頭，大陸學者也進一步透露，共軍航母山東艦日前在航行期間，於沖之鳥礁附近遭遇日本反潛巡邏機抵近偵察，共軍警告日本「你方任何一次轉彎都在我導彈射程之內」，讓日本不再靠近。新浪新聞「環球專事」欄目報導，大陸海疆專家王曉鵬透露，共軍航空母艦山東艦日前在航行期間，於沖之鳥礁附近遭遇日本自衛隊P -3C反潛巡邏機偵察。共軍隨即派出殲-15艦載戰鬥機升空攔截，並在對峙過程中透過無線電發出強硬警告，展現威懾力。\n\n報導稱，在殲-15強勢壓制下，日方偵察機最終放棄原有行動。公開資料顯示，殲-15配備有源相控陣雷達及「霹靂-15」空對空導彈，射程超過200公里，具備「先視、先射」優勢，作戰半徑可覆蓋東海及西太平洋大範圍空域。王曉鵬未明確說出兩軍遭遇的時間。\n\n而根據過去公開資訊，日本防衛省去年6月曾指控山東艦艦載戰鬥機殲-15，兩度在太平洋公海上空異常靠近日本海上自衛隊的P-3C反潛巡邏機，距離一度近至約45公尺，第二天還橫越自衛隊機前方約900公尺處。與此同時，大陸國安部4月30日透過官方公眾號發表評論，點名日本高市內閣近期一系列政策轉向，從修改「防衛裝備轉移三原則」、 放寬武器出口限制，到供奉靖國神社及自衛隊艦艇進入台灣海峽，直指日本安保政策已由「專守防衛」轉向進攻態勢，「新型軍國主義」 愈發猖獗，指日本正系統性鬆動戰後和平體制。在外交層面，大陸外交部同日對日本擬恢復「大將」、「大佐」等二戰前軍銜制度表達強烈關切。\n\n發言人林劍指出，日本自戰後以來刻意採用去軍事化銜級名稱，以切斷與舊軍國主義體制的連結，如今卻計畫恢復舊制，絕非單純技術調整。林劍指，日本以「營造榮譽感」為由推動更名，實質上是在制度與認知層面突破戰後框架，甚至「在受害國人民傷口上撒鹽」。林劍警告，日本若持續在軍事擴張與歷史認知上「倒行逆施」，不僅難以取信國際社會，也將對區域和平穩定帶來嚴重衝擊，呼籲國際社會提高警惕，防止軍國主義死灰復燃。"}, {"title": "何立峰視訊美財長 關切經貿限令 陸禁Manus併購 官媒指涉國安非純商業", "source": "中國時報 AA01 要聞", "cat": "國際經濟情勢", "priority": 1, "summary": "經貿限令陸禁Manus併購官媒指涉國安非純商業大陸副總理何立峰與美國財長貝森特、美貿易代表格里爾，昨晚舉行視訊通話，就進一步妥善解決彼此關注的經貿問題和拓展務實合作，進行了坦誠、深入、建設性的交流。中方就近期美對華經貿限制措施表達嚴正關切。雙方同意繼續發揮好中美經貿磋商機制作用，不斷增進共識、管控分歧、加強合作，推動中美經貿關係健康、穩定、可持續發展。", "full_text": "經貿限令陸禁Manus併購官媒指涉國安非純商業大陸副總理何立峰與美國財長貝森特、美貿易代表格里爾，昨晚舉行視訊通話，就進一步妥善解決彼此關注的經貿問題和拓展務實合作，進行了坦誠、深入、建設性的交流。中方就近期美對華經貿限制措施表達嚴正關切。雙方同意繼續發揮好中美經貿磋商機制作用，不斷增進共識、管控分歧、加強合作，推動中美經貿關係健康、穩定、可持續發展。\n\n大陸國家發改委4月27日宣布，對Meta收購Manus項目作出禁止投資決定，要求撤銷交易。大陸央視旗下媒體帳號「玉淵譚天」發文強調，禁止Manus併購案，不是禁止AI企業出海，這次只是劃清合規與不合規的界限，為外資投資提供更明確的監管參考，報導引述專家說法，指撤銷交易是地緣政治博弈的必然結果，涉及 AI、先進算法、核心數據等戰略領域的跨境併購，已不再是單純的商業交易，而被納入國家安全與發展利益的統籌考量。玉淵譚天的文章指，Manus的特別之處在於，先利用大陸境內要素完成孵化，後受美國因素驅動，試圖把自己包裝成一家新加坡公司，規避了大陸的監管規定。\n\n文章引述北京金誠同達律師事務所律師沈姿英表示，大陸《外商投資安全審查辦法》第四條對審查範圍有比較明確的規定：涉及國防安全的領域，比如投資軍工配套，或者在軍事設施周邊投資。只要落入這個範圍，不考慮外國投資者持股比例和控制權，都需要申報。文章指，Meta收購Manus，取得實際控制權，核心技術和團隊將被完整轉移至大陸境外，這需要在國家安全風險此外，外商投資安全審查有一個特點，「穿透審查」。\n\n即便交易主體在形式上已經是新加坡公司，但只要核心技術、人才、數據的起源在大陸境內，而且這筆交易可能導致關鍵技術外流，就會被穿透認定為外商投資行為，進行一體化審查。"}, {"title": "防弊 國發基金設投資管理平台", "source": "中國時報 A06 財經綜合", "cat": "台灣產業與投資動向", "priority": 0, "summary": "為了引導資金投入重點產業，先前國發基金結合各部會推動7大主題式百億基金投資方案，但立委4月30日關心投資成效問題。國發會主委葉俊顯表示，未來還會再有2個百億基金進來，總共9個，目前規畫成立「基金投資管理平台」，檢視投資案盈虧、投資時效等，如表現不佳，將要求執行單位到管理委員會報告。全球產業面臨數位轉型、淨零轉型等趨勢，國發基金結合各部會推動7大主題式百億基金投資方案，要引導資金投入國家重點產業，涵蓋經濟部主導的「策略性製造業實施方案」、...", "full_text": "為了引導資金投入重點產業，先前國發基金結合各部會推動7大主題式百億基金投資方案，但立委4月30日關心投資成效問題。國發會主委葉俊顯表示，未來還會再有2個百億基金進來，總共9個，目前規畫成立「基金投資管理平台」，檢視投資案盈虧、投資時效等，如表現不佳，將要求執行單位到管理委員會報告。全球產業面臨數位轉型、淨零轉型等趨勢，國發基金結合各部會推動7大主題式百億基金投資方案，要引導資金投入國家重點產業，涵蓋經濟部主導的「策略性製造業實施方案」、「策略性服務業實施方案」、「中小企業實施方案」，文化部負責的「文化創意產業實施方案」，數發部的「AI新創實施方案」、環境部的「綠色成長淨零產業實施方案」，以及國科會的「智慧機器人投資實施方案」。\n\n立委邱志偉昨指出，113年「中小企業實施方案」投資有147家，但有110家發生虧損，比例蠻高。雖投資不完全是著眼於效益，也要有協助、輔導、產業發展功能，但也不能太離譜，要有一定的績效。葉俊顯指出，正規畫成立「基金投資管理平台」，針對相關盈虧狀況或投資時效等做檢視，如表現不好，要到管理委員會來說明。\n\n民進黨立委邱議瑩關心國發基金投資綠能部分指出，近期釋出聯合再生420萬股，持股比例降至5.81％，僅保留1.5％股權、1席董事，說是階段性任務達成，這代表政府放棄綠能發展嗎？葉俊顯否認，強調就是按規定投資超過5年要檢討，如產業可自己站起來，就慢慢釋放一部分股票。"}, {"title": "無人機國家隊 267家串聯 漢翔、佳世達、長榮航太等北中南供應鏈各有重點投入領域 洽談國際訂單金額突破百億元", "source": "經濟日報 A04 焦點", "cat": "台灣產業與投資動向", "priority": 0, "summary": "經濟部昨（30）日在行政院會報告無人機產業發展，報告指出，全台已有267家業者投入無人機整合與關鍵零組件製造的供應鏈，無人機國家隊成形，包含漢翔、雷虎、佳世達、長榮航太、飛鴻、台希創等，北中南供應鏈各有重點投入領域。經濟部透露，業者已成功切入國際供應鏈，目前洽談中訂單金額，規模已突破百億元，市場潛力強勁；更有逾20家國內業者，如中光電、神基等打入美國無人機供應鏈。", "full_text": "經濟部昨（30）日在行政院會報告無人機產業發展，報告指出，全台已有267家業者投入無人機整合與關鍵零組件製造的供應鏈，無人機國家隊成形，包含漢翔、雷虎、佳世達、長榮航太、飛鴻、台希創等，北中南供應鏈各有重點投入領域。經濟部透露，業者已成功切入國際供應鏈，目前洽談中訂單金額，規模已突破百億元，市場潛力強勁；更有逾20家國內業者，如中光電、神基等打入美國無人機供應鏈。\n\n行政院長卓榮泰昨日聽取經濟部、國防部報告無人機產業。卓揆指出，台灣無人機產業 2025 年產值達 129 億元，較前一年成長逾2.5倍，而2025年整機外銷產值29.5億元，相較前一年成長幅度更高達21倍，顯見國內業者研發、製造、外銷能力俱足。卓榮泰指出，政府透過國防部軍用商規無人機採購，已建立整機非紅供應鏈整合能量，並帶動關鍵技術發展。\n\n經濟部產業發展署長邱求慧表示，台灣已與歐美日等九國簽署備忘錄（MOU），展現國際合作布局與高度信任基礎，洽談中訂單金額已突破百億元。除打入美國無人機供應鏈，也與歐洲最大無人機公司 Parrot簽署MOU，針對鏡頭、馬達、整機等合作。經濟部盤點全台北中南各區，均有業者投入無人機產業。\n\n北部共164家，因具備強大資通訊背景與學研資源，重心在於「軟硬體研發」與「系統控制」，指標企業有長榮航太、中光電等。中部共57家，發揮傳統精密加工與航太產業聚落的優勢，重心在於「機身結構」與「動力系統」，指標企業有漢翔、雷虎、海威、台擎動力。南部共 45 家，主要透過亞創中心與航太聚落，重心在於「系統試煉」與「創新整合應用」，指標企業有台希創、亞航、新樂飛。\n\n東部以整機系統整合為主，目前為一家，即飛鴻。卓榮泰昨日再向立院喊話，國防特別預算包含「三塊拼圖、七大類別」，強化防衛韌性，呼籲朝野共同支持1.25兆國防特別條例。國防部副部長徐斯儉強調，特別條例中，無人機相關預算規模達數千億元，政府投入可帶動國內產業發展，且透過一次性長期訂單，可提升廠商投資意願並擴大產能；\n\n若採逐年編列預算，將受限於金額及刪減風險，將影響產業布局。"}, {"title": "美前國防部副助理部長柯海諾：川習會前未通過軍購 台灣形同放棄主動權", "source": "自由時報 A03 焦點新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "美國前國防部東亞事務副助理部長柯海諾（Heino Klinck）昨表示，台灣在華府與北京的關係中能掌握的「主動權（agency）」有限，倘若不能在美國總統川普五月訪中前通過國防特別預算案，形同白白放棄戰略籌碼。他強調，此舉將向美國傳遞最明確的訊號，展現台灣對自我防衛的承諾，否則國際社會將質疑台灣面對存亡威脅時的自我防衛決心。特別預算遲遲未過美方已有質疑柯海諾昨接受本報專訪表示，儘管台灣在美中關係的主動權有限，但重點在於台灣如何有戰略地運...", "full_text": "美國前國防部東亞事務副助理部長柯海諾（Heino Klinck）昨表示，台灣在華府與北京的關係中能掌握的「主動權（agency）」有限，倘若不能在美國總統川普五月訪中前通過國防特別預算案，形同白白放棄戰略籌碼。他強調，此舉將向美國傳遞最明確的訊號，展現台灣對自我防衛的承諾，否則國際社會將質疑台灣面對存亡威脅時的自我防衛決心。特別預算遲遲未過美方已有質疑柯海諾昨接受本報專訪表示，儘管台灣在美中關係的主動權有限，但重點在於台灣如何有戰略地運用這些影響力。\n\n他指出，台灣的國防特別預算未能於四月通過，已引發美方觀察家質疑，台灣內部的爭論是否反映了人民對自身防衛承諾的真實態度。柯海諾示警，若在川普赴北京與中國國家主席習近平會晤前，台灣仍未通過該預算案，這在戰略上是一個錯誤，無異於在美中大國博弈的節骨眼上放棄主動權。他認為，通過預算不僅是強化嚇阻力，向美國傳遞明確的最終訊號，更是向北京傳達台灣強化國防是「玩真的」的態度。\n\n國民黨作為不符合台灣戰略利益針對台灣在野黨對國防特別預算的爭辯，柯海諾對在野黨的內部分歧表達不解與擔憂。他提到，黨主席一結束訪中，國民黨便在美國總統訪中前夕加倍反對特別預算，這些舉動完全不符合台灣的戰略利益。他個人認為，若訪問中國未能改變共軍侵擾台灣空海域的行為，且未能帶回任何服務台灣自由民主的成果，其動機不免啟人疑竇。\n\n柯海諾強調，民主體制容許激烈的公開辯論，但在國家防衛議題上不應有黨派之爭。台灣過去數十年因國防投資不足而苦苦追趕，現在正處於需要優先排序國防資源、展現嚴肅態度的關鍵時刻，不應讓政治動機阻礙國安進展。審查延宕「負面影響」美後續軍售針對外界擔憂習近平可能藉與川普會面動搖美國對台政策，柯海諾重申，「六項保證」是美國的既定政策，且在川普第一任期內已解密。\n\n他指出，川普總統高度敬重雷根總統及其「實力帶來和平」的理念，因此沒有任何跡象表示川普政府會背離這項政策。柯海諾認為，比起習近平的干預，台灣內部預算審查的延宕對美國後續軍售支持的「負面影響」可能更大，當台灣政治建制派內部出現雜音，美國、歐洲或亞洲盟友就會開始考慮，若台灣自己都不確定防衛承諾，外界到底該付出多少對台承諾。台灣島嶼自主國防工業至關重要談及國防特別預算的內涵，柯海諾也以自身過去接觸相關系統的經驗指出，台灣採購無人機系統以及具備人工智慧整合能力的C5ISR系統皆是正確的方向。\n\n他形容，C5ISR系統是軍事能力的「大腦」，能協助台灣應對解放軍的壓倒性優勢，並以烏克蘭為例強調，台灣身為島嶼，必須建立自主國防工業、備妥充足彈藥並建立無人機產能，因為如果東西不在島上，一旦戰爭爆發將更難取得。柯海諾一九九○年代末就曾到訪台灣，更曾以美國武官身分長駐北京及香港逾七年。他感嘆，香港現狀已與中國其他城市無異，新聞與言論自由蕩然無存，而台灣則有越來越多人開始明白，不能將自由民主視為理所當然。\n\n他重申美國格言「自由並非平白得來」強調，民主需要持續的投資與犧牲。他說，包括美國人、日本人、歐洲人或其他外國人都關心台灣的自由，「但這份關心，不可能超過台灣人本身的渴望。」"}, {"title": "呼籲朝野共同支持國防特別條例 卓揆：三塊拼圖 缺一不可", "source": "自由時報 A04 政治新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "行政院院會昨安排經濟部報告「無人機產業現況與推動成果」與國防部報告國防特別條例執行規劃，再次說明整體規劃與急迫性。行政院長卓榮泰強調，建構台灣之盾、高科技擊殺鏈及產業自主，是構成國安的「三塊拼圖」，缺一不可，呼籲朝野共同支持。卓揆在院會中指出，中共對台灣及印太威脅正在加劇，行政院提出的特別預算涵蓋三塊拼圖。", "full_text": "行政院院會昨安排經濟部報告「無人機產業現況與推動成果」與國防部報告國防特別條例執行規劃，再次說明整體規劃與急迫性。行政院長卓榮泰強調，建構台灣之盾、高科技擊殺鏈及產業自主，是構成國安的「三塊拼圖」，缺一不可，呼籲朝野共同支持。卓揆在院會中指出，中共對台灣及印太威脅正在加劇，行政院提出的特別預算涵蓋三塊拼圖。\n\n第一塊是籌購強弓等各類防空、反彈道飛彈及無人機反制系統，搭配現有愛國者、天弓防空系統，逐步打造台灣之盾，有效捍衛領空安全、確保關鍵基礎設施防護。第二塊是引進高科技、人工智慧，籌獲人工智慧（AI）輔助決策系統；第三塊拼圖，是厚植國防相關產業自主發展，藉台美合作、國防無人機需求契機，在最短時間內擴大國內自主量能、建立非紅供應鏈、推動國防產業發展、刺激經濟動能。\n\n對於國民黨提出八○○○億元或「三八○○億元+N」的預算上限，國防部副部長徐斯儉昨在院會後記者會強調，國防特別條例是整體戰力構成，無人機與反制無人機也是其中一部分，「如果你有拳頭，也就是打擊武器，可是沒有眼睛、大腦和後續力，要怎麼打」？至於是否接受把無人機編入年度預算？徐斯儉說，編在特別預算，是讓台灣業者能有長單投資基礎設施，刺激國內業者投入，若編入年度預算速度會非常慢，且武器到位後會「不能用、打不到」，也會因逐年審議、刪減帶來不確定性。\n\n徐斯儉指出，若反對黨認為應編在年度預算，應告知評估根據與邏輯，行政院版都經過評估，而且是與美方一起評估。徐斯儉：整體規劃戰力預算無法刪除至於若通過在野黨版，數千億元的落差會造成哪些衝擊？徐斯儉強調，沒有什麼可以刪除與延後的，「刪除或延後，就會讓其他能力沒有辦法發揮，等於是浪費納稅人的錢」。\n\n經濟部昨也在行政院院會報告「無人機產業現況與推動成果」，產發署長邱求慧在院會後記者會表示，今年首季我國無人機整機出口值為一．一五億美元，已超過二○二五年的○．九三億美元出口總額約一．二倍，產業已逐步建立整機及關鍵零組件非紅供應鏈能力，成功切入國際市場，預計今年外銷金額可突破二．五億美元。"}, {"title": "學前、國教預算 教部減編138億", "source": "自由時報 A06 生活新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "立法院教育委員會昨日審查教育部今年度預算，整體規模達三四七二億元，較去年減少七十九億元、約減二％，其中受財政收支劃分法修改影響，地方財源大增，學前及國教預算配合調整減少一三八億元、約減八％。教文會主席、立委伍麗華表示，立法院終於開始審查今年度預算。教育部長鄭英耀報告，教育部主管歲出預算二六五九億元，另含一般性補助款八一三億元，其中學前及國教經費為一五四六億元，較前一年減少一三八億元，為變動最大項目，主因在於財政收支劃分法修正，地方政府整...", "full_text": "立法院教育委員會昨日審查教育部今年度預算，整體規模達三四七二億元，較去年減少七十九億元、約減二％，其中受財政收支劃分法修改影響，地方財源大增，學前及國教預算配合調整減少一三八億元、約減八％。教文會主席、立委伍麗華表示，立法院終於開始審查今年度預算。教育部長鄭英耀報告，教育部主管歲出預算二六五九億元，另含一般性補助款八一三億元，其中學前及國教經費為一五四六億元，較前一年減少一三八億元，為變動最大項目，主因在於財政收支劃分法修正，地方政府整體財源大幅增加，故調整中央與地方分攤比例。\n\n鄭英耀說明，多項原由中央負擔的經費改由地方支應，包括○至六歲育兒政策，中央仍負擔六○○．○七億元，但八八．五四億元改由地方負擔；高中以下學校電價補貼約卅四．○一億元改由地方負擔；國小教師員額編制經費有十三．七七億元轉由地方支應；\n\n學生輔導與諮商人力約十二．九九億元亦改由地方負擔。政策面則持續推動雙語教育，新增高中以下學校雙語生活化計畫十八．八四億元。提升教研待遇高教預算逆勢成長相較之下，高等教育預算逆勢成長至一三四七億元，較去年增加廿二億元，主要用於提升教研人員待遇、推動大專雙語學習及補助校舍整建與醫療體系建設。\n\n立委吳思瑤質詢時指出，如非財劃法修改，高教預算應該成長得更多。此外，資訊及科技教育預算亦成長至八十一．五億元，增加十．二億元、約十四％，聚焦 AI學習系統與數位基礎建設；終身教育預算則達九十三．九億元，增加十六．七億元、約廿二％，投入公共圖書館建設與服務升級等。\n\n另，教育部主管公共建設計畫今年編列六十九．五四億元，較去年增加十八．八億元，其中以高教建設占最大宗，編列四○．八一億元，較去年大幅增加十九．四八億元，包含陽明交通大學附設醫院第二期擴建、國家重點領域校際研教園區、台大醫院新竹生醫園區分院、成功大學醫院高齡醫療及沙崙醫療園區等多項重大工程，顯示政府持續強化醫療與高教研究量能。公共建設在學前及國教預算為七．六八億元，主要投入無人載具產業發展統籌型計畫（高中以下學校），並配合校舍新建工程調整。"}, {"title": "考量人道與留才 學者促修法", "source": "聯合報 A08 教育", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "張姓陸生透過繁星推薦錄取台大，卻因兩岸人民關係條例等規定，年滿十八歲成年就必須離境，導致無法順利入學，此案也引發教育界對相關制度銜接的討論。有學者指出，部分在台長期成長並受教育的陸籍學生，實際生活與本地學生差異有限，若因法律身分限制其升學與居留權益，恐對教育公平與人才培育造成影響。據了解，此非教育部第一次接獲相關陳情案件，但過去不少陳情案都是父母其中一方為台灣人，但子女來台後，卻忽略收養、居留等程序。", "full_text": "張姓陸生透過繁星推薦錄取台大，卻因兩岸人民關係條例等規定，年滿十八歲成年就必須離境，導致無法順利入學，此案也引發教育界對相關制度銜接的討論。有學者指出，部分在台長期成長並受教育的陸籍學生，實際生活與本地學生差異有限，若因法律身分限制其升學與居留權益，恐對教育公平與人才培育造成影響。據了解，此非教育部第一次接獲相關陳情案件，但過去不少陳情案都是父母其中一方為台灣人，但子女來台後，卻忽略收養、居留等程序。\n\n民主文教基金會董事長桂宏誠認為，這些陸籍學生完整接受民進黨政府執政後的教育，又願意留在台灣，政府應該再想辦法讓他們得以留下，例如比照大陸人來台灣就讀學位的方式辦理。世新大學前副校長李功勤表示，若該生繁星推薦可以上台大，持學測成績申請中國大陸九八五等級的大學應不難，但問題在於其從小在台灣生活，回大陸會極度不適應。李功勤建議，問題應從根本上解決，兩岸人民關係條例、國籍法應隨時空環境修改，從人道立場出發促進兩岸關係緩和、幫助兩岸人民良性互動，「我認為這是修法的基礎」。\n\n教育部表示，此案是居留許可，不是就學資格問題，該名學生是以父親投資經營管理隨行子女身分就讀高中，依規定成年後即喪失居留事由，因此無法在台繼續升學。至於學生為何能參加繁星推薦，教育部解釋，報考資格僅設有學歷限制，如高三在學、高中畢業等，並未禁止外國學生或陸籍學生報考。"}, {"title": "被剝兩層皮 社會保險保費 民團籲免稅 現況與商業保險共用扣除額 導致不公平 藍委支持列入免稅 綠委也將提相關法案", "source": "聯合報 A09 話題", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "五月報稅季到來，教團與朝野立委指出，現行制度將具強制性的社會保險與商業保險併入同一列舉扣除額，未反映兩者性質差異，導致合併計算後形成不公平現象，呼籲立法院盡速完成「所得稅法」修法，將第一層的勞保、公教保險、軍人保險等的相關保險費用免納所得稅，並刪除列舉扣除額規定。全教總理事長侯俊良說，我國所得稅制對不同層級的年金保險保費扣除規定存在矛盾，如勞退、私校退撫及公教退撫等第二層提繳費用，可免納入所得課稅；第三層商業保險則享有每人每年二萬四千元...", "full_text": "五月報稅季到來，教團與朝野立委指出，現行制度將具強制性的社會保險與商業保險併入同一列舉扣除額，未反映兩者性質差異，導致合併計算後形成不公平現象，呼籲立法院盡速完成「所得稅法」修法，將第一層的勞保、公教保險、軍人保險等的相關保險費用免納所得稅，並刪除列舉扣除額規定。全教總理事長侯俊良說，我國所得稅制對不同層級的年金保險保費扣除規定存在矛盾，如勞退、私校退撫及公教退撫等第二層提繳費用，可免納入所得課稅；第三層商業保險則享有每人每年二萬四千元列舉扣除額；\n\n但第一層勞保、公教保險、軍人保險等強制提繳已自薪資扣除，若再與商業保險保費併計課稅，恐造成制度失衡，形同「一筆收入被剝兩層皮」。國民黨立委牛煦庭說，保險分為具強制性的社會保險與任意投保的商業保險，兩者性質不同；但現行所得稅法第十七條將兩者同列列舉扣除額並共用二萬四千元額度，明顯沒有考量到這兩者的本質差異。\n\n較合理作法應將社會保險費改列免稅，以區隔兩者性質。民進黨立委林宜瑾也認為，設計一套合理稅制比普發現金更具建設性，強調社會保險為強制政策、保費自薪資扣除，若再課稅等同是在擴大國家政策對人民生活的影響。將提出相關法案，期待在不遠的未來能夠盡速完成立法。\n\n國民黨立委林沛祥說，依行政院主計總處資料，一一三年每戶可支配所得差距已達六點一四倍，每人差距也達三點九二倍，且仍在擴大，顯示整體經濟雖然成長，但成果未平均分配，中產及基層族群負擔反而愈來愈重。因此再度提出「公勞保提撥免稅」主張，強調公勞保屬退休保障與基本安全網，其為非可支配所得卻仍納入課稅，形同「一邊為未來存錢，卻還要先被課稅一次」，制度有檢討必要。健保財務嚴峻，行政院政務委員陳時中日前在歐洲在台商務協會舉辦的「二○二六歐洲台灣健康論壇」演說時建議，應仿效菸捐，若能提撥現行千分之三證交稅的百分之五十挹注健保，可為健保帶來穩定財源，不僅確保未來廿年財務平衡，且符合資本利得者應負擔更多社會責任，不增加投資人現有稅負。\n\n行政院發言人李慧芝說，健保財政永續是政府重要目標，為了達到這個目標，行政院會持續傾聽各界意見，相關方案都還在討論當中，目前未有定案。"}, {"title": "與美商晚宴 盧秀燕：藍版軍購尚未定案", "source": "中國時報 A03 焦點新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "國民黨因「國防特別預算條例」版本引發黨內內訌，副主席季麟連 4 月 29 日抨擊立法院長韓國瑜「若賣黨求榮，將建請開除其黨籍」。黨主席鄭麗文4月30日緩頰說，季、韓已是幾十年的老同志，季也是語重心長，無須擴大解讀，更不須見縫插針，老同志的情誼沒有這麼容易被分化，更何況國民黨絕不可能接受1.25兆天文數字空白授權。不過，各界皆為韓抱不平，韓國瑜臉書更湧入數萬則留言鼓勵。", "full_text": "國民黨因「國防特別預算條例」版本引發黨內內訌，副主席季麟連 4 月 29 日抨擊立法院長韓國瑜「若賣黨求榮，將建請開除其黨籍」。黨主席鄭麗文4月30日緩頰說，季、韓已是幾十年的老同志，季也是語重心長，無須擴大解讀，更不須見縫插針，老同志的情誼沒有這麼容易被分化，更何況國民黨絕不可能接受1.25兆天文數字空白授權。不過，各界皆為韓抱不平，韓國瑜臉書更湧入數萬則留言鼓勵。\n\n鄭麗文並特別去韓國瑜臉書留言，但遭大批韓粉湧入留言區大加撻伐，質疑鄭麗文與立法院黨團總召傅（山昆）萁傾向「3800億元＋N」的方案，與多數基層期盼不符，甚至有網友怒嗆「最該被踢出政黨的是黨主席本人」。台中市長盧秀燕昨日參加台中美國商會晚宴，被問及如何看待國民黨對美軍購案，盧秀燕表示，台灣是一個高度民主自由的國家，包括每個政黨及民眾都有不同看法，中央政府提出1.25兆軍購案，是非常龐大的預算，各政黨現在看法不一樣，目前立場並無確定，立法院或不同政治人物有不一樣看法，目前沒有定案。鄭麗文昨日到國民黨新北市黨部參加表揚勞工活動時表示，韓院長任重道遠，「立法院院長真的歹做（台語：真的很難做），就是石磨心（台語：比喻夾在中間、左右為難）。」為了兩岸和平安全發展及台灣國防安全，國民黨從來都是最負責任的政黨。鄭麗文說，國民黨可以充分討論軍購案，但絕不能跳進民進黨的陷阱裡。國民黨會成功開拓兩岸的和平大道，也會深化與美國在戰略國防上的合作，從來沒有矛盾，也不需要自亂陣腳。\n\n她強調，國民黨絕不可能接受1.25兆天文數字空白授權，這是負責任的態度。另外，季麟連昨日私下聯絡部分媒體，表示他要於黨中央受訪，國民黨文傳會知情後立刻介入了解，並勸季勿再對外發言，以免節外生枝；於是黃復興聯絡人便以「副主席另有公務」為由，取消季受訪行程。\n\n至於黨中央的國防特別條例立場是否因為風波而改變？國民黨文傳會主委尹乃菁表示，基層其實有很大的聲音，不該讓美國予取予求。同時也有很多退伍軍人，都認為3800億是最剛好的金額，多的錢沒有發價書，幹嘛給軍火商多賺錢。"}, {"title": "軍購協商 白營：美確定的都支持", "source": "中國時報 A03 焦點新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "國防特別條例持續卡關，立法院長韓國瑜5月6日將再召集朝野協商，倘若藍白有一定共識，不排除5月8日在院會表決處理，然而國民黨中央及黨團對「3800億＋N」、「8000億」版本至今仍未喬定。民眾黨主席黃國昌昨表示，相信國民黨最後一定會形成一致立場，而民眾黨也會調整黨版，看如何確保政府拿到美方發價書後再編預算。藍營內部對軍購總金額有歧見，是否影響在野整合？", "full_text": "國防特別條例持續卡關，立法院長韓國瑜5月6日將再召集朝野協商，倘若藍白有一定共識，不排除5月8日在院會表決處理，然而國民黨中央及黨團對「3800億＋N」、「8000億」版本至今仍未喬定。民眾黨主席黃國昌昨表示，相信國民黨最後一定會形成一致立場，而民眾黨也會調整黨版，看如何確保政府拿到美方發價書後再編預算。藍營內部對軍購總金額有歧見，是否影響在野整合？\n\n黃國昌昨於廣播節目中表示，民眾黨支持台灣的國防，但也要幫納稅人把關，「我相信也是在這樣的想法下，國民黨內部有些不太一樣的看法」，但民主過程中本來就會有不同意見，「我希望、也相信國民黨透過黨內民主程序，最後會形成一致立場」。由於民眾黨團已提4000億元軍購版本，被問到有無與藍營協商並取得共識？黃國昌重申，國民黨還沒確定立場，很難說跟對方有無共識；\n\n而民眾黨自身版本也會隨著新資訊進行調整，包括美國尚未宣布第二批軍購，但美方行政部門及國會議員卻又強烈表達，希望第二批軍購能放在此次國防特別條例中，因此如何確保特別條例通過後不是張空白支票，要拿到發價書後才能有後續編列預算，民眾黨會進一步細緻設計法律條文，下周應會完成。針對下周又要朝野協商軍購，有沒有機會藍白整合項目跟數字並於 5月8日表決通過？民眾黨立院黨團副總召王安祥提及，民眾黨內部不斷研商，找軍購專家擔任意見諮詢對象，黨內意見非常收斂，「軍購只要是（美國同意）確定的部分，民眾黨都會支持」。\n\n王安祥強調，其實國防特別預算沒有所謂「卡關」，因為還在協商階段，希望接下來的協商中，大家可以異中求同達成共識。"}, {"title": "堅持1.25兆 國防部：台美共同評估結果", "source": "中國時報 A03 焦點新聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "國防特別條例卡關，立法院長韓國瑜下周將第4度舉行黨團協商。行政院長卓榮泰昨強調，政府編列1.25兆元特別預算涵蓋3塊拼圖、 7大類別，此3大面向構成安全不可或缺的拼圖，缺一不可，他指示國防部積極與朝野各黨團溝通說明，務求朝野以確保國家安全、守護國民生命財產為第一目標。國防部副部長徐斯儉強調，1.25兆元規模是台美評估結果。", "full_text": "國防特別條例卡關，立法院長韓國瑜下周將第4度舉行黨團協商。行政院長卓榮泰昨強調，政府編列1.25兆元特別預算涵蓋3塊拼圖、 7大類別，此3大面向構成安全不可或缺的拼圖，缺一不可，他指示國防部積極與朝野各黨團溝通說明，務求朝野以確保國家安全、守護國民生命財產為第一目標。國防部副部長徐斯儉強調，1.25兆元規模是台美評估結果。\n\n卓揆表示，中共對台灣及印太地區的威脅正在加劇，且升級灰色地帶等各種類型侵擾形態，為了守護國家安全以及國民生命財產，經系統性及整體性規畫，在2026到2033年編列1.25兆預算籌購精準火砲等 7類現代化精良裝備，提升國防戰力。卓榮泰指出，這次特別預算涵蓋3塊拼圖、7大類別，第一塊拼圖是籌購強弓等各類防空、反彈道飛彈及無人反制系統，逐步打造「台灣之盾」；第二塊拼圖是引進高科技與人工智慧；\n\n第三塊拼圖是厚植國防相關產業自主發展。他強調，此3大面向構成安全不可或缺的拼圖，缺一不可，再次呼籲朝野共同支持。卓指出，特別條例預算上限及籌購項目尚待立法院5月6日第4次黨團協商確認，他指示國防部積極與立法院朝野各黨團溝通。\n\n對於國防特別條例匡列金額，在野主張應看緊荷包，防止弊案發生，徐斯儉強調，若有弊案歡迎檢舉、檢調調查，若沒有任何違法，不能因為這樣就因噎廢食、捕風捉影。他強調，刪除或延後軍購預算將造成戰力無法發揮，等於浪費納稅錢，國防部無法贊成。針對在野黨要求將特別預算改編年度預算，徐斯儉表示，國防特別預算須確保指管、武器同步到位，並反問在野黨要求改編年度預算的依據，「是敵情威脅不到位，還是認為只有武器就能精準打擊」，強調1.25兆元規模行政院版是與美方一起評估出來的結果。"}, {"title": "調降金融營業稅 捲土重來 金融總會彙整九項多年未獲參採的政策，爭取主管機關重新檢視", "source": "工商時報 A04 綜合要聞", "cat": "台灣政府與政策訊息", "priority": 0, "summary": "金融總會30日發行成立20周年紀念專刊，具體政策建言內容頗受關注。金總表示，包括重新檢視金融營業稅等九項建議，多次於白皮書中提案但未獲參採，僅列為持續評估或適時推動的議題，金總對此的態度是，爭取主管機關持續檢視及關注，並安排納入日後施政方案。金總於2019年至2024年間，協助金融業提出254項政策建言提案，其中有100項獲得主管機關參採，總參採率39.4％，2024單年參採率高達52.9％，為歷年最佳。", "full_text": "金融總會30日發行成立20周年紀念專刊，具體政策建言內容頗受關注。金總表示，包括重新檢視金融營業稅等九項建議，多次於白皮書中提案但未獲參採，僅列為持續評估或適時推動的議題，金總對此的態度是，爭取主管機關持續檢視及關注，並安排納入日後施政方案。金總於2019年至2024年間，協助金融業提出254項政策建言提案，其中有100項獲得主管機關參採，總參採率39.4％，2024單年參採率高達52.9％，為歷年最佳。\n\n值得注意的是，金總將持續反映的九項提案內容，分別為：重新檢視金融營業稅率及其稅款使用方式、修正金控收入成本費用歸屬認定原則、完善連續受益人課稅規定以推動家族信託發展、推動上市櫃股票當日沖銷證券交易稅稅率減半常態化、調降期貨及選擇權交易稅率、修正《勞工退休金條例》開放「自選投資」、檢討電子文件排除適用規範、保險業資金運用、接軌IFRS 17（國際財務報導準則第17號保險合約）及TW-ICS（新一代清償能力制度）未來展望等。排名首位的金融營業稅部分，財政部於2014年將銀行業及保險業本業營業稅率，由2％恢復為5％，3％撥入國庫、2％撥入金融業特別準備金，至今仍維持5％稅率。金總認為，國內金融服務業整體所得稅負負擔已大幅增加，若能重新檢視金融營業稅率並予以調降，有助於產業升級。\n\n另一也和稅負有關的是連續受益人課稅規定。金總表示，家族信託本質上為跨世代的資產規劃，卻常因賦稅不明確無法辦理，造成國內發展家族信託困難，建議比照日本等鄰近國家做法，針對連續受益人信託課稅原則，予以明確規範。保險業資金運用也是反映的重點項目之一。\n\n鑑於保險業資金已達 3 7兆元，且海外投資比重過高，金總建議引導保險業資金投入國家基礎建設與轉型發展，除投資綠能、淨零產業外，還可布局健康福祉資源，提升醫療照護服務品質。保險業2026年接軌IFRS17及TW-ICS，金管會陸續完成相關法規修正，金總期望接軌後，定期依業者實際執行情形進行制度檢討，並持續關注IAIS（國際保險監督官協會）公布國際制度最新發展，配合調整修正。據金總統計，2019年至2024年間，銀行業共提出126項政策建言提案，整體參採率達42.1％；\n\n證券業共提出109項政策建言提案，參採率38.5％；保險業共提出19項政策建言提案，參採率26.3％。成立於 2005年的金融總會，自2011年起定期發布《金融建言白皮書》。"}, {"title": "融通業務告急？金管會澄清", "source": "工商時報 A04 綜合要聞", "cat": "台灣產業與投資動向", "priority": 0, "summary": "台股行情熱，投資人槓桿操作大增，外傳部分券商辦理「不限定用途款項借貸」額度用罄暫停受理，甚至出現資金荒。證期局副局長黃厚銘 30 日指出，截至 4 月 28 日，整體 34 家券商融通業務占淨值比，粗估達 159％，距離法定400％上限還有段距離，沒有任何券商有達到上限的問題。至於券商公會提出的「融資業務總額」與「負債淨值比」鬆綁建議，黃厚銘說，證交所會對此通盤研議，目前還沒提案給金管會，未來若有提案，金管會會廣納意見，在衡平二大原則「...", "full_text": "台股行情熱，投資人槓桿操作大增，外傳部分券商辦理「不限定用途款項借貸」額度用罄暫停受理，甚至出現資金荒。證期局副局長黃厚銘 30 日指出，截至 4 月 28 日，整體 34 家券商融通業務占淨值比，粗估達 159％，距離法定400％上限還有段距離，沒有任何券商有達到上限的問題。至於券商公會提出的「融資業務總額」與「負債淨值比」鬆綁建議，黃厚銘說，證交所會對此通盤研議，目前還沒提案給金管會，未來若有提案，金管會會廣納意見，在衡平二大原則「市場風險控制，與券商業務發展需求」下放寬。\n\n台股上攻4萬點之際，傳出券商融資額度恐告急的現象，是否代表市場有過熱的跡象？黃厚銘對此的說法是，截至 3 月底，台股本益比達 24.18 倍，至 4 月底台股集中市場漲幅 34.4％，觀察美國費半指數上漲 45％、韓股上漲57.46％，台股表現在國際主要股市屬於中間的位置。黃厚銘說明，金管會是針對券商整體融資狀況進行規範，未針對不限定用途款項借貸做特定限制。\n\n「信用交易、不限用途款項借貸，及證券業務借貸款項」等業務，皆屬券商資金融通業務，目前有兩項限制，一是融通業務的整體金額不得超過淨值4倍，二是券商負債總額不得超過淨值比6倍，兩限制目前證交所皆在研議是否有必要放寬。市場傳出部分券商開始停止承辦客戶新的融資業務，黃厚銘認為，券商會考量自己風險承受度，若有券商停止承辦融資業務，屬於個案現象。黃厚銘還說，證交所處在市場第一線上，會根據會員反應並考量市場風險胃納衡量，若有必要開放也會有配套措施。"}, {"title": "4月股匯大盤點 台股 強彈7,203點", "source": "經濟日報 A03 話題", "cat": "台灣產業與投資動向", "priority": 0, "summary": "台股昨（30）日戲劇性開高殺低，尾盤因外資賣超、台積電等科技權值股重挫，終場大跌376點收38,926點，但回顧整個4月，台股仍繳出史詩級的超狂成績單，不僅指數盤中閃見「40K」，更一口氣改寫五大歷史紀錄。4月台股在AI浪潮與權值股帶領下，跑出飆馬行情，創五大紀錄，一是集中市場加權指數單月強彈7,203點，為史上最大單月漲點，而漲幅22.7％，亦改寫近25年來最大單月漲幅。二是櫃買指數單月漲點76點，為櫃買史上最大單月漲點，漲幅24.9...", "full_text": "台股昨（30）日戲劇性開高殺低，尾盤因外資賣超、台積電等科技權值股重挫，終場大跌376點收38,926點，但回顧整個4月，台股仍繳出史詩級的超狂成績單，不僅指數盤中閃見「40K」，更一口氣改寫五大歷史紀錄。4月台股在AI浪潮與權值股帶領下，跑出飆馬行情，創五大紀錄，一是集中市場加權指數單月強彈7,203點，為史上最大單月漲點，而漲幅22.7％，亦改寫近25年來最大單月漲幅。二是櫃買指數單月漲點76點，為櫃買史上最大單月漲點，漲幅24.9％亦居歷史第五位。\n\n三是市值創新高，上市櫃總市值規模昨達137.7兆元，單月增25.6兆元，為單月最強。四是成交量創天量，4月23日集中市場創1.46兆元單日天量，4月成交量衝破19兆元，創單月最大量。五是權王台積電股價勁揚，一度觸及與股號一樣的2,330元，昨日跌45元收2,135元，市值55.3兆元；\n\n單月大漲375元，貢獻大盤漲點超過3,000點。不過，台股 4 月最後一個交易日，受到國際油價走高、連假效應影響，呈現「高檔震盪、開高走弱」的劇烈波動。早盤大盤一度衝上39,848點高點，但隨後因連假前調節賣壓與獲利了結影響，午盤翻黑下挫。\n\n尾盤台積電為首的科技權值股湧現賣單，導致大盤殺至當日最低點38,926點，全天高低震盪達922點，成交量放大至1.07兆元。外資昨日賣超535.6億元、呈現連四賣，顯示高檔調節意圖明顯，累計4月買超2,481.1億元。"}, {"title": "網路投保 金管會三大鬆綁 服務項目全面開放、拉高旅平險醫療保額、創新業務放行 為數位保險公司舖路", "source": "經濟日報 A10 金融 產業", "cat": "台灣產業與投資動向", "priority": 0, "summary": "民眾網路投保將更簡單、保障也升級。金管會昨（30）日修正「保險業辦理電子商務應注意事項」，一口氣鬆綁三大項目，包括服務全面開放、拉高旅平險醫療保額、創新投保快速上路，並放寬數位保險公司限制，5月起全面放行。此舉宣告網路投保從「管制導向」轉向「原則開放」，對民眾來說，投保將更具彈性、保障更到位，也替數位保險公司發展全面鋪路。", "full_text": "民眾網路投保將更簡單、保障也升級。金管會昨（30）日修正「保險業辦理電子商務應注意事項」，一口氣鬆綁三大項目，包括服務全面開放、拉高旅平險醫療保額、創新投保快速上路，並放寬數位保險公司限制，5月起全面放行。此舉宣告網路投保從「管制導向」轉向「原則開放」，對民眾來說，投保將更具彈性、保障更到位，也替數位保險公司發展全面鋪路。\n\n這次最大變革是，網路投保服務項目由過去「正面表列」改為「負面列舉」。未來原則全面開放，僅針對少數高風險情境設限，例如要保人與被保險人不同且涉及他人意思表示時，仍維持限制。保險局副局長陳清源說，過去採「正面表列」，是擔心難以確認保戶意思表示的考量；\n\n但隨數位身分驗證機制成熟，多數操作已可確認為本人，風險可控，因此鬆綁限制。其次，這也是替即將上路的數位保險公司鋪路，避免制度過度箝制線上發展，使數位保險公司業務發展受限。團險部分同步放寬，若保費由被保險人全額負擔，未來可自行透過網路辦理查詢、資料變更等服務，提升使用便利性。\n\n第二大鬆綁是，提高旅平險附加實支型意外醫療、海外突發疾病醫療險的保額。目前規定，醫療險須附加於壽險主約，且保額多限制在主約10%，僅赴申根國家如歐洲可提高到20%；新制上路後，一律放寬到30%，不再區分地區。\n\n陳清源舉例，當壽險主約500萬元時，過去醫療險限10%、即最高只有50萬元保額，新制可提高到30%、150萬元。此舉是考量海外醫療費用高昂，拉高醫療險保額，可讓保障更貼近實際需求。18歲以下的未成年族群，保障也同步拉高。\n\n現行因身故保額限制，連帶壓縮醫療險額度，新制改採定額 120萬元，大幅提升保障水準。第三項鬆綁鎖定創新業務模式。未來試辦成功的案件，經保險公會訂定自律規範後，其他業者即可比照辦理，不再逐案核准，加速創新服務擴散。\n\n以保誠人壽與台灣大車隊合作為例，民眾透過App叫車時，可同步選擇投保，保費直接隨車資扣款，提升投保便利性。此外，金管會也放寬數位保險公司初期限制，開業一年內只要取得資安與個資認證，即可開辦網路投保業務，協助新型業者快速切入市場。市場指出，此波鬆綁從服務、商品到制度全面推進，在風險可控前提下，讓投保更簡單、保障更充足，也為保險業數位轉型開啟新一波成長動能。"}, {"title": "延長封鎖 川普聽取新作戰方案", "source": "自由時報 A05 國際新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "在美國總統川普傳出將延長對伊朗海上封鎖，並預計於四月卅日聽取美軍中央司令部對伊朗採取軍事行動的新方案後，伊朗最高領袖哈米尼與總統裴澤斯基安於同日發表強硬聲明，警告美國的封鎖「注定失敗」。國際油價則應聲飆漲，布倫特原油價格一度突破每桶一二六美元，創下烏俄戰爭以來的四年新高。伊朗嗆美違反國際法哈米尼在國營電視台宣讀的書面聲明中宣稱，美國在這次危機中遭遇了「恥辱性的失敗」，伊朗已掌握主導權，並高度評價伊朗對荷姆茲海峽航運的控制能力。", "full_text": "在美國總統川普傳出將延長對伊朗海上封鎖，並預計於四月卅日聽取美軍中央司令部對伊朗採取軍事行動的新方案後，伊朗最高領袖哈米尼與總統裴澤斯基安於同日發表強硬聲明，警告美國的封鎖「注定失敗」。國際油價則應聲飆漲，布倫特原油價格一度突破每桶一二六美元，創下烏俄戰爭以來的四年新高。伊朗嗆美違反國際法哈米尼在國營電視台宣讀的書面聲明中宣稱，美國在這次危機中遭遇了「恥辱性的失敗」，伊朗已掌握主導權，並高度評價伊朗對荷姆茲海峽航運的控制能力。\n\n裴澤斯基安也反擊稱，任何海上封鎖或限制都「違反國際法，注定失敗」，並警告此舉將「破壞波斯灣的持久穩定」。伊朗國會議長卡利巴夫則指出，美國的封鎖旨在製造伊朗內部分裂，使其「從內部崩潰」。自四月十三日起，川普政府對伊朗港口實施海軍封鎖，意圖迫使德黑蘭就放棄核計畫進行談判。\n\n美軍中央司令部於廿九日宣布，已成功攔截第四十二艘試圖違反封鎖的商船，目前共有四十一艘油輪、載運約六千九百萬桶石油無法出售，估計價值超過六十億美元。川普在接受 Axios 新聞媒體訪問時形容：「（伊朗）現在像隻塞得飽飽的豬一樣喘不過氣，而且情況還會更糟。」 他明確表示，在與伊朗達成核協議前，不會解除對伊朗港口的海軍封鎖。\n\n據Axios報導，中央司令部司令庫珀預定卅日向川普簡報軍事行動的新方案，內容可能包括針對基礎設施發動「短暫但強力」的打擊，顯示美方認真考慮恢復作戰行動。簡報提出的計畫還包括奪取荷姆茲海峽部分區域，以重新開放航道；另一個軍事選項則是執行特種部隊行動，以確保伊朗的高濃縮鈾庫存安全。\n\n美軍可能動用極音速飛彈此外，根據彭博報導，中央司令部已請求將陸軍延宕多時的「暗鷹」高超音速飛彈送往中東，若獲得批准，這將是美軍首次動用此類武器。消息人士透露，鑑於伊朗已將發射器移出「精準打擊飛彈」（PSM）約四八二公里的射程之外，中央司令部需要以更長程的系統打擊位於伊朗領土深處的彈道飛彈發射器。川普普廷通話拒俄提議川普與俄羅斯總統普廷於廿九日舉行電話會談。\n\n普廷警告，對伊朗重啟戰事將導致「嚴重後果」，地面進攻「完全不可接受且危險」。但川普透露，普廷提議願協助處理伊朗的濃縮鈾，以促成核協議；川普則回應，寧願俄方協助結束烏克蘭戰爭。\n\n在美伊對峙升溫下，布倫特原油期貨價格在卅日盤中暴漲七．一％，突破一二六美元大關，創下四年來最高價位，隨後在倫敦午盤交易中小幅回落。國際能源總署（IEA）形容此次中東衝突為「史上最大供應衝擊」，能源交易商Vitol集團估計市場面臨約十億桶供應損失。"}, {"title": "打通荷姆茲航運 美號召組新聯盟", "source": "自由時報 A05 國際新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "伊朗戰爭導致荷姆茲海峽航運受阻至今，美國華爾街日報四月廿九日披露，根據美國近日向駐外使館發出的電報，美國打算號召籌組新國際聯盟，共同協助讓船隻通行這條全球能源運輸要道。這批廿八日發出的電報，要求外交人員力促外國政府加入這項由美國率領的「海上自由架構」（MaritimeFreedom Construct）聯盟，聯盟成員將分享資訊、透過外交協調和執行制裁措施。路透指出，這項倡議已獲國務卿魯比歐批准，電報指示使館在五月一日前口頭向夥伴國家傳達...", "full_text": "伊朗戰爭導致荷姆茲海峽航運受阻至今，美國華爾街日報四月廿九日披露，根據美國近日向駐外使館發出的電報，美國打算號召籌組新國際聯盟，共同協助讓船隻通行這條全球能源運輸要道。這批廿八日發出的電報，要求外交人員力促外國政府加入這項由美國率領的「海上自由架構」（MaritimeFreedom Construct）聯盟，聯盟成員將分享資訊、透過外交協調和執行制裁措施。路透指出，這項倡議已獲國務卿魯比歐批准，電報指示使館在五月一日前口頭向夥伴國家傳達，但排除俄羅斯、中國、白俄羅斯、古巴和其他美國對手國家；\n\n電報稱這項架構為建立戰後中東海上安全架構的關鍵第一步，攸關確保長期能源安全、關鍵海上基礎設施以及重要海上航道的航行權和自由。華爾街日報指出，川普政府要求國際支持該聯盟，顯示出美國希望其他國家參與當前以及未來可能的荷姆茲海峽管理。電報寫道，「貴國的參與將強化我們共同恢復航行自由和保護全球經濟的能力」，「集體行動是展現一致決心以及讓伊朗為阻礙該海峽通行付出代價所不可或缺」。\n\n「海上自由架構」雖非軍事聯盟，但電文指示外交官員，詢問外國政府對等單位，是否願意成為「外交和（或）軍事夥伴」。根據電文，該聯盟由國務院和美軍中央司令部共同合作，國務院為外交行動樞紐，中央司令部將為商業航運「提供即時海域態勢」，並在聯盟夥伴軍方之間協調情資分享。之前川普猛烈抨擊盟邦，稱應由盟邦、尤其是歐洲，自己設法解決荷姆茲航運受阻問題。\n\n為此歐洲國家已多次召開會議研擬對策。英、法近日主持一場有超過五十國參與會議，討論組成防禦性質多國海上部隊，確保戰後該海域通行。儘管美國官員批評歐洲在這場危機中行動遲緩且官僚，但電文寫道「海上自由架構將與其他海上安全特遣隊互補，包括英、法主導的海上行動計畫」。"}, {"title": "川習會談 王毅通話魯比歐：台灣問題是最大風險", "source": "聯合報 A02 焦點", "cat": "國際經濟情勢", "priority": 0, "summary": "五月中旬川習會前夕，中共中央政治局委員、外交部長王毅四月卅日同美國國務卿魯比歐通電話。王毅強調，台灣問題事關中國的核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇。", "full_text": "五月中旬川習會前夕，中共中央政治局委員、外交部長王毅四月卅日同美國國務卿魯比歐通電話。王毅強調，台灣問題事關中國的核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇。\n\n新華社報導，王毅表示，元首外交始終是中美關係的「定盤星」。在習近平主席和川普總統戰略引領下，中美關係總體保持了穩定。這符合兩國人民根本利益，也符合國際普遍期待。\n\n雙方要維護好來之不易的穩定局面，籌備好重要高層互動議程，擴大合作面、管控分歧點，探索構建具有戰略性、建設性、穩定性的中美關係，實現相互尊重、和平共處、合作共贏。王毅強調，台灣問題事關中國核心利益，是中美關係的最大風險點。美方應信守承諾，作出正確抉擇，為中美合作打開新空間，為世界和平作出應盡努力。\n\n據中方發布，魯比歐表示，美中關係是世界上最重要的雙邊關係，元首外交是美中關係的核心。雙方要保持溝通協調，相互尊重、妥處分歧，為美中高層互動積累成果，尋求美中關係的戰略穩定。稍早前，央視也報導，大陸國務院副總理何立峰與美國財政部長貝森特和貿易代表葛里爾舉行視訊通話，陸方通稿指出，雙方就進一步妥善解決彼此關注的經貿問題和拓展務實合作，進行了坦誠、深入、建設性的交流。\n\n大陸還就近期美對大陸經貿限制措施表達嚴正關切。路透報導，中國國家主席習近平曾在二○二四年「拜習會」要求美國時任總統拜登將對台措辭從「不支持台獨」改為「反對台獨」，但美方拒絕，如今參與川普訪中籌備的幾位人士私下說，中方在這次川習會前一直在工作層級發出類似訊號。復旦大學國際問題研究院院長、同時擔任中國外交部政策諮詢委員的吳心伯表示：「關於台灣，邏輯很簡單，如果美國不想因台灣問題與中國爆發大型戰爭，就不應支持台灣獨立。」"}, {"title": "美防長：與中和平 不改變台灣現狀 用實力嚇阻非對立", "source": "聯合報 A02 焦點", "cat": "國際經濟情勢", "priority": 0, "summary": "美國國防部長赫塞斯四月廿九日出席聯邦眾院聽證會，他透過書面報告表示，川普政府尋求與中國建立穩定和平的關係，並表示美國無意改變台灣現狀。美國眾議院軍事委員會四月廿九日針對二○二七年度國防預算舉行聽證會，邀赫塞斯、參謀首長聯席會議主席凱恩等人出席。赫塞斯在書面報告中指出，除了保護美國本土，國防部的第二項重點工作就是在印太地區嚇阻中國，並表示美國的嚇阻政策是採取「實力謀和平」，而非對立。", "full_text": "美國國防部長赫塞斯四月廿九日出席聯邦眾院聽證會，他透過書面報告表示，川普政府尋求與中國建立穩定和平的關係，並表示美國無意改變台灣現狀。美國眾議院軍事委員會四月廿九日針對二○二七年度國防預算舉行聽證會，邀赫塞斯、參謀首長聯席會議主席凱恩等人出席。赫塞斯在書面報告中指出，除了保護美國本土，國防部的第二項重點工作就是在印太地區嚇阻中國，並表示美國的嚇阻政策是採取「實力謀和平」，而非對立。\n\n赫塞斯指出，在美國總統川普領導下，美中關係比過去多年來更好、更強健，川普政府尋求與中國建立穩定和平、公平貿易和相互尊重關係。赫塞斯說，國防部也採取同樣的方式，以消除和降低衝突為目標，開放與中國人民解放軍展開更廣泛的軍事對話；赫塞斯說，數個月前美國已與解放軍對口在馬來西亞舉行的東協峰會中打下基礎，這方面工作還在持續進行。\n\n赫塞斯說，在印太地區嚇阻中國是建立在有彈性的現實主義之上，不是要尋求稱霸，而是平衡的關係；這種權力平衡將讓所有國家在印太地區享有和平，讓貿易得以自由、公平流通，讓大家共同繁榮，彼此利益都能獲得尊重。赫塞斯表示，美國會維持強勢但非對立的戰略位置，美國不會試圖扼殺中國成長，也不會企圖稱霸或羞辱中國；\n\n赫塞斯說，美國也不會嘗試改變台灣現狀。"}, {"title": "日學者：川習不排除訂台灣密約", "source": "聯合報 A02 焦點", "cat": "國際經濟情勢", "priority": 0, "summary": "美國總統川普五月中訪問北京，哈佛大學費正清中國研究中心前客座研究員峯村健司表示，去年他赴華府交流時，美政府官員曾提「政權內部作為參考」的塔夫脫—桂協定（Taft–Katsura Agreement）。峯村認為，未來美中領袖會談，除了公開的協議文件外，不排除另有類似的「台灣密約」。若川普承諾「有事不軍事介入」，可能加速中國推進統一台灣行動。", "full_text": "美國總統川普五月中訪問北京，哈佛大學費正清中國研究中心前客座研究員峯村健司表示，去年他赴華府交流時，美政府官員曾提「政權內部作為參考」的塔夫脫—桂協定（Taft–Katsura Agreement）。峯村認為，未來美中領袖會談，除了公開的協議文件外，不排除另有類似的「台灣密約」。若川普承諾「有事不軍事介入」，可能加速中國推進統一台灣行動。\n\n現為佳能全球戰略研究所高級研究員兼中國研究中心主任的峯村在日經商業撰文指出，塔夫脫—桂協定是一九○五年日俄戰爭期間，日本首相桂太郎與美國老羅斯福總統的特使、時任陸軍部長塔夫脫之間達成。內容是日本承認美國對菲律賓的統治，美方承認日本對朝鮮半島的支配，日本隨後據此推動併吞韓國。當時沒有公開，屬於祕密協定。\n\n峯村表示，去年五月他在華府與兩名政府官員交流時，對方提到塔夫脫—桂協定。一九七○年代美中建交談判時，就曾存在與台灣有關的未公開安排。他根據與美方官員的討論，推估川普政府可能尋求的交換條件：第一是縮減對中貿易逆差，若中方承諾大規模採購美國商品，川普用「台灣牌」誘因將大幅提高。\n\n第二，格陵蘭或巴拿馬運河，若中國默許美國在這些戰略據點的控制權作為交換，美方可能承認中國併吞台灣。第三，朝鮮半島。中國容許美軍在朝鮮半島行動，美方在台灣議題上讓步。\n\n這類交換條件雖屬極端，但不能完全排除。此外，習近平還有另一張牌，就是伊朗局勢的調停角色。峯村認為，伊朗局勢進一步強化中國在領袖會談中的優勢地位。"}, {"title": "打破僵局 川普聽取攻打伊朗新方案 計畫發動「短暫且強力」打擊 衝突可能升級讓油價一度衝上4年高點", "source": "聯合報 A10 國際", "cat": "國際經濟情勢", "priority": 0, "summary": "Axios報導，二名知情人士透露，美國總統川普預計卅日聽取對伊朗潛在軍事行動新方案簡報，由美國中央司令部司令庫柏負責，顯示川普正考慮恢復大規模作戰行動以打破談判僵局，或在結束戰爭前發動最後一擊。三名知情人士表示，中央司令部已備妥對伊朗發動一波「短暫且強力」打擊的計畫，攻擊目標可能包括基礎設施，旨在促使伊朗重返談判桌。另一項預計將向川普簡報的方案，是奪取荷莫茲海峽部分區域控制權，以重新開放商業航運。", "full_text": "Axios報導，二名知情人士透露，美國總統川普預計卅日聽取對伊朗潛在軍事行動新方案簡報，由美國中央司令部司令庫柏負責，顯示川普正考慮恢復大規模作戰行動以打破談判僵局，或在結束戰爭前發動最後一擊。三名知情人士表示，中央司令部已備妥對伊朗發動一波「短暫且強力」打擊的計畫，攻擊目標可能包括基礎設施，旨在促使伊朗重返談判桌。另一項預計將向川普簡報的方案，是奪取荷莫茲海峽部分區域控制權，以重新開放商業航運。\n\n消息人士指出，此類行動可能涉及地面部隊；此外，過去曾被討論也可能在此次簡報中提出的另一選項，是動用特種部隊奪取伊朗濃縮鈾。消息人士表示，美軍參謀首長聯席會議主席凱恩也預計出席簡報。\n\n川普廿九日對Axios表示，將持續對伊朗實施海上封鎖，直到伊朗政權同意一項協議，解決美國對伊朗核計畫的關切。此舉意味他拒絕伊朗先前提出的方案，即先開放荷莫茲海峽並解除封鎖，隨後再進行核談判。川普表示，「封鎖在某種程度上比轟炸更有效」，還說伊朗現在無法運出石油也無處儲藏，「他們像一頭快被撐死的豬，而且情況只會變得更糟。\n\n他們不能擁有核武」。消息人士指出，川普目前將封鎖視為主要施壓手段，若伊朗仍不讓步，不排除動用軍事行動。美軍參謀人員也正評估，伊朗可能為報復封鎖，攻擊中東美軍。\n\n法新社引述匿名白宮官員報導，川普廿八日在白宮會見石油業高層時表示，美國對伊朗的海上封鎖可能再延長幾個月，並與業者共商必要時可採取哪些措施，以及如何降低對美國消費者的衝擊。美伊衝突可能升級，讓國際油價四月卅日一度衝上四年高點，布倫特原油六月期貨一度大漲百分之七點一至每桶一二六點四一美元，創二○二二年俄烏戰爭後新高。隨後歐元區公布上季國內生產毛額僅成長百分之零點一，反映出伊朗戰爭引發能源成本飆升可能衝擊經濟，拖累石油需求，布倫特原油又從四年高點回落，一度跌逾百分之四。"}, {"title": "專家：只靠封鎖 難逼伊朗讓步", "source": "聯合報 A10 國際", "cat": "國際經濟情勢", "priority": 0, "summary": "川普押注海上封鎖能逼伊朗讓步，但這項策略正面臨成本與判斷兩大考驗。美國政府認為，切斷石油出口與關鍵物資進口，將壓垮伊朗經濟，迫使伊朗放棄核子計畫，但外界質疑這套邏輯是否過於樂觀。ＣＮＮ報導，川普近期推動海上封鎖，試圖用經濟壓力逼迫伊朗。", "full_text": "川普押注海上封鎖能逼伊朗讓步，但這項策略正面臨成本與判斷兩大考驗。美國政府認為，切斷石油出口與關鍵物資進口，將壓垮伊朗經濟，迫使伊朗放棄核子計畫，但外界質疑這套邏輯是否過於樂觀。ＣＮＮ報導，川普近期推動海上封鎖，試圖用經濟壓力逼迫伊朗。\n\n華府官員看到伊朗通膨飆升、失業擴大與物資短缺，認為這項行動已開始發揮效果。川普四月廿九日公開稱讚這項策略「是天才之舉」，並直言伊朗經濟「已經死去」。他對封鎖成效感到滿意，甚至要求幕僚規畫長期執行。\n\n然而，這場戰爭缺乏明確終局，封鎖策略也面臨兩個核心問題。首先是美國自身代價，美國油價已突破每加侖四美元，通膨壓力升高，選民對生活成本高漲不滿，共和黨內部開始擔心政治風險和十一月期中選舉選情。其次是判斷是否失準。\n\n美國長期傾向以自身經驗推測中東局勢，但伊朗未必會依經濟理性行動。川普押注這個神權政體最終會因經濟壓力讓步，即使其領導層過去多次讓民眾承受巨大痛苦。目前跡象顯示伊朗經濟確實惡化，川普也多次宣稱，伊朗若無法出口石油，將被迫停產，油井受損恐需數年修復。\n\n不過，伊朗國會議長卡利巴夫表示，美國為阻止伊朗出售石油所採取的措施，尚未使伊朗儲油設施達到容量上限，反倒推升油價。中東研究所資深研究員瓦坦卡指出，封鎖可能引發經濟痛苦並轉化為政治反對力量，但這個過程可能需時數月，且很難確定是否會引發大規模抗議或政權分裂。時間則對川普不利。\n\n他的支持率下滑，共和黨憂心失去國會控制權；戰事拖長、荷莫茲海峽持續受阻，對美國經濟的衝擊也會擴大。分析家也認為，若擊殺伊朗最高領袖哈米尼與數周轟炸都未動搖伊朗政權，單靠經濟壓力是否足以改變其立場。\n\n伊朗長年承受制裁與戰爭衝擊，自伊斯蘭革命以來，對抗美國一直是政權核心理念，甚至社會崩潰也不願讓步。"}, {"title": "美首季GDP增幅 優於上季 PCE升破3％…戰事影響恐Q2開始浮現", "source": "工商時報 A02 火線焦點", "cat": "國際經濟情勢", "priority": 0, "summary": "拜政府支出反彈所賜，美國第一季經濟季增年率達2％，但遜於預期。在此同時，美伊開戰後首份通膨報告出爐，個人消費支出物價指數（PCE）升破3％，年增率3.5％創下將近三年來新高紀錄。專家示警，伊朗戰爭對經濟的影響將自第二季開始顯現，油價攀升將繼續推高通膨。", "full_text": "拜政府支出反彈所賜，美國第一季經濟季增年率達2％，但遜於預期。在此同時，美伊開戰後首份通膨報告出爐，個人消費支出物價指數（PCE）升破3％，年增率3.5％創下將近三年來新高紀錄。專家示警，伊朗戰爭對經濟的影響將自第二季開始顯現，油價攀升將繼續推高通膨。\n\n美商務部30日公布，第一季國內生產毛額（GDP）季增年率達2％，遜於經濟學家預估的成長2.3％，但明顯優於去年第四季的擴張0.5％。去年末因為43天創紀錄的聯邦政府關門，導致政府支出減少，將G DP削去1.16個百分點，寫下1994年第一季以來最高紀錄。首季GDP報告顯示，美國經濟在伊朗戰爭爆發前表現穩健，大額退稅協助抵消初期油價上漲。\n\n然而美國經濟回升可能只是暫時，中東衝突進入第九周，經濟學家咸認，戰事拖延愈久，對美國經濟的衝擊愈大，對經濟成長的影響可能從第二季開始浮現。AI熱潮和支援AI技術的資料中心興建，持續支撐科技業支出，但美國經濟的成長引擎消費者支出，在美伊開戰前就逐漸失去動能，如今進一步放緩。國際油價目前升破每桶100美元，美國汽油價格在每加侖4美元之上。\n\n另3月PCE年增3.5％，大幅高於2月的年增2.8％，創2023年5月來最高紀錄。3月PCE由月增0.4％揚升至 0.7％，兩數據皆符合市場預期。聯準會偏好的通膨衡量指標核心 PCE，3 月數據月增 0.3％和年增 3.2％。\n\n聯準會4月例會按兵不動，下次例會將在6月召開。"}, {"title": "歐元區恐步入停滯性通膨 首季GDP季增0.1％，4月CPI年增幅擴大至3％，面臨經濟成長疲弱與物價上漲雙重挑戰", "source": "工商時報 A07 國際經濟", "cat": "國際經濟情勢", "priority": 0, "summary": "歐元區經濟在地緣政治衝擊下明顯降溫。最新數據顯示，今年第一季歐元區國內生產毛額（GDP）僅小幅季增0.1％，幾近停滯。另一方面，4月消費者物價指數（CPI）年增幅擴大至3％，顯示通膨壓力再度升溫。", "full_text": "歐元區經濟在地緣政治衝擊下明顯降溫。最新數據顯示，今年第一季歐元區國內生產毛額（GDP）僅小幅季增0.1％，幾近停滯。另一方面，4月消費者物價指數（CPI）年增幅擴大至3％，顯示通膨壓力再度升溫。\n\n在美伊戰爭持續影響能源市場與供應鏈之際，歐元區正面臨成長疲弱與物價上漲的雙重挑戰。數據指出，歐元區通膨率從2月的1.9％擴大到3月的2.6％，4月進一步擴大至3％，不僅高於歐洲央行設定的2％目標，也凸顯能源價格飆升的影響持續擴大。根據Eurostat資料，4月能源成本年增幅10.9 ％，遠高於3月的5.1％，成為推升整體物價的主要動能。\n\n在此背景下，歐洲央行即將召開利率決策會議，市場普遍預期將維持基準利率不變，以觀察通膨走勢與經濟變化。經濟學家普遍憂心歐洲恐步入「停滯性通膨」局面，即經濟低成長、高通膨與失業壓力並存。戰爭引發的能源供應緊縮、價格上揚，以及企業與消費者信心受挫，均為潛在風險來源。\n\n不過，仍有部分指標顯示壓力尚未全面擴散。4月核心通膨率（排除食品與能源）從3月的2.3％稍稍降至2.2％，意味著通膨尚未形成更具黏性的「第二輪效應」。所謂第二輪效應，是指通膨引發工資上升與企業調價，進一步推升物價，形成惡性循環。\n\n摩根士丹利分析師指出：「至少可以確認短期核心通膨風險仍受控，數據並未顯示需要央行迅速行動。這與我們長期看法一致，即歐洲央行在4月將按兵不動，並在未來會議中保留所有選項。」 然而，地緣政治風險仍是最大變數。\n\n作為全球能源運輸要道的荷姆茲海峽持續受阻，使歐洲在能源取得上面臨更大壓力，特別是在需求高漲與供應競爭激烈的情況下。貝倫貝格銀行（Berenberg）警告，如果歐洲央行因短期通膨上升而升息，歐元區可能在今年底或明年初陷入不必要的小型衰退，之後才可能復甦，建議作法是今年維持利率不變。"}, {"title": "跟進Fed 歐英央行維持利率不變", "source": "工商時報 A07 國際經濟", "cat": "國際經濟情勢", "priority": 0, "summary": "在美國聯準會（Fed）宣布利率按兵不動後，歐洲央行（ECB）與英國央行（BOE）也跟進維持利率不變，分別為2％與 3.75％。歐英央行一如市場預期凍結利率，但釋出對通膨飆升的擔憂訊號，強化市場對未來升息的押注。ECB在會議結束後決定將存款利率維持在2％，再融資與邊際貸款利率停留在2.15％與2.4％。", "full_text": "在美國聯準會（Fed）宣布利率按兵不動後，歐洲央行（ECB）與英國央行（BOE）也跟進維持利率不變，分別為2％與 3.75％。歐英央行一如市場預期凍結利率，但釋出對通膨飆升的擔憂訊號，強化市場對未來升息的押注。ECB在會議結束後決定將存款利率維持在2％，再融資與邊際貸款利率停留在2.15％與2.4％。\n\n此為連續第三次按兵不動，並符合市場預期。但該央行警告，美伊衝突遲未落幕與荷姆茲海峽持續封鎖，恐對歐元區經濟帶來嚴重衝擊。ECB聲明指出：「最新數據大致符合先前判斷，但通膨上行風險與經濟下行風險都在升高。\n\n戰爭持續時間愈長、能源價格維持高檔愈久，對整體通膨與經濟的影響就愈大。」 歐元區經濟成長已出現疲弱跡象，4月通膨數據升至3％、遠高ECB 設定的2％目標，且未來數月可能持續攀升。投資人預期，ECB未來12個月可能升息三次，將存款利率升至2.75 ％，首次升息可能在6月。\n\n歐央總裁拉加德在會後記者會上表示：「經濟前景高度不確定，將取決於中東衝突持續時間，以及其對能源與其他商品市場，以及全球供應鏈的衝擊程度。」 英央同日也宣布利率維持不變。英央貨幣政策委員會（MPC）九名委員中八人選擇按兵不動，僅立場偏鷹的首席經濟學家皮爾（Huw P ill）一人主張立即升息1碼至4％。\n\nMPC聲明表示：「本委員會將在必要時採取行動，確保消費者物價指數（CPI）中期內回到2％目標」，會後措辭與3月相同。英央總裁貝利（Andrew Bailey）表示：「中東衝突導致今年通膨再度升溫，我們將持續密切監控局勢及其對英國經濟的影響。」他指出，在目前經濟與中東局勢高度不可預測情況下，利率暫時不變是「 合理決策」。\n\n英央針對能源價格衝擊提出三種情境預測，在最嚴峻情境下，通膨恐大幅飆升，可能迫使其在2027年將利率調升至約5.25%。"}, {"title": "諾貝爾經濟學獎得主：大宗商品將進入新一輪超級週期", "source": "工商時報 A07 國際經濟", "cat": "國際經濟情勢", "priority": 0, "summary": "諾貝爾經濟學獎得主漢克（Steve Hanke）表示，大宗商品將進入新一輪「超級週期」（supercycle），近期飆漲走勢只是剛開始，建議投資人，應把資金從科技股轉向大宗商品與實體資產，理由是，A I榮景將會激發更多大宗商品的需求。目前在約翰霍普金斯大學擔任應用經濟學教授的漢克，在社交平台 X發文表示：「我們正進入另一個大宗商品超級週期，所有價格將會上漲。美國與以色列對伊朗開戰，促使發生這狀況。」 其實，近期部份大宗商品價格的飆漲，並...", "full_text": "諾貝爾經濟學獎得主漢克（Steve Hanke）表示，大宗商品將進入新一輪「超級週期」（supercycle），近期飆漲走勢只是剛開始，建議投資人，應把資金從科技股轉向大宗商品與實體資產，理由是，A I榮景將會激發更多大宗商品的需求。目前在約翰霍普金斯大學擔任應用經濟學教授的漢克，在社交平台 X發文表示：「我們正進入另一個大宗商品超級週期，所有價格將會上漲。美國與以色列對伊朗開戰，促使發生這狀況。」 其實，近期部份大宗商品價格的飆漲，並非從伊朗戰爭爆發後才開始，像銅價去年因供應緊張而屢創新高。至於石油，這場戰爭確實導致油價飆漲，主要是美伊始終無法達成解決方案，令油市走勢繼續高度波動。漢克認為超級週期可能會在未來數年內，對大宗商品價格構成上漲壓力。\n\n因為目前大宗商品庫存偏低，和基建多年來投資不足。當出現超級週期期時，即使大宗商品價格走高，也無法刺激供應迅速增加，因為供應面正陷入瓶頸。當大宗商品和其他實體資產的價格，因超級週期期而大漲時，科技股的表現就會出現相對落後。\n\n他認為市場已把「輕資產」企業的估值充份反映在股價上，卻低估那些有助推動超級週期的企業估值。漢克表示，AI並非單純數位資產，其必須要電力、資料中心、冷卻系統、土地、鋼鐵、銅、氣體和電網的供電能力，這一切都會令大宗商品的需求暴增，讓大宗商品相對科技股更有投資吸引力。漢克表示，自己偏好透過大宗商品的期貨市場來投資，而不是在現貨市場買進實體的大宗商品。\n\n漢克以石油為例，若是預期油價上漲，根本不需要煩惱如何分析石油公司的各種複雜因素，只要直接在期貨市場做多油價就可以。對於像鋰和釩等沒有期貨可供交易的大宗商品，漢克建議，可以投資開採以及提煉它們的礦商股票。"}, {"title": "陸4月製造業PMI 優預期 50.3連續第二個月處擴張區間，戰事影響企業提前出貨，帶動出口訂單升高", "source": "工商時報 A09 大陸財經", "cat": "國際經濟情勢", "priority": 0, "summary": "在中東地緣政治緊張，帶動的搶貨潮支撐下，由大陸統計局30日公布的4月製造業採購經理人指數（PMI），儘管較3月微幅下跌0.1個百分點至50.3，但仍優於市場預期的50.1，且已連續第二個月位於景氣分水嶺上方。分析指出，企業為因應伊朗戰事可能推升成本，提前增加出貨力度，帶動新出口訂單升至近兩年高點。大陸統計局同步公布4月非製造業PMI降至49.4，較3月的50.1明顯下滑，也低於市場預期的49.8，反映以內需為導向的服務業轉為萎縮。", "full_text": "在中東地緣政治緊張，帶動的搶貨潮支撐下，由大陸統計局30日公布的4月製造業採購經理人指數（PMI），儘管較3月微幅下跌0.1個百分點至50.3，但仍優於市場預期的50.1，且已連續第二個月位於景氣分水嶺上方。分析指出，企業為因應伊朗戰事可能推升成本，提前增加出貨力度，帶動新出口訂單升至近兩年高點。大陸統計局同步公布4月非製造業PMI降至49.4，較3月的50.1明顯下滑，也低於市場預期的49.8，反映以內需為導向的服務業轉為萎縮。\n\n綜合陸媒及外媒報導，4月中國製造業PMI由3月的50.4，小幅回落至50.3，仍優於市場預期的50.1，且連續兩個月維持在50以上的擴張區間。從企業規模看，大型企業PMI為50.2，較3月下滑1.4個百分點，但仍高於榮枯線；中、小型企業PMI分別為50.5及50.1，均維持在擴張區間。\n\n分項指標顯示，生產指數擴張速度略有加快，新出口訂單指數升至 50.3，為2024年4月以來新高，3月為49.1；原材料庫存指數則有所回升，但仍處於收縮區間。大陸統計局服務業調查中心首席統計師霍麗慧解讀，4月製造業景氣水準整體平穩，延續良好運行態勢，供需兩端均持續擴張。\n\n三大重點產業維持擴張，高技術製造業與裝備製造業PMI分別為52.2與51.8，消費品產業PMI為50.7，均續處於擴張區間。保銀資產管理首席經濟學家張智威表示，PMI數據顯示製造業對外部衝擊仍具韌性，但未來數月仍須觀察官方貿易數據，確認出口表現是否延續。東莞一名經營塑膠產業倉儲業者表示，近期訂單明顯升溫，主因為企業擔憂價格上漲而提前備貨。\n\n他指出，儘管中國不缺石油，但化工原料供應偏緊，企業對後市需求轉趨謹慎，帶動大規模囤貨潮。此外，標普與RatingDog 30日亦發表大陸4月製造業PMI，較上月大幅加快1.4個百分點至52.2，高於市場預期的51，並創2020年12月以來新高。該機構指出，受惠於需求穩健、營運改善及新產品推出，帶動產出創近兩年最快成長。\n\n分析指出，上述調查涵蓋上海及華南地區出口導向廠商，更能反映外需變化。市場認為，若是中東衝突持續升高，恐拖累全球經濟並壓抑外需，而外需近年成為支撐中國經濟的重要動能之一。"}, {"title": "IMF：大陸出現通膨回歸訊號", "source": "工商時報 A09 大陸財經", "cat": "國際經濟情勢", "priority": 0, "summary": "大陸過去一段時間深陷通縮危機，國際貨幣基金組織（IMF）亞洲及太平洋部主任斯里尼瓦桑（KrishnaSrinivasan）表示，隨著中東緊張局勢推高能源成本，大陸已出現通膨回歸的跡象。不過，若要徹底扭轉通縮壓力，仍需更具持續性的價格上升趨勢。香港經濟日報引述斯里尼瓦桑指出，雖然當前物價數據有所變動，但判定大陸是否進入通膨復甦期仍言之尚早。", "full_text": "大陸過去一段時間深陷通縮危機，國際貨幣基金組織（IMF）亞洲及太平洋部主任斯里尼瓦桑（KrishnaSrinivasan）表示，隨著中東緊張局勢推高能源成本，大陸已出現通膨回歸的跡象。不過，若要徹底扭轉通縮壓力，仍需更具持續性的價格上升趨勢。香港經濟日報引述斯里尼瓦桑指出，雖然當前物價數據有所變動，但判定大陸是否進入通膨復甦期仍言之尚早。\n\n他認為，大陸目前當務之急是重振經濟動能，並透過刺激國內消費來實現更穩健、可持續的增長。大陸國家統計局此前公布數據顯示，3月大陸全國消費者物價指數（CPI）年增1％，較2月份回落0.3個百分點，遜於預期。累計2026年第一季，大陸CPI年增0.9％。\n\n而全國工業生產者物價指數（PPI）年增率由2月的下降0.9％轉為上漲0.5％，創下連續下降41個月後首次上漲，累計第一季大陸PPI年減0.6％。澳盛銀行中國市場經濟學家邢兆鵬稍早分析，數據表明大陸持續三年半的通縮結束，但「輸入性通膨」對經濟並不友好。此外，大陸房地產問題拖累經濟多時，斯里尼瓦桑呼籲，應採取更強而有力的措施進行整頓，房地產市場的穩定對於推動整體經濟復甦具關鍵作用。\n\n而地緣政治風險方面，他提醒，亞洲屬於「能源密集型」經濟區域，面對中東緊張局勢，極易受供應鏈中斷及能源價格波動影響。斯里尼瓦桑預計，若中東局勢引發長期經濟動盪，到2027年亞太地區的經濟增長預計將累計放緩1至2個百分點，而區域內的通膨率則可能因此上升1至4個百分點，並指IMF已就相關風險情境做好應對準備。"}, {"title": "Fed利率不動 鮑爾時代落幕 決策聲明偏鷹 三位聯準銀總裁主張降低寬鬆傾向 市場估年底前不降息 美債殖利率揚", "source": "經濟日報 A02 話題", "cat": "國際經濟情勢", "priority": 0, "summary": "美國聯準會（Fed）在主席鮑爾主持的最後一場決策會議，決議維持聯邦資金利率區間在3.5%-3.75%，完全符合預期，令人意外的是有三位聯準銀行總裁主張應降低決策聲明的寬鬆傾向，鮑爾也表示決策聲明重心正走向「更中性」立場，透露鷹派意味，市場認為幾乎確定今年底前不會降息。Fed利率決策小組聯邦公開市場操作委員會（FOMC）這次決策聲明，新增「通膨居高不下，一部分是反映最近全球能源價格上漲」，暗示更擔心通膨情勢。最引人注目的為四名官員提出異議...", "full_text": "美國聯準會（Fed）在主席鮑爾主持的最後一場決策會議，決議維持聯邦資金利率區間在3.5%-3.75%，完全符合預期，令人意外的是有三位聯準銀行總裁主張應降低決策聲明的寬鬆傾向，鮑爾也表示決策聲明重心正走向「更中性」立場，透露鷹派意味，市場認為幾乎確定今年底前不會降息。Fed利率決策小組聯邦公開市場操作委員會（FOMC）這次決策聲明，新增「通膨居高不下，一部分是反映最近全球能源價格上漲」，暗示更擔心通膨情勢。最引人注目的為四名官員提出異議，為1992年10月以來首度有四名官員對決議提出異議。\n\n這四名官員中，理事米倫主張應降息1碼，克理夫蘭聯準銀行總裁哈瑪克、明尼亞波利聯準銀行總裁卡斯哈里及達拉斯聯準銀行總裁蘿根雖支持按兵不動，但不支持在本次決策聲明納入寬鬆傾向。立場都屬於鷹派陣營的這三位地區聯準銀行總裁，憂慮在於Fed決策聲明表示，「在考量對聯邦資金利率目標區間的額外調整程度與時機時，委員會將謹慎評估未來的數據、演化展望及風險平衡」，其中的「額外」兩字暗示Fed下一步決策可能是降息。Fed從去年12月來都維持「額外」這兩個字的寬鬆傾向措辭，這次卻有三名地區聯準銀行總裁提出異議，原因可能是通膨依然僵固、伊朗戰爭帶來額外通膨風險，但選在Fed新任主席提名人選華許將在5月上任前表態，時機格外耐人尋味。\n\n觀察家指出，這些「異議」是對華許提出強烈暗示，表明他們將不會贊成短期內降息。市場解讀Fed決策聲明偏鷹，使美債殖利率上漲，交易員也陸續減少對Fed今年底前降息的押注，摩根士丹利預期Fed今年底前都將按兵不動。法國興業銀行美國研究主管拉賈帕認為，這些異議票可能為 Fed未來幾次會議偏離寬鬆立場奠基。\n\n鮑爾在被問及這些異議票時，表示FOMC討論「熱絡」，支持更中性語言的官員增加，也反映FOMC的重心「正趨向更中性位置」。這番話似乎暗示不具投票權的決策官員，也反對在決策聲明納入寬鬆傾向。但鮑爾也說，「我們多數委員覺得目前還不需要對此（升息）釋出訊息」，FOMC也沒有任何委員表示現在需要升息。\n\n拉賈帕說，Fed要升息的門檻仍相對較高，現在Fed也沒必要大幅改變政策偏向。這場會議也象徵過去八年來的「鮑爾時代」畫下句點，並象徵20年來強調透明與溝通的風格告終。Fed前主席柏南克和葉倫設計出更倚重對外溝通、提早引導市場預期的貨幣政策溝通架構，鮑爾承襲這些作風，甚至更進一步讓市場為潛在政策調整預作準備。"}, {"title": "華許有望本月接主席", "source": "經濟日報 A02 話題", "cat": "國際經濟情勢", "priority": 0, "summary": "美聯準會（Fed）新任主席提名人華許（Kevin Warsh）人事案，29日獲聯邦參議院銀行委員會通過，有望在現任主席鮑爾5月15日任期屆滿前，獲得參院全院批准，如期走馬上任，但在鮑爾表態將留任Fed理事之際，華許將面臨有意對抗降息的Fed。參院銀行委員會以13票支持、11票反對確認華許接任Fed主席人事案，有望5月在共和黨掌控微弱多數席次的參院，獲得全院表決通過。美國總統川普已多次表達他期許華許能降息，華許幾乎將面臨川普對貨幣政策的龐...", "full_text": "美聯準會（Fed）新任主席提名人華許（Kevin Warsh）人事案，29日獲聯邦參議院銀行委員會通過，有望在現任主席鮑爾5月15日任期屆滿前，獲得參院全院批准，如期走馬上任，但在鮑爾表態將留任Fed理事之際，華許將面臨有意對抗降息的Fed。參院銀行委員會以13票支持、11票反對確認華許接任Fed主席人事案，有望5月在共和黨掌控微弱多數席次的參院，獲得全院表決通過。美國總統川普已多次表達他期許華許能降息，華許幾乎將面臨川普對貨幣政策的龐大施壓。\n\n但Fed在幾小時後的貨幣政策決策，卻表達對降息的抗拒態度：三位地區聯準銀行總裁主張，應從決策聲明刪除透露寬鬆傾向的字句。摩根大通資產管理公司投資組合經理人米斯拉認為，這不只對即將上任的華許釋出訊息，也是向市場和川普政府表達：FOMC擁有可信而獨立的民主，「若華許想降息，就要說服同僚」。此外，鮑爾表示他的主席任期屆滿後繼續留任Fed理事，這項宣告降低了Fed在華許上任後降息的機率。"}, {"title": "美經濟熱絡 首季增速2% 上周初領失業金人數探57年低點 顯示景氣未受中東戰局影響 3月通膨數據升溫", "source": "經濟日報 A06 國際", "cat": "國際經濟情勢", "priority": 0, "summary": "美國第1季實質國內生產毛額（GDP）成長2%，比去年第4季明顯回升，上周初領失業金人數也降至1969年來最低，顯示美國經濟並未受中東戰局影響，景氣依然熱絡，加上聯準會（Fed）偏好的通膨指標也升溫，所以近期內降息機率進一步下降。美國經濟分析局4月30日公布，第1季GDP季增年率為2%，雖低於預估的2.3%，但高於去年第4季時的0.5%增幅，主要受到企業投資大幅增長以及穩健的消費者需求所推動；其中個人消費年增 1.6%，高於預估的1.4%...", "full_text": "美國第1季實質國內生產毛額（GDP）成長2%，比去年第4季明顯回升，上周初領失業金人數也降至1969年來最低，顯示美國經濟並未受中東戰局影響，景氣依然熱絡，加上聯準會（Fed）偏好的通膨指標也升溫，所以近期內降息機率進一步下降。美國經濟分析局4月30日公布，第1季GDP季增年率為2%，雖低於預估的2.3%，但高於去年第4季時的0.5%增幅，主要受到企業投資大幅增長以及穩健的消費者需求所推動；其中個人消費年增 1.6%，高於預估的1.4%，但低於去年第4季的1.9%增幅。\n\n占經濟活動約三分之二的消費支出增長1.6%，優於預期，主要受到醫療保健與金融服務等服務業需求的帶動。勞工部同日數據顯示，上周（4月25日止）首次申領失業救濟金人數僅18.9萬人，為1969年以來最低，遠低於預估的21.2萬人，及前周的21.5萬人；四周移動平均人數為20.75萬人，低於之前一周的21.1萬人。\n\n連續申領失業給付（4月18日止）人數為178.5萬人，低於預估的181.5萬人，及之前一周的180.8萬人。彭博行業研究分析師指出，上周初領失業金人數下滑，發出強烈的訊號指出，失業依然有限。這有助解釋為何伊朗衝突爆發以來，明明不確定性上升，勞動市場情緒尚稱平和。\n\n3月代表通膨率的整體PCE平減指數比2月大幅上升0.7%，創下2022年以來最大升幅，符合預估，高於2月時的0.4%增幅；比去年同期上升3.5%，符合預估，但遠高於2月時的2.8%升幅，主因能源價格上漲。目前汽油價格持續攀升，已達到2022年以來的最高水準。\n\nFed 最重視的核心 PCE 平減指數，比 2 月上升 0.3%，符合預估，低於 2 月時的 0.4%升幅；比去年同期上升 3.2%，符合預估，但高於2月時的3.0%升幅。個人消費支出比2月大幅增加0.9%，符合預估，高於2月時的0.6%增幅；\n\n扣除通膨後的實質個人消費支出比2月增加0.2%，低於預估及2月時的0.3%增幅。個人所得增加0.6%，高於預估的0.3%，及2月時的不增不減，主因「大而美法」使退稅金額增加。經濟學者指出，各項經濟數據顯示第1季通膨已開始升高，但油價上漲的衝擊尚未充分顯現，因此4月通膨可能更高；\n\n消費支出熱絡，加上失業減少，顯示經濟成長動能仍強。儘管聯準會（Fed）6月會議將由主張降息的新任主席華許主持，但由於通膨居高，降息機率仍舊渺茫。"}, {"title": "官員說重話日圓貶值變強升 警告投機客奏效 匯價從貶破160關卡 應聲強彈3% 寫今年2月來最高價", "source": "經濟日報 A06 國際", "cat": "國際經濟情勢", "priority": 0, "summary": "日圓匯率4月30日盤中一度貶破160關卡，寫下今年來最低價位，但在日本官員發出可能干預匯市的嚴厲警告後，日圓強升3%，至155.57，為今年2月以來最高。日本外匯事務負責人三村淳向投機客喊話：「如果你想要全身而退，這是我最後的忠告。」財務大臣片山皋月同日也說，東京方面對投機舉動提高戒備，當局已準備好必要時全天候對付匯率波動，對匯率採取大膽舉措的時機「即將到來」。", "full_text": "日圓匯率4月30日盤中一度貶破160關卡，寫下今年來最低價位，但在日本官員發出可能干預匯市的嚴厲警告後，日圓強升3%，至155.57，為今年2月以來最高。日本外匯事務負責人三村淳向投機客喊話：「如果你想要全身而退，這是我最後的忠告。」財務大臣片山皋月同日也說，東京方面對投機舉動提高戒備，當局已準備好必要時全天候對付匯率波動，對匯率採取大膽舉措的時機「即將到來」。\n\n日本大部分地區到下周三之前都將是黃金周假期，市場交易量預計會減少，但片山表示，官員們仍將密切關注匯市。雖然最新的警告可能會為日圓帶來短暫的喘息，但如果日本繼續不進場干預，反覆發出的口頭警告可能會失去效力。隨著各國央行延後調整利率，加上中東緊張局勢推升油價，投資人日益認為，官方干預市場是近期阻貶日圓的唯一手段。\n\n日銀總裁植田和男在本周日銀決策後的記者會上，並未就下次升息時機提供明確訊號，導致日圓這幾天走勢疲軟。而中東衝突導致油價上漲，日圓也因此承壓，因為日本嚴重依賴該地區的石油，增加了貿易收支惡化的風險。日本當局曾在2024年日圓貶破160關卡時，數度進場干預，不過日本官員一再強調，他們關注的是匯率的過度波動，而非捍衛特定價位。\n\n另據路透報導，市場消息來源說，這波日圓由貶轉升，看起來有官方進場的特徵，在過去官方干預的案例中，日圓升勢通常會更快。當被問及是否懷疑日圓走勢背後有日銀干預時，法國興業銀行（Societe Generale）外匯策略師布勞克斯表示：「看起來確實很像，同時也存在空頭回補。」「最後警告的言論確實讓一些交易員感到不安。」每周數據顯示，投資者目前持有的做空日圓部位，是自2024年7月以來最大。一名政府官員向日經證實，在日圓貶破160後，日銀透過買入日圓、賣出美元干預匯市。"}, {"title": "歐洲英國利率按兵不動", "source": "經濟日報 A06 國際", "cat": "國際經濟情勢", "priority": 0, "summary": "歐洲央行（ECB）4月30日宣布維持利率按兵不動，但表達了對通膨高漲的擔憂，推升市場對其今年將升息多次的押注，最近一次預測將在 6 月；英國央行也宣布維持利率不變，並為伊朗戰爭的經濟影響推算出多種可能情景，其中一種情景需要「強而有力」的升息。ECB 4月30日決議維持基準的存款利率在2%不變。", "full_text": "歐洲央行（ECB）4月30日宣布維持利率按兵不動，但表達了對通膨高漲的擔憂，推升市場對其今年將升息多次的押注，最近一次預測將在 6 月；英國央行也宣布維持利率不變，並為伊朗戰爭的經濟影響推算出多種可能情景，其中一種情景需要「強而有力」的升息。ECB 4月30日決議維持基準的存款利率在2%不變。\n\n隨著伊朗戰爭推升油價至四年來最高，歐元區4月通膨率躍升至3%，高於ECB目標的2%，且預期將進一步上漲。ECB聲明表示：「通膨的向上風險和成長的向下風險已經加劇。戰事持續愈久，以及能源價格持續在高位愈久，整體通膨和經濟可能受到的影響就會愈強勁。」 金融市場如今預期，ECB將在6月和7月升息，並在秋季至少再升息一次，因為ECB在2022年曾因動作緩慢遭到批評，將會渴望快速平息任何通膨螺旋。英國央行（BOE）4月30日維持基準利率在3.75%不變，符合市場預期。央行表示，將持續密切關注中東情勢，但就業市場疲軟和金融市場借貸成本上漲，將有助抑制通膨。\n\n英國央行為伊朗戰事的影響推算出三種可能情景，在影響最深的情景 C下，能源價格將長期居高不下，通膨最高可能達到 6.2%，為近期數據的近兩倍。央行表示，若此情景實現，「可能需對貨幣政策進行強而有力的緊縮」。"}, {"title": "陸製造業PMI 連二月擴張 上月指數50.3 優於預期 分析師：油價大漲衝擊企業生產節奏 本月恐回落至收縮區間", "source": "經濟日報 A08 兩岸", "cat": "國際經濟情勢", "priority": 0, "summary": "大陸國家統計局昨（30）日公布，大陸4月製造業採購經理人指數（PMI）由3月的50.4降至50.3，優於市場預期的50.1，並連續兩個月處於50榮枯線之上的擴張水平。同日公布的非製造業（服務業）商務活動指數PMI由3月的50.1下降至49.4，低於市場預期的49.8，主因建築業景氣不佳。大陸國家統計局表示，經濟總體產出保持擴張，製造業延續較好運行趨勢，生產及市場需求保持擴張，企業採購意願進一步增強，尤其生產經營活動預期指數連續三個月回升...", "full_text": "大陸國家統計局昨（30）日公布，大陸4月製造業採購經理人指數（PMI）由3月的50.4降至50.3，優於市場預期的50.1，並連續兩個月處於50榮枯線之上的擴張水平。同日公布的非製造業（服務業）商務活動指數PMI由3月的50.1下降至49.4，低於市場預期的49.8，主因建築業景氣不佳。大陸國家統計局表示，經濟總體產出保持擴張，製造業延續較好運行趨勢，生產及市場需求保持擴張，企業採購意願進一步增強，尤其生產經營活動預期指數連續三個月回升，製造業企業對近期市場發展信心持續增強。\n\n不過，受近期部分大宗商品價格高位波動等因素影響，主要原材料購進價格指數及出廠價格指數，均繼續處於近年高位，製造業市場價格水平明顯上升。東方金誠首席宏觀分析師王青分析，歷史資料顯示，過去十年4月製造業PMI指數平均回落0.5，主要是經歷3月的節後集中復工後，4月製造業生產經營會恢復正常節奏，當前國內房地產市場仍處於調整狀態，中東局勢還沒有實質性降溫，外部不確定性仍處於高位，特別是伴隨著國際油價大幅上衝向國內傳導，一些行業生產經營會受到負面的影響。展望下一階段製造業走勢，王青表示，預估 5 月製造業 PMI 指數將在 49.8 左右，主因國際原油價格大幅上漲後，在市場有效需求不足背景下，一些製造業企業會放緩生產節奏，可能拖累製造業景氣度在 5月回落到收縮區間。\n\n大陸國家統計局指出，非製造業景氣水平有所下降，服務業景氣度回落，批發、零售及居民服務等行業的商務活動市場活躍度偏弱；建築業景氣水平亦回落。值得注意的是，去年11月以來，除了今年3月服務業商務活動指數在擴張區間，其餘月份都位於收縮區間，顯示近期服務業增長動能偏弱，王青認為，這與房地產行業持續調整直接相關，也顯示當前消費信心不足，居民旅遊出行、餐飲住宿、文化娛樂等服務消費也有待進一步提振。"}, {"title": "Fed利率連3凍 鮑爾留任理事護獨立性", "source": "自由時報 A02 焦點新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "美國聯準會（Fed）在週三（廿九日）例行政策會議後維持利率不變，但決策官員對會後聲明出現一九九二年十月以來最嚴重分歧，為擔任Fed主席八年、將於五月十五日卸任的鮑爾，畫下一個罕見的爭議性句號。不過，鮑爾強調將續任Fed理事一段時間，以保護該機構免受川普政府的法律攻擊。聯邦公開市場操作委員會（FOMC）在週三會後決定維持利率在三．五％至三．七五％區間不變，這也是 Fed連續第三次維持利率不變。", "full_text": "美國聯準會（Fed）在週三（廿九日）例行政策會議後維持利率不變，但決策官員對會後聲明出現一九九二年十月以來最嚴重分歧，為擔任Fed主席八年、將於五月十五日卸任的鮑爾，畫下一個罕見的爭議性句號。不過，鮑爾強調將續任Fed理事一段時間，以保護該機構免受川普政府的法律攻擊。聯邦公開市場操作委員會（FOMC）在週三會後決定維持利率在三．五％至三．七五％區間不變，這也是 Fed連續第三次維持利率不變。\n\n會後聲明指出，「通膨仍然偏高，部分原因是近來全球能源價格上漲」，與三月會後聲明指通膨僅「略高」的說法有所改變，卻未修改暗示下一步利率更可能下調而非上調的措辭。這個會後聲明遭到十二名決策委員中四人的反對，為一九九二年十月政策會議以來反對票最多的一次。這些分歧凸顯出，在Fed因應能源危機帶來的通膨風險之際，鮑爾的繼任者華許（Kevin Warsh）可能面臨的嚴峻挑戰。\n\n反對會後聲明的包括克里夫蘭聯邦準備銀行總裁哈馬克、明尼亞波利斯聯邦準備銀行總裁卡什卡里和達拉斯聯邦準備銀行總裁羅根，三人雖然支持將利率維持在三．五％至三．七五％區間不變，但反對在聲明中納入「寬鬆傾向」（easing bias）。投下反對票的第四名決策官員是Fed理事米蘭，他的立場剛好相反，主張要降息一碼（○．二五個百分點）。此外，鮑爾在會後記者會上表示，在卸任Fed主席後，將續任理事一段時間，打破數十年來，Fed主席在繼任者就職時就離開Fed的慣例。\n\n鮑爾指出：「我真正擔心的是針對Fed的一系列法律攻擊，這些攻擊威脅到我們在不考慮政治因素的前提下實施貨幣政策的能力。」 上週美國司法部官員暫停了針對鮑爾監督Fed大樓翻修工程的刑事調查。鮑爾表示，他對此感到鼓舞，但重申在調查完全結束前不會離開Fed，並強調作為理事將保持低調，不會干預華許對Fed的領導。"}, {"title": "180萬兌1美元! 伊朗貨幣貶至新低", "source": "自由時報 A05 國際新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "美國對伊朗港口的海上封鎖，正加劇德黑蘭早已百廢待舉的經濟困境，伊朗貨幣里亞爾匯率四月廿九日貶到一八○萬兌一美元，創新低。根據追蹤里亞爾在黑市匯率的網站Bonbast數據，里亞爾一週來已貶值約十二％，廿九日達到一八○萬兌一美元的歷史新低。伊朗貨幣貶值顯示美國對伊朗的海上封鎖正升高伊朗經濟的壓力。", "full_text": "美國對伊朗港口的海上封鎖，正加劇德黑蘭早已百廢待舉的經濟困境，伊朗貨幣里亞爾匯率四月廿九日貶到一八○萬兌一美元，創新低。根據追蹤里亞爾在黑市匯率的網站Bonbast數據，里亞爾一週來已貶值約十二％，廿九日達到一八○萬兌一美元的歷史新低。伊朗貨幣貶值顯示美國對伊朗的海上封鎖正升高伊朗經濟的壓力。\n\n美國財政部長貝森特日前指里亞爾貶值證明華府的經濟施壓行動正在發揮作用。里亞爾匯率在戰爭初期尚能維持穩定，一部分是因為進口和貿易量少。伊朗經濟已因情勢不確定、供應鏈被打斷、運輸和生產成本高漲以及美國持續的封鎖而倍受壓力，專家警告，里亞爾持續貶值可能使通貨膨脹進一步惡化，尤其是與進口相關貨品以及包裝、原物料。\n\n里亞爾去年就貶值70％伊朗從糧食、醫藥品到電子產品和原物料等許多項目都仰賴進口，去年里亞爾已貶值約七十％，物價上升、貨幣貶值，引爆一月初的全國示威。美國的海上封鎖切斷伊朗的石油出口，打擊該國重要收入來源。伊朗在戰前每日生產三百多萬桶原油，僅約一半供應國內市場。\n\n美國四月十三日展開封鎖後，油輪幾乎已裝滿卻無法出口。美國總統川普廿九日向新聞網站Axios表示，他已拒絕伊朗提出以重開荷姆茲海峽，交換美國解除封鎖的提案，他說，「封鎖在某種程度比轟炸更有效，而且對他們來說情況還會更糟。伊朗不能擁有核武」。\n\n專家指出，由於石油無法出口，儲存空間又日漸減少，德黑蘭或許最快在兩週內，就得被迫將部份油井大幅減產、甚至停產。伊油最快兩週內減停產大宗商品行情追蹤公司Kpler認為，即使減產，伊朗目前所剩儲存量能，還可儲存大約兩週的產量，「立即性的收入衝擊有限，但是作業受到侷限現在正迫使減產，並且導致之後的顯著財務壓力」。另一家能源顧問公司伍德瑪肯西（Wood Mackenzie）估計，伊朗將在大約三週內用罄儲存空間，停產超過一個月將會對伊朗石油儲備造成長期損害。"}, {"title": "周小川談IMF改革 散發中美博弈煙硝", "source": "聯合報 A11 兩岸", "cat": "國際經濟情勢", "priority": 0, "summary": "近期中東局勢升溫，地緣政治不平靜，金融市場震盪，外界關注金融穩定議題時，大陸人行前行長周小川會在今年博鰲論壇期間（三月底），提出要回到國際貨幣基金（ＩＭＦ）多邊框架下解決全球貿易失衡問題。大陸官方提倡ＩＭＦ改革並非新鮮事，周小川現場的發言，張力十足，牽扯出中西方數十年來在金融治理上的恩怨情仇，也散發出中美博弈的煙硝。周小川談及解決全球不平衡問題，要利用ＩＭＦ多邊框架機制，乍聽似乎是要擁抱ＩＭＦ的功能，但事實上，ＩＭＦ過去幾十年跟新興國家...", "full_text": "近期中東局勢升溫，地緣政治不平靜，金融市場震盪，外界關注金融穩定議題時，大陸人行前行長周小川會在今年博鰲論壇期間（三月底），提出要回到國際貨幣基金（ＩＭＦ）多邊框架下解決全球貿易失衡問題。大陸官方提倡ＩＭＦ改革並非新鮮事，周小川現場的發言，張力十足，牽扯出中西方數十年來在金融治理上的恩怨情仇，也散發出中美博弈的煙硝。周小川談及解決全球不平衡問題，要利用ＩＭＦ多邊框架機制，乍聽似乎是要擁抱ＩＭＦ的功能，但事實上，ＩＭＦ過去幾十年跟新興國家、亞洲地區國家的摩擦還在延續。\n\n期間伴隨中西勢力消長，美國在ＩＭＦ影響力逐步減弱，周小川則持續對ＩＭＦ改革發言，他二○二五年在陸家嘴論壇上直言，全球宏觀經濟調控處於「三無」狀態：沒有一個機構負責、沒有工具（特別提款權ＳＤＲ僅作為記帳工具）、沒有共識（美國有一票否決權）。他明確指出，按正式職責定義，ＩＭＦ沒有「全球央行」的角色，也沒有貨幣政策協調的角色。周小川在博鰲論壇上，再次呼籲全球應重拾ＩＭＦ的框架措施來解決全球失衡問題。\n\n但這句話背後，也暗示了當前ＩＭＦ框架在解決全球失衡（如貿易、投資、資本流動失衡）方面的失效。周小川諸多表態有如隱晦的博弈，許多觀點實際上是在批評由美國主導的ＩＭＦ體系，及美國的單邊主義政策。比如他在今年論壇批評美國自身面臨全球失衡，卻放棄傳統的匯率調節工具，轉而使用關稅手段。\n\n他認為關稅是棘手的問題，而應使用ＩＭＦ框架來解決。他也提到ＳＤＲ機制，認為它是解決全球失衡的潛在工具，但目前受限於美國的否決權，難以發揮作用。從這場論壇觀察全球局勢，多邊治理機制背後的大國角力依舊波濤洶湧。"}, {"title": "首批關稅退款 美預計5月11日發放", "source": "中國時報 AA02 焦點新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "在美國最高法院裁定美國總統川普的對等關稅違法3個多月後，關稅退款程序終於取得實質進展。根據美國國際貿易法院最新提交的命令，首批關稅退款預計將於5月11日前後正式開始發放，整體退款規模高達1660億美元（約新台幣5.3兆元），涉及全球超過33萬家進口商。負責監督退款程序的美國國際貿易法院法官伊頓（Richard Eaton）在命令中指出，目前約有21％依據「國際緊急經濟權力法」（IEEPA）徵收的關稅申報，已透過關稅退稅平台「CAPE」獲...", "full_text": "在美國最高法院裁定美國總統川普的對等關稅違法3個多月後，關稅退款程序終於取得實質進展。根據美國國際貿易法院最新提交的命令，首批關稅退款預計將於5月11日前後正式開始發放，整體退款規模高達1660億美元（約新台幣5.3兆元），涉及全球超過33萬家進口商。負責監督退款程序的美國國際貿易法院法官伊頓（Richard Eaton）在命令中指出，目前約有21％依據「國際緊急經濟權力法」（IEEPA）徵收的關稅申報，已透過關稅退稅平台「CAPE」獲准撤銷。\n\n截至4月26日，已有約174萬筆申報完成結算並進入最後退款程序。伊頓已安排於5月12日舉行聽證會，持續追蹤退稅的進度。儘管退款作業已啟動，但目前僅約3％的案件完成結算，後續將由美國財政部以電子款項方式發放。\n\n海關與邊境保護局（CBP）表示，符合條件案例在獲准後60至90天內會收到退款。然而，由於CAPE系統開發倉促，雖已有1330萬筆進口申報項目通過初步審查，但美國海關表示，約有15％的申請因格式錯誤或身分不符等因素遭到初審拒絕，律師提醒企業可修正錯誤後重新提交。在退款受益者中，汽車業與物流業首先受惠。\n\n福特汽車（Ford）預計將獲得13億美元退款，並因此上調年度獲利預期；通用汽車（GM）與斯泰蘭蒂斯（Stellantis）也分別預計回收5億美元與4億歐元。此外，優比速公司（UPS）與聯邦快遞（FedEx）也承諾，在收到政府退款後，將把原本轉嫁給消費者的關稅費用退還給客戶。\n\n值得注意的是，川普曾對尋求退款的企業發出警告，表示會「記住」那些申請退款的公司，並稱讚不尋求退款的企業「聰明」。對此，福特財務長強調，申請退款是為了保護股東利益的受託責任。"}, {"title": "阿聯退OPEC 川普稱有助壓低油價 美封鎖伊朗恐延數月國際油價劇震", "source": "中國時報 A02 焦點新聞", "cat": "國際經濟情勢", "priority": 0, "summary": "國際油價在荷莫茲海峽封鎖持續下急升，布倫特原油4月30日一度突破每桶126美元，川普則聲稱阿拉伯聯合大公國（UAE）退出OPEC有助壓低油價，但多方媒體均否定上述論點，認為當前油價仍由封鎖主導，阿聯短期內無法緩解供應緊張。美國總統川普28日會晤能源業高層時更透露，對伊朗封鎖可能延長數月。川普29日表示，美將續對伊朗實施海上封鎖，目前暫不打算解除。", "full_text": "國際油價在荷莫茲海峽封鎖持續下急升，布倫特原油4月30日一度突破每桶126美元，川普則聲稱阿拉伯聯合大公國（UAE）退出OPEC有助壓低油價，但多方媒體均否定上述論點，認為當前油價仍由封鎖主導，阿聯短期內無法緩解供應緊張。美國總統川普28日會晤能源業高層時更透露，對伊朗封鎖可能延長數月。川普29日表示，美將續對伊朗實施海上封鎖，目前暫不打算解除。\n\n市場對波灣能源恢復流動的期待迅速降溫，布倫特原油連續8個交易日上漲，創近4年來最長連漲紀錄，一度達126美元；西德州原油也觸及110美元。不過30日油價轉跌，布蘭特原油期貨下跌3%至每桶114美元，西德州原油期貨也下跌2%至104美元。\n\n另有白宮官員透露，川普28日會見多位石油業高層，稱美國可能將對伊朗的海上封鎖再延長數月。稍早，阿聯28日宣布5月1日退出OPEC。外界普遍解讀，阿聯此舉反映出與OPEC實質領袖沙烏地長期累積的矛盾。\n\n兩國近年在石油、政治、人才與資本等多處摩擦加劇，阿聯希望積極變現已擴充的石油產能，沙烏地則傾向限制產量維持油價穩定，兩國的長期目標顯著分歧。川普稱阿聯退出OPEC一事「很棒」，並認為有助降低國際油價。但彭博指出，現階段左右市場的仍是海峽能否重啟，幾乎沒有數據佐證川普的論點，例如阿聯宣布退出後，油價反而持續攀升並刷新 2022 年以來高點。\n\n阿聯退出短期無助緩解供應緊張，但長期會削弱OPEC調控油價的能力。國際能源總署統計，戰爭前阿聯每日原油產量約 340 萬桶，但實際產能高達 485 萬桶，並計畫 2027 年提高至每日 500 萬桶。阿聯能源部長表示，退出OPEC後，阿聯將能以更大彈性滿足全球能源需求。\n\n不過他也承認因海峽封鎖，短期市場不會因阿聯退出而明顯變化。但長期而言，美媒分析戰爭結束後，阿聯、沙烏地與美國等主要產油國可能為爭奪市占展開價格戰。BBC推測，沙烏地可用增產回應阿聯，阿聯雖經濟結構較多元，足以承受較低油價，但其他財政更依賴石油收入的OPEC成員未必能承受同等壓力。"}, {"title": "鮑爾任內最後一舞 利率連3凍 內部決策罕見分歧 華許接任後面臨更複雜的政策局面", "source": "中國時報 A06 財經綜合", "cat": "國際經濟情勢", "priority": 0, "summary": "美國聯準會4月29日宣布連續第3次維持利率不變，主席鮑爾在卸任前最後一場會議表示，當前利率已接近中性水準，仍須觀察通膨、油價與關稅影響。不過，本次會議共有4人提出異議，顯示內部對降息路徑的分歧明顯擴大，也讓華許接任後面臨更複雜的政策局面。聯準會宣布利率維持在現行3.5％至3.75％區間。", "full_text": "美國聯準會4月29日宣布連續第3次維持利率不變，主席鮑爾在卸任前最後一場會議表示，當前利率已接近中性水準，仍須觀察通膨、油價與關稅影響。不過，本次會議共有4人提出異議，顯示內部對降息路徑的分歧明顯擴大，也讓華許接任後面臨更複雜的政策局面。聯準會宣布利率維持在現行3.5％至3.75％區間。\n\n聯準會表示，當前貨幣政策合適，在通膨仍受關稅與能源價格影響時，沒有必要急於調整利率。這是鮑爾主席的最後一場會議，他將在5月15日卸任主席，但他表示在聯準會翻修工程的調查徹底結束前，將繼續留任聯準會理事。鮑爾表示，目前貨幣政策「處於非常好的位置」，可繼續等待更多經濟數據。\n\n他認為中性利率落在3％至4％之間，目前仍屬合理範圍。鮑爾將近期通膨歸咎於能源與關稅影響，承認能源漲價短期內會拉高通膨，但目前不足以讓聯準會立即改變利率。此次會議內部分歧明顯升高。\n\n共有4人對政策或聲明提出異議，是 1992年以來反對票最多的一次。其中，理事米蘭（Stephen Miran）主張直接降息；另3位地區聯準銀行總裁雖支持維持利率不變，但反對聲明保留暗示未來可能降息的措辭。\n\n在政治壓力方面，鮑爾警告，若貨幣政策受到政治干預，將對市場與經濟造成嚴重後果。他同時表示已向接任人選華許表達祝賀，並相信會有「正常、標準的過渡過程」。被問及華許能否抵禦白宮壓力時，鮑爾表示他相信華許的承諾。\n\n另一方面，華許的聯準會主席提名，已獲參議院銀行委員會通過，正式進入全院表決程序。委員會29日以13票贊成、11票反對，依兩黨人數通過提名。若最終獲參議院確認，華許將在鮑爾任期屆滿前接掌聯準會。\n\n華許為爭取提名，曾提出聯準會體制變革，包括縮表、修正通膨政策，以及調整與公眾溝通策略，不過尚未得知如何落實。民主黨對華許提名明確表示反對。參議員華倫警告，川普仍有意掌控聯準會貨幣政策，華許可能助長白宮干預聯準會獨立性。\n\n值得留意的是，華許的提名未獲任何民主黨人支持，是參院史上首次完全按黨派表決聯準會主席提名。相較之下，鮑爾先前兩次提名分別僅有1票反對。"}, {"title": "打破慣例 鮑爾留任聯準會理事惹議", "source": "中國時報 A06 財經綜合", "cat": "國際經濟情勢", "priority": 0, "summary": "美國聯準會主席鮑爾 4 月 29 日在任內最後一場會議後，明確表示主席任期結束後仍將留任理事捍衛機構獨立性，直到針對聯準會的法律調查「以透明且徹底的方式結束」。美國總統川普隨後發文嘲諷鮑爾「找不到工作」才留在聯準會；財政部長貝森特也批評鮑爾打破聯準會慣例，並違背他自稱重視的制度準則。", "full_text": "美國聯準會主席鮑爾 4 月 29 日在任內最後一場會議後，明確表示主席任期結束後仍將留任理事捍衛機構獨立性，直到針對聯準會的法律調查「以透明且徹底的方式結束」。美國總統川普隨後發文嘲諷鮑爾「找不到工作」才留在聯準會；財政部長貝森特也批評鮑爾打破聯準會慣例，並違背他自稱重視的制度準則。\n\n聯準會29日會後維持政策利率不變，主席鮑爾在記者會上表示，這是他作為主席任內的最後一次會議，但他將在5月15日主席任期屆滿後，繼續擔任聯準會理事。鮑爾目前仍是7名理事之一，理事任期至 2028年。按照聯準會制度，主席必須同時具備理事身分，但過去75年來每位主席卸任後，均辭去理事職務離開聯準會。\n\n針對司法部近期的刑事調查，鮑爾也明確表示，在調查完全結束前，他不會離開理事會。他認為這些行動已威脅聯準會不受政治干擾執行貨幣政策的能力，過去3個月的情況，讓他認為除了堅持外別無選擇。不過，他也試圖淡化自己留任後的影響，表示自己不會扮演「影子主席」，後續會保持低調，全力支持新主席。\n\n鮑爾在記者會多次談到聯準會獨立性問題。他表示，民選政治人物通常都希望低利率，因此分割貨幣政策與政治，是控制通膨的重要基礎。他也批評剝奪地方聯準銀行總裁投票權的提議，稱若是每屆政府都如此調整制度，就是聯準會獨立性的終點，最終變成內閣機構。\n\n川普則在會後晚間於社群平台發文，譏諷鮑爾留任理事的決定。川普寫道，「『遲到鮑爾』想留在聯準會，是因為他在外面找不到工作，沒人要用他」。其中「遲到」顯然是諷刺鮑爾遲遲不降息。\n\n川普過去已多次批評鮑爾，並以遲到或太慢形容其政策。財長貝森特也批評鮑爾卸任主席後續任理事的做法。貝森特接受福斯新聞訪問時表示，打破慣例的是鮑爾，而不是白宮。\n\n貝森特還表示，鮑爾留任等同羞辱其他由川普任命的聯準會理事，因為即使鮑爾離開，其他理事仍可以捍衛聯準會的獨立性。"}, {"title": "自由廣場》製造恐慌更傷農 零關稅不等於「滅農」", "source": "自由時報 A12 自由廣場", "cat": "社論與評論觀點", "priority": 0, "summary": "在台美對等貿易協定（ART）尚未生效之際，雲林縣長張麗善對美國花生可能的零關稅待遇，直接定性為「滅農」，此說不僅欠缺事實基礎，更在政策評價上構成明確誤導。直白而言，這不是審慎評估，而是以誇張敘事取代理性分析，對市場預期形成實質干擾。從制度面檢視，我國對花生長期採取關稅配額與特別防衛措施雙軌保護，並非毫無屏障的全面開放。", "full_text": "在台美對等貿易協定（ART）尚未生效之際，雲林縣長張麗善對美國花生可能的零關稅待遇，直接定性為「滅農」，此說不僅欠缺事實基礎，更在政策評價上構成明確誤導。直白而言，這不是審慎評估，而是以誇張敘事取代理性分析，對市場預期形成實質干擾。從制度面檢視，我國對花生長期採取關稅配額與特別防衛措施雙軌保護，並非毫無屏障的全面開放。\n\n即便未來特定來源產品降為零關稅，只要進口量達門檻，仍會啟動加徵機制抑制衝擊。因此，將「部分降稅」等同「產業崩解」，係屬過度推論，亦忽視既有的制度設計。再觀察市場結構，國產與進口花生並不存在完全替代關係。\n\n國產主攻鮮食市場，憑藉品質與新鮮優勢，市場占比約七十五％；進口來源多用於加工，以美國花生為例，占比不到一％。更關鍵的是，加工業者若改用外國原料，須調整製程且風險升高，替代誘因自然不足，據此判斷，短期內形成價格崩跌的條件並不存在。\n\n二〇一九年雲林「花生之亂」，當時並未出現制度性開放，卻因市場謠言與錯誤訊息擴散，導致價格迅速下滑。事後證明，價格波動並非源於進口衝擊，而是預期心理被操弄。此例清楚顯示，真正傷害農民的，往往不是政策，而是被放大的恐慌敘事。\n\n此外，過去美國火雞肉開放進口時，同樣出現這類論述，但結果顯示消費者仍偏好國產火雞肉，進口火雞肉僅補足特定用途，在產品特性與消費偏好差異下，進口與國產多呈現分工關係，而非全面競爭。綜上，將ART簡化為「滅農」，在制度、價格與市場三個層面皆難成立。此類說法是對市場預期的直接干預。\n\n農業需要保障，但應依賴制度與升級，而非情緒操作。當政治語言凌駕專業判斷，真正被犧牲的，終究是農民的長遠利益。"}, {"title": "自由廣場》證交稅可補健保財務 但不能代替改革", "source": "自由時報 A12 自由廣場", "cat": "社論與評論觀點", "priority": 0, "summary": "「台股救健保」聽來像替財務找到新財源，真正要問的是：健保永續能不能押在牛市上？政委陳時中提出以部分證交稅挹注健保，衛福部長石崇良表態樂見其成，確實點出健保長期倚賴薪資所得的結構壓力。但把這項構想說成能撐住未來廿年，可觀的稅收數字就可能蓋過改革責任。", "full_text": "「台股救健保」聽來像替財務找到新財源，真正要問的是：健保永續能不能押在牛市上？政委陳時中提出以部分證交稅挹注健保，衛福部長石崇良表態樂見其成，確實點出健保長期倚賴薪資所得的結構壓力。但把這項構想說成能撐住未來廿年，可觀的稅收數字就可能蓋過改革責任。\n\n支持多元財源並非問題。高齡化、少子化讓工作人口減少，醫療支出又持續上升；健保若主要靠受薪者保費維持，本就不公平。\n\n資本市場交易熱絡時，將部分稅收用於健保，有其正當性。但這筆錢只能減輕財務壓力，不能取代健保改革。關鍵在於財源是否穩定。\n\n證交稅是波動稅收，不是穩定保費。台股成交旺盛時，稅收看似充裕；市場轉弱時，財源也會減少。\n\n就醫需求、藥費、醫護人力與醫療品質，不會因交易量下降而同步下降。把不會跟著市場降溫的支出綁在波動財源上，最容易讓股市熱絡時的稅收遮住制度問題。財政紀律也不能被輕描淡寫。\n\n政府若每年透過預算撥補，立法院仍可審查用途與成效；若改成固定比例提撥既有稅收，甚至讓稅收變相專款專用，就會碰到現行財政紀律法的限制。健保要永續，不能把預算審查與財政紀律當成次要問題。\n\n更要警惕的是改革被往後推。額外財源若來得太順，保費負擔公平、醫療點值穩定、醫護待遇與醫療支出控管，真正該處理的改革，反而可能被擱下。證交稅若要挹注，就應明定用途、公開流向，優先用於穩定醫療品質，而不是變成掩蓋制度問題的財務止痛藥。\n\n健保永續不能只是再找一筆錢補上，而是要重建誰負擔、誰受益、誰監督的制度平衡。牛市可以替健保爭取時間，但改革不能交給股市完成！"}, {"title": "AI再怎麼能幹 也不該取代大腦 因為AI便利，現在很多人做事都不經過大腦，每每剪貼了事，險誤大事 創造力是一個人最重要的能力，原創性也是一件作品最珍貴的地方 如何平衡科技與人性，是現代教育政策制定者一定要去深思的事", "source": "聯合報 A14 論壇", "cat": "社論與評論觀點", "priority": 0, "summary": "現在網路上假訊息很多，很多人認為好東西要跟好朋友分享，便好心轉發出去；結果朋友因相信你，買了無益的補品，或吃了有害的偏方，反而怨你。所以我勸學生，不要做吃力不討好的事，轉發訊息前，先確定它是不是ＡＩ製作的假訊息，免得為虎作倀。", "full_text": "現在網路上假訊息很多，很多人認為好東西要跟好朋友分享，便好心轉發出去；結果朋友因相信你，買了無益的補品，或吃了有害的偏方，反而怨你。所以我勸學生，不要做吃力不討好的事，轉發訊息前，先確定它是不是ＡＩ製作的假訊息，免得為虎作倀。\n\n舉了幾個真實的例子後，學生果然小心了。但我沒想到，他們竟然矯枉過正，明明是真的，卻因不符合他們的預期或過去經驗，也存疑。例如有學生問：老師，康乃爾大學不是美國長春藤的名校之一嗎？\n\n他們的教授腦子應該沒有進水吧？為什麼會在課堂裡要求學生用打字機寫作文？是打字機，不是打印機喔。\n\n打字機不是那個博物館裡陳列的東西嗎？為什麼人類已經會走了，還要叫他回去爬？原來這是該校的一堂語文課，授課老師發現學生都依賴 ChatGPT 和線上工具來寫作文，雖然詞彙豐富，文法正確，甚至沒有錯別字，但它缺少了他們自己的思考與表達；\n\n沒有了原創性，作品就沒有了靈魂。所以她要求學生在課堂上不得用電腦打字，不可上網查資料，當場完成一篇作文。她要學生真正了解書寫與思考的本質。\n\n我很贊同這位老師的做法。因為ＡＩ的便利，現在很多人做事都不經過大腦，每每剪貼了事，常常牛頭不對馬嘴，險誤大事。心理學早有實驗發現，新知識若沒有經過反覆的思辨並與舊知識組織在一起，就不可能成為永久性的知識。\n\n短期記憶中的東西，若沒有經過思考，廿秒後便煙消雲散了。這位老師深知人性是好逸惡勞，既然有ＡＩ代勞，學生又怎可能不用？便想透過打字機，強迫學生慢下來思考他要說的話。\n\n老式打字機不能像電腦一樣，打錯字退回去修改，打錯只能用橡皮擦掉，如果打錯三個字以上，紙張塗改難看，就只好丟掉重來。果然，學生發現不能隨意的改動文字後，他們變得謹慎，先認真思考自己要說的話，想好了再打上去，謀定而後動，不然損失的是自己。因為寫出來的自己的話，不是別人的牙慧，作文課因此變得有意義了。\n\n過去也曾經有個實驗，上課時要求一半的學生用手抄筆記，另一半用打字，下課前十分鐘，請他們把今天上課的內容盡量回憶出來。結果發現手寫組的成績比打字組好。因為手寫時，語音要先轉換成語意，還要透過肌肉對字母的記憶把字寫出來，訊息在腦中處理的時間比打字組聽音按鍵的自動化歷程長，留下來的痕跡比較深，記憶的成績便比較好了。\n\n在數位工具日益主導學習模式的今日，康乃爾大學的這堂課提醒我們不要忘記教育的目的與初衷，科技提升效率，卻也削弱了人類最基本的思考與表達能力。創造力是一個人最重要的能力，原創性也是一件作品最珍貴的地方，別人的話，不管有多悅耳，它不是你的話。當一篇文章百分之九十都是別人的話時，這篇文章還有讀的必要嗎？\n\nＡＩ再怎麼能幹，它不該取代我們的大腦。如何平衡科技與人性，是現代教育政策制定者一定要去深思的事。"}, {"title": "勞工、雇主同時上街頭 示警制度結構性問題 雇主日 不是對立是補缺失", "source": "聯合報 A14 論壇", "cat": "社論與評論觀點", "priority": 0, "summary": "理事長張姮燕（高雄市）今年五月，台灣將出現一個值得嚴肅看待的現象：勞工與雇主同時走上街頭。這不是單一族群的抗議，而是台灣在經濟快速發展與產業轉型過程中所建立的制度，在現實壓力下已出現結構性問題。當原本被視為制度承擔者的雇主，都必須站出來爭取「平權」，代表問題已經不再是個別政策爭議，而是整體體系的失衡。", "full_text": "理事長張姮燕（高雄市）今年五月，台灣將出現一個值得嚴肅看待的現象：勞工與雇主同時走上街頭。這不是單一族群的抗議，而是台灣在經濟快速發展與產業轉型過程中所建立的制度，在現實壓力下已出現結構性問題。當原本被視為制度承擔者的雇主，都必須站出來爭取「平權」，代表問題已經不再是個別政策爭議，而是整體體系的失衡。\n\n在勞動節隔天訂為「雇主日」不是在飆創意，而是反映台灣引進移工卅年來，已迫切需要從「雇主角度」重新檢視移工制度。這場行動的意義，不在於對抗，而在於補上長期遺失的一塊拼圖。過去台灣討論移工，多半集中在勞工權益，這固然重要，但當制度建立在單一視角之上，忽略實際承擔責任與風險的一方，失衡就成為必然。\n\n雇主日提醒一個最基本的問題：沒有雇主，何來移工？沒有產業支撐，何來就業？沒有穩定照護，又何來安老社會？\n\n何況在聘僱關係中，看護工的雇主多為一般勞工家庭，而漁船船東本身也是第一線漁民。台灣在少子化、超高齡化與人才外流壓力下，穩定勞動力是維持競爭力的關鍵。因此問題從來不是「要不要移工」，而是「什麼樣的制度，才能讓這套體系正常運作」。\n\n一個健康的制度應能留下穩定履約的勞動者，同時淘汰不適任或長期破壞制度運作者，而不是讓風險長期堆積在雇主與整體社會之上。移工制度更深層的問題，在於缺乏「台灣優先」的基本原則。任何國家的勞動政策，都必須先回應本國社會的承受能力。\n\n然而台灣長期以來，制度設計高度回應外部壓力，卻對本國勞工與雇主的處境回應不足。這樣的失衡，已在多個面向顯現。從就業安定基金使用不透明，到移工安置制度的法律模糊，再到逃逸與黑工問題的持續擴大，都顯示制度已出現質變。\n\n當成本不斷上升、責任不斷加重，但風險卻沒有相應分攤，制度自然難以長期維持。在此脈絡下，社會也必須誠實面對一個敏感但無法迴避的問題：勞保與健保等社會保險制度，應更清楚區分公民與非公民的權利與義務。這並非歧視，而是制度設計的基本邏輯。\n\n不同身分本應對應不同責任、貢獻與保障，若界線不清，將加劇有限資源分配的爭議，並削弱制度正當性。回到制度核心，「就業服務法」從一九九二年制定以來，以單一架構涵蓋不同產業與勞動型態，並以同一法源適用性質差異甚大的看護工、產業工、農業工、漁工等工種，卅多年來卻只見片段式修補法條。當前問題已非單一修法可解，而是必須重新檢視整體設計，使制度能同時保障外籍勞工、支持本國勞工，並讓雇主有能力承擔且願意持續參與。\n\n雇主日的出現，不是對立的開始，而是警訊的出現。當雇主走上街頭，不是否定移工制度，是提醒制度若持續失衡，最終將無法保障任何一方。台灣需要外籍勞動力，但更需要一套能長期運作、兼顧公平與現實的制度。\n\n若改革仍停留在片段調整與口號回應，制度與現實的落差只會持續擴大。沒有雇主，就沒有制度的基礎；當基礎動搖，改革就不再是選擇，而是必要。"}, {"title": "落實尊嚴勞動 從政府做起", "source": "聯合報 A14 論壇", "cat": "社論與評論觀點", "priority": 0, "summary": "水（台北市）今天五一，也是台灣社會首次迎來全民放假的勞動節，這是去年「紀念日及節日實施條例」三讀通過後，終結一國兩制放假亂象的勞動平權里程碑。然而，社群平台上卻湧現家長的集體失落，哀嘆「專屬休息日沒了」、「跟一般周末沒兩樣」，這股情緒看似源於個人行程被打亂的抱怨，實則暴露了台灣社會對勞動與假期的深層誤解。回顧整個修法過程，政府部門消極不作為，一再以社會未達共識搪塞，不願運用行政權力促成公共對話以縮小認知差距，其效果正是延續價值混亂，執政...", "full_text": "水（台北市）今天五一，也是台灣社會首次迎來全民放假的勞動節，這是去年「紀念日及節日實施條例」三讀通過後，終結一國兩制放假亂象的勞動平權里程碑。然而，社群平台上卻湧現家長的集體失落，哀嘆「專屬休息日沒了」、「跟一般周末沒兩樣」，這股情緒看似源於個人行程被打亂的抱怨，實則暴露了台灣社會對勞動與假期的深層誤解。回顧整個修法過程，政府部門消極不作為，一再以社會未達共識搪塞，不願運用行政權力促成公共對話以縮小認知差距，其效果正是延續價值混亂，執政者這種坐收政治安全的態度，與其說是尊重多元意見，不如說是典型的威權心態—「你們自己吵，吵完再告訴我」。\n\n同樣消極卸責的就是軍公教調薪機制。近來政府不斷大外宣：台灣人均ＧＤＰ創新高、遠甩日韓，殊不知，經濟確實大幅成長，卻也同時見證一個荒謬的現實，撐起國家運作骨幹的軍公教，淪為繁榮景象下的實質新貧。過去十年人均ＧＤＰ飆升百分之九十三點二，但軍公教待遇累計調幅僅百分之十四點七，不到國家成長率的六分之一。\n\n其實，問題的關鍵不在於「這次調多少」，而在於「憑什麼這樣調」、「誰決定的」、「標準是什麼」。長期以來，軍公教待遇審議委員會的決策過程猶如黑箱，調薪與否、幅度多寡，全憑政治氛圍與行政院長裁決，缺乏與經濟成長率、物價指數、民間薪資水準連動的科學公式。更諷刺的是，當工會團體屢次呼籲應比照最低工資審議委員會，將基層軍公教代表納入待遇審議機制時，政府部門仍以「二者功能任務及性質明顯不同」為由斷然拒絕。\n\n至於攸關公教人員退休金永續的撥補問題，同樣令人憤慨。二○二三年公教人員改採個人專戶制後，相關法律均明定政府應依退撫基金財務精算結果，先行撥補新制退撫財務缺口。但三年來政府對撥補消極以對，已連續三年短編。\n\n依最新公布的退撫基金第九次精算報告，十年撥補較廿年可為國庫省下七五○億元，政府卻執意採取總花費更多且明顯不利於基金財務永續的撥補方案。這種違反常識的選擇，若非專業能力令人質疑，便是根本不在意自家員工的退休金永續。政府不僅是全民的政府，更是公教人員的雇主。\n\n從勞動節修法的消極以對，到調薪機制的黑箱作業，再到退休金撥補的消極作為，我們看到的是主其事者以最少政治成本，換取最大選舉利益的謀算。相較之下，勞動者的尊嚴、國家制度的透明、員工退休基金的永續，從來不在優先順序的前列。今年五一勞動節，我們終於不必再問「誰的假期」，但「誰的勞動被看見、誰的勞動被犧牲」卻始終是追求尊嚴勞動須追問的嚴肅課題。\n\n只有當政府主動扛起促成對話、揭露結構、保障弱勢的責任；只有當軍公教調薪制度化、透明化依法調整；只有當退休金撥補依據精算數據確實執行，那一天的勞動節才不只是假期，是社會尊重勞動的開始。"}, {"title": "AI紅利正在抵消能源衝擊", "source": "中國時報 A10 時論廣場", "cat": "社論與評論觀點", "priority": 0, "summary": "教授莊奕琦美伊戰爭爆發後，國際油價突破每桶 100 美元，全球能源供應受阻，通膨壓力升高。根據 IMF《世界經濟展望》2026年報告，全球GDP成長率已下修至3.1％，若衝突延續至2027年，油價可能再飆升，全球經濟恐將陷入困境甚至衰退。傳統上，這樣的能源衝擊往往導致股市下跌。", "full_text": "教授莊奕琦美伊戰爭爆發後，國際油價突破每桶 100 美元，全球能源供應受阻，通膨壓力升高。根據 IMF《世界經濟展望》2026年報告，全球GDP成長率已下修至3.1％，若衝突延續至2027年，油價可能再飆升，全球經濟恐將陷入困境甚至衰退。傳統上，這樣的能源衝擊往往導致股市下跌。\n\n然而，美股卻逆勢上漲，標普500自戰爭爆發後的低點反彈逾 8％，相較戰前水準約上升2％，顯示市場不僅收復跌幅，更持續走高；科技股領漲，Nvidia、Amazon等公司市值創新高，這一現象揭示全球經濟的新邏輯：AI生產力革命正在抵消能源衝擊的負面效應。首先，從需求面來看，高油價理論上會壓抑消費，降低總需求。\n\n然而，AI應用的擴張卻創造了新的需求。生成式 AI、雲端運算、AI 晶片的快速普及，使得企業與消費者在數位領域的支出持續增加。投資人普遍相信，AI將帶來長期效率革命，這種「結構性需求增長」抵消了能源衝擊下的消費疲弱。\n\n其次，從供給面來看，戰爭造成能源供應受阻，企業成本上升，理應壓縮獲利。但AI技術的導入提升了生產力，降低了營運成本。美國大型科技企業憑藉全球定價能力與雲端生態系，能夠在成本上升時維持高毛利。\n\n台積電董事長魏哲家更指出，AI晶片需求結構性增長，產能緊繃，摩爾定律延伸至系統層級效能，顯示科技供給面正在成為新一輪經濟支柱。需求面與供給面的交互作用，形成了新的市場邏輯：能源衝擊雖然存在，但AI紅利正在抵消其負面影響，甚至推動股市逆勢上漲。在短期內，油價飆升帶來通膨壓力，消費受到抑制。\n\n然而，避險資金流入美股，加上AI需求爆發，使得股市仍能上漲。投資人認為，聯準會不會因短期能源通膨而大幅升息，這種「理性預期」支撐了市場信心。在中期，如果油價持續高檔，停滯性通膨風險將浮現。\n\n企業成本上升，獲利可能受損。但AI提升效率，科技股獲利上修，能源與科技形成雙軸市場，傳統產業震盪，科技股領漲。在長期，若戰爭延續，全球增速下滑，經濟結構將面臨挑戰。\n\n然而，AI生產力革命可能推動全球供應鏈重組，美國與台灣半導體產業成為新核心。若AI紅利持續釋放，全球可能進入「低增長、低通膨、高效率」的新常態，經濟結構由能源驅動轉向科技驅動。聯準會面臨兩難：若油價持續居高不下，通膨壓力迫使升息；\n\n但 A I提升生產力，降低成本，使央行有更大政策空間。結果是升息壓力與生產力紅利的拉鋸。若聯準會忽視能源通膨，可能損及信譽；\n\n但若過度緊縮，可能壓抑AI投資與科技紅利。因此，政策需在抑制通膨與維持成長間取得平衡。這種政策挑戰，正是未來全球經濟治理的核心難題。\n\n美伊戰爭揭示了全球經濟的轉折點：能源衝擊不再必然導致股市崩跌，因為AI與科技紅利正在重塑市場韌性。未來的全球經濟將是一場「人工智能與能源的角力」，決定全球新秩序的走向。"}, {"title": "《社論》歡慶勞動節—政策美意盼落實", "source": "工商時報 A02 火線焦點", "cat": "社論與評論觀點", "priority": 0, "summary": "2026年5月1日勞動節終於再度成為國定假日，勞動尊嚴與價值不再因從業身分而有所差異；對於投入生產要素的廣大勞工而言，也不再因勞保與公保身分不同，或公職人員、教師與勞工之別，而受到差別待遇。然而，勞動節雖恢復為國定假日，勞工整體處境卻更趨嚴峻。", "full_text": "2026年5月1日勞動節終於再度成為國定假日，勞動尊嚴與價值不再因從業身分而有所差異；對於投入生產要素的廣大勞工而言，也不再因勞保與公保身分不同，或公職人員、教師與勞工之別，而受到差別待遇。然而，勞動節雖恢復為國定假日，勞工整體處境卻更趨嚴峻。\n\n首先，2025年人工智慧（AI）的快速發展，以及對等關稅（包含232條款等）之課徵，使國內產業K型化發展日益明顯。例如，電子資通產品占總出口比重於2026年第1季創新高，達78.44％，其餘產業則萎縮至 21.56％，更加凸顯產業結構失衡趨勢；而位於下行端的傳統產業，因營運低迷，使從業勞工處境更形困難。\n\n例如，勞雇雙方協商減少工時的情形，近期低點出現在對等關稅實施前的2025年3月底（123家、實施人數1,989人），其後逐季攀升，至11月底已達456家、9,153人。雖然K型化發展並非臺灣所獨有，因全球化與產業發展失衡，部分國家呈現此一趨勢，但其影響往往集中於特定勞工族群，對社會的衝擊更值得關注。觀察後疫情時期，台灣失業率多低於4.0％（僅2021年5月至8月間，受疫情與畢業季影響，失業率短暫高於4.0％），已接近自然失業率，呈現充分就業狀態。\n\n然而，幾乎各行各業仍普遍反映缺工問題，且其樣態呈現分化：傳統產業式微部門與勞力密集型服務業多面臨招工困難，因而仰賴建教合作與外籍生作為替代人力員難以即時成為戰力；至於一線科技大廠，雖人才來源穩定，但在少子化影響下，「新鮮肝」仍顯不足。另一方面，壯齡與中高齡勞工多因技能落差、職場文化適應及勞動條件限制，轉職不易。\n\n自21世紀以來，台灣與歐美國家相似，在職業分化與產業轉型趨勢下，勞工流動率呈現下降，即使轉職，多以同業內移動或轉向服務業部分工時為主，較難累積技能與人力資本。為積極延展並開發優質勞動力、保障勞工生活，台灣自2020年後陸續施行多項新制，包括2020年施行之《中高齡者及高齡者就業促進法 》、2022年施行之《勞工職業災害保險及保護法》，以及2024年上路之《最低工資法》等。此外，自2026年初起，行政院推動「育嬰留職停薪彈性化措施」，放寬育嬰留停申請方式，得以30日額度按「日」為單位使用；\n\n家庭照顧假亦可改以「小時」計算（全年56小時）。考量我國30人以下企業占比逾97％，為避免雇主負擔過重及衍生隱性歧視與勞資關係緊張，政府並提供小微型企業經濟支持：凡勞工申請1日育嬰留停，雇主可獲得定額獎勵金1,000元。此類政策除促進工作與生活平衡、營造友善職場外，亦有助於提升員工留任率，並改善職務代理與責任分工，具有多方受益之潛力。\n\n然而，政策推動往往伴隨非預期效果。例如，過去50年來臺灣女性勞動參與率隨教育提升、性別平權意識及職場環境改善而顯著上升，但在配套措施不足、制度彈性與支持仍有限的情況下，反而為生育率持續下降形成結構性張力的主要原因之一。此外，在當前國際局勢動盪之際，企業營運面臨內外多重挑戰，包括中東戰事推升能源價格，以及關稅政策未定等不確定性風險。\n\n彈性化措施原意良善，但勞工是否終將受制於企業文化、績效壓力等隱性因素，而形成「看得到卻不敢使用」的情況，或僅限於公部門及大型企業員工得以適用，其政策實際效益仍有待觀察。"}, {"title": "社論/Fed鬥爭暗潮趨向白熱化", "source": "經濟日報 A02 話題", "cat": "社論與評論觀點", "priority": 0, "summary": "美國聯準會（Fed）29日會議決定維持利率不變，不僅完全符合預期，而且這項利率決策竟然淪為配角。各界關注的焦點轉到這次會議投下的兩枚震撼彈；其一是現任主席鮑爾保證他在5月15日主席任期屆滿後將繼續留任理事，其二是有三位決策委員反對Fed在會後聲明中出現暗示「降息」。", "full_text": "美國聯準會（Fed）29日會議決定維持利率不變，不僅完全符合預期，而且這項利率決策竟然淪為配角。各界關注的焦點轉到這次會議投下的兩枚震撼彈；其一是現任主席鮑爾保證他在5月15日主席任期屆滿後將繼續留任理事，其二是有三位決策委員反對Fed在會後聲明中出現暗示「降息」。\n\n這將使下任主席華許對Fed進行「體制改變」的願景面臨重大障礙，而他的降息主張在短期內也將難以落實。鮑爾在會後記者會上保證他在主席任滿之後，將留任理事「一段期間」，此舉打破 Fed數十年來主席卸任後便同時走人的慣例。但慣例並非法律，鮑爾依法有權留任；\n\n何況川普一再攻擊Fed的獨立性，早已打破總統與Fed之間的傳統關係。鮑爾決定留任理事至少有四點原因。第一，也是最重要的，就是提出調查案檢察官皮羅雖已撤回對鮑爾的刑事調查，但她表示未來仍可能重啟調查，代理檢察長布南奇也暗示這項調查仍然存在。\n\n這都顯示鮑爾完全離開 Fed的「最低門檻」並未得到滿足。第二，鮑爾留任，讓他有時間評估華許如何捍衛Fed的獨立性；第三，阻擋川普再任命一位理事；\n\n第四，為其他理事創下一個不在任期屆滿之前就離職的範例。鮑爾留任，Fed將出現先、後兩任主席同時出席決策會議的尷尬場面，而且川普政府必然將繼續猛烈攻擊鮑爾。但以鮑爾綿裡藏針的行事風格，加上律師背景，應可坦然以對，並伺機反擊。\n\n鮑爾留任的直接效應，就是現任的「川派」理事米倫必須離職，為華許空出理事（兼主席）位置。儘管現任理事沃勒與鮑蔓都是川普在第一任期時所任命，但兩人與川普的淵源並不深，沃勒最近更警告「伊朗戰爭使美國經濟面臨通膨震撼風險」。如此一來，華許上任後很可能淪為「光桿司令」，難以拆毀 Fed的既有體制，以及開革地區性聯準銀行總裁的可能性。\n\n華許接到的第二枚震撼彈，就是這次會議中有三位委員投下「異議」票。他們並非反對利率不變，而是主張將會後聲明中暗示Fed偏向「降息」的字眼刪除。這幾個字意思是「在考慮額外的調整幅度與時機時（Inconsidering the extent and timing of additional adjustments）」，表面上看似乎是「中性」，但由於之前都是降息，因此「額外」便是在暗示利率偏向下降；\n\n如果刪除，就意味Fed下一步是降息與升息的機率相當，因為中東戰爭使能源價格大幅上漲，對通膨造成重大威脅。如果政策聲明做出此種改變，等於是暗示降息已經出局，本身就會使金融情勢變緊。這次多數官員雖還不準備做出如此偏向「鷹派」的動作，但至少顯示華許就任後將遭遇重大的降息阻力。\n\n最後再看華許的政策主張。金融市場普遍認為華許一向屬於「鷹派」，現在卻因為政治原因而變成「鴿派」。但是這顯然忽略了華許低利率政策架構中最重要的一點，就是華許一直偏向「供給面」，認為人工智慧（AI）等新科技將帶動生產力及經濟成長大幅提升，既導致通膨下降，並且使勞動市場出現「創造性毀滅」，失業激增，因此可能需要寬鬆的貨幣政策。\n\n目前美國經濟成長依然熱絡，但就業卻明顯降溫，與華許的思維若合符節。另一方面，為顧及通膨，華許主張縮減Fed的資產負債表規模，作為降息的交換條件。華許是「貨幣學派」的信徒，認為通膨是貨幣供給過多所致，因此以縮表作為釜底抽薪的工具。\n\n目前Fed既維持利率不變，但同時又重新買進公債，兩種作法顯然相互矛盾。不過他這項主張不僅在Fed內部可能遭到抵制，也會引起大銀行的反對，因為縮表將使金融情勢變緊。總之，華許5月即將就任主席，鮑爾卻留任理事不走，加上Fed內部「鷹派」勢力抬頭，以及川普政府勢必將繼續攻擊鮑爾；\n\nFed的內鬥與外鬥都將趨向白熱化，貨幣政策出現錯誤的風險也將升高。"}, {"title": "社論》在野以拖待變 等「解放軍準備好了」？", "source": "自由時報 A02 焦點新聞", "cat": "社論與評論觀點", "priority": 0, "summary": "立法院正在審議的「國防特別條例草案」，攸關台灣能否加快腳步，建構更完整的不對稱戰力。行政院去年十一月提出一兆二千五百億元版本後，藍白兩黨幾乎週週聯手阻擋排審。直到國內民意反彈、美國行政與國會部門公開敦促，國民黨與民眾黨才分別提出三千八百億與四千億元版本交付審議。", "full_text": "立法院正在審議的「國防特別條例草案」，攸關台灣能否加快腳步，建構更完整的不對稱戰力。行政院去年十一月提出一兆二千五百億元版本後，藍白兩黨幾乎週週聯手阻擋排審。直到國內民意反彈、美國行政與國會部門公開敦促，國民黨與民眾黨才分別提出三千八百億與四千億元版本交付審議。\n\n然而，這項不足十條條文的法案，朝野黨團已歷經三度協商，進度依舊牛步，下週能否通過充滿變數。雖然部分國民黨立委主張將預算提高至八千億元，與黨中央意見相左，但尚未形成有力的集體主張，與政院版仍有明顯差距。當中共加速挑釁印太區域，我們提升國防戰力的時間極為急迫。\n\n在野黨從阻擋到拖延，如今又陷入內部喬不定的戲碼，令人質疑是否刻意「以拖待變」，企圖讓軍購案胎死腹中。賴清德總統去年推出國防特別預算案，藍白攻訐不斷，但多屬誤導。其中最大謬誤，是在野黨堅持必須先有美國軍售「發價書」，才能展開條例與預算審議。\n\n然而，發價書並非一般商業往來的報價單，而是美方同意供售的正式文件。軍購流程是我方先遞交「要價書」，表達採購意願並了解價格；待美方完成審查並決定供售後，才會發出「發價書」。\n\n換言之，一旦收到發價書，便代表進入付款階段。此次美方供售的海馬士多管火箭系統，就因國防特別條例在立法院遭卡，導致首期款無法支付，還出現由美方先代墊的尷尬情形。在野黨將「收到發價書」作為審議預算的必要條件，等於預示未來軍購款項都可能延遲。\n\n一旦個案變成通例，軍購將屢屢陷入簽約後卻無錢支應的窘境，甚至迫使軍方連提出「要價書」都趨於保守，等於實質阻擋未來的軍購。這既傷害台美關係，更讓國際懷疑我們的自我防衛決心。藍白另一項謬誤，是反對特別預算涵蓋國防自主、台美研發合作等約三至四千億元的「商購」、「委製」項目，要求回歸年度預算編列。\n\n這部分正是行政院版八年一兆二千五百億元的重要拼圖，透過規模化與穩定性的預算支應，結合國內外廠商建構「台灣之盾」，並打造「非紅供應鏈」。美方對此亦給予肯定與支持。然而，在野黨無視年度預算僅剩不足百億元的編列空間，執意不讓納入特別預算。\n\n國民黨主席鄭麗文甚至嗆說「死了這條心」。從烏俄戰爭到伊朗戰事，一再證明無人機等載具在戰場上的關鍵作用，專家更強烈建議我們應加速產製與購買，在台海防衛構築「地獄景象」，嚇阻共軍入侵。面對中共正大量生產無人載具，我們必須以更快速度應對。\n\n反之，對美軍購延宕，國防自主遭封殺，國防準備敵快我慢，差距勢必愈來愈大。助長中共謀台野心，將使台灣更陷危機。立法院長韓國瑜已經主持三次朝野協商，幾乎原地打轉。\n\n韓本週一協商原擬挑燈夜戰，結果不到三十分鐘便宣布散會。此外，為了擋下部分藍委推動八千億元版本，鄭麗文週二接受專訪先行定調，週三再聯手國民黨團總召傅崐萁，試圖在黨團大會強壓黨籍立委接受黨中央堅持的三千八百億版本。黨副主席更警告韓國瑜莫「賣黨求榮」，推其他提高預算的版本。\n\n國民黨內的軍購之亂很熱鬧，但不同於黨中央路線的藍委，至今尚未展現集體性的反制作為，替代版本也仍保守，未如政院版反映台灣的防衛需求。鄭麗文赴中見到習近平，宛如獲得紅色加持，對軍購案從阻擋到拖延，再強行拉回被批評為「閹割版」的杯葛立場，協商進度回到原點。藍營內鬥戲碼不斷，軍購案卻毫無進展，令人懷疑這正是「以拖待變」的策略。\n\n美國總統川普與習近平的「川習會」預計五月中旬登場。鄭麗文先前赴中「求和」，再到延宕國防特別預算案，正好成為習近平在美中談判桌上的籌碼。當台灣呈現給國際社會是不願積極承擔自我防衛責任的形象，勢必增加中共向美國遊說減少對台軍售或調整台海政策的機會。\n\n在野黨經常說台灣不該成為美中之間的交易棋子，但如今的拖延，反倒更像是「自我實現的諾言」。中共正利用媚中的鄭麗文在國會牽制兩個在野黨，進而鼓吹台灣減少防務才能換取台海和平的謬論。正如某位退役艦長近日登上共艦，竟跪舔著說「看到解放軍在進步，不會腿軟」、「看艙內整潔和文宣品，就知道解放軍準備好了」。\n\n貶低自己、誇耀敵人，正是部分在野人士的嘴臉。如今藍白對軍購案以拖待變，敵長我消，難道真要等到「解放軍準備好了」才甘心嗎？"}, {"title": "社論/雙重剝削：農產對美門戶洞開，對陸緊閉大門", "source": "聯合報 A02 焦點", "cat": "社論與評論觀點", "priority": 0, "summary": "繼放寬發芽馬鈴薯進口後，美國花生又將挾著「零關稅」及「豁免特別防衛措施」（ＳＳＧ）雙重利刃大舉攻台，而這不過是賴政府口中「漂亮全壘打」的台美對等貿易協定（ＡＲＴ）中的一道「前菜」。農民一方面要承受低價農產傾銷衝擊，另方面又因賴政府的意識形態作祟對大陸緊閉大門，失去潛在的廣大市場。一放一收間，形成了雙重剝削，全是賴政府政治凌駕民生種下的惡果。", "full_text": "繼放寬發芽馬鈴薯進口後，美國花生又將挾著「零關稅」及「豁免特別防衛措施」（ＳＳＧ）雙重利刃大舉攻台，而這不過是賴政府口中「漂亮全壘打」的台美對等貿易協定（ＡＲＴ）中的一道「前菜」。農民一方面要承受低價農產傾銷衝擊，另方面又因賴政府的意識形態作祟對大陸緊閉大門，失去潛在的廣大市場。一放一收間，形成了雙重剝削，全是賴政府政治凌駕民生種下的惡果。\n\nＡＲＴ二月間正式簽署時，賴政府高調宣傳成功爭取調降對等關稅，且有二六一項農產品豁免對等關稅，卻對一四八二項零關稅、卅一項調降至特定稅率的農產品輕輕帶過。美國貿易代表署三月底發布《各國貿易評估報告》，其間揭露賴政府對美全盤讓步、任憑予取予求的真相，甚至不惜犧牲食安與產業，大舉放寬美豬美牛及馬鈴薯、花生的進口標準。根據新規，進口美國馬鈴薯若發現發芽，無需整批退運，可送至指定加工廠進行選別後再製成食品。\n\n至於如何處理發芽馬鈴薯，衛福部與農業部不僅毫無章法，官員還在國會殿堂上演互踢皮球的難堪戲碼。行政院長卓榮泰更做出「逐顆檢查」的承諾，遭部屬打臉，外界訕笑。從官員到閣揆，一路失格。\n\n更可議的是，早在ＡＲＴ簽署前一周，農業部二月六日就公告訂定「美國產加工用馬鈴薯輸入檢疫條件」。亦即，合約尚未簽訂，農業部已忙著配合美方修改檢疫規定。這種毫無尊嚴的「配合度」，令人瞠目結舌。\n\n繼馬鈴薯後，美國花生也挾零關稅與豁免特別防衛機制雙利器兵臨城下，農業部的回應仍荒腔走板。農業部先稱，美國進口花生僅占進口一％，衝擊不大。問題是，目前美國去殼花生每公斤八十五．五元，約為本土花生一五○至一六○元價格之半，而此價格是計算配額內稅率與權利金的結果。\n\n若去除關稅及ＳＳＧ的雙重保護，美國花生到岸價格僅四十七元，為本土價格的三分之一。就連綠委都坦言，「吃習慣後，就不是只有一％」。面對如此劇烈的衝擊，農業部輕描淡寫在前，然後才匆忙提出輔導農民轉作、推動濕莢交易配套，除不切實際，更是緩不濟急，顯示農業部事前根本毫無因應方案。\n\n國內近九成花生均來自雲林，縣長張麗善憂心此舉將「滅農」；陳駿季竟稱，張麗善是「唱衰台灣、為選舉炒作」。農業部失職在先，還以政治性操作攻擊為農民發聲的縣市首長，目的只在掩飾自己的不作為。\n\n事實上，接下來還有更多美國低關稅或零關稅農產品將陸續叩關，依農業部這樣的態度，「滅農」之說絕非危言聳聽。另一方面，由於兩岸關係緊張，大陸幾年前對台多項農漁產品祭出禁令，農業部不斷宣稱已開拓多元外銷市場有成。但統計顯示，去年出口值比前年減少四．七億美元，年減近一成。\n\n農產品貿易逆差則擴大為一四二．六億美元，過去五年，出口下滑超過廿％。兩岸因地理及文化相近，是其他海外市場難以取代的優勢；從數據即可看出，台灣農漁產品出口大陸之萎縮，其缺口並非他國市場所能填補。\n\n賴政府對美國產品門戶洞開，對大陸釋出的經濟利多卻又緊閉大門。鄭習會後，陸方釋出十項利多措施，其中包括推動符合檢疫標準的台灣農漁產品進入大陸市場，卻被賴政府以「統戰」之名拒於門外。農民一方面要承受美國農產品的大軍壓境，一方面要承受農產品因政治阻撓無法輸陸的雙重壓迫；\n\n賴政府如此雙標，心中對人民竟無一絲悲憫嗎？"}, {"title": "社論／大陸民企出海 展現國家戰略韌性", "source": "中國時報 AA02 焦點新聞", "cat": "社論與評論觀點", "priority": 0, "summary": "大陸第一季經濟成長率5％，優於市場預期的4.8％，也較去年第四季4.5％略增。其中代表新質生產力的裝備製造業、高技術製造業增加值年增8.9％、12.5％，比傳統製造業的6.1％要好。若再細分，工業機器人及積體電路等製造業表現更為優異，分別較去年同期成長33.2％及24.3％。", "full_text": "大陸第一季經濟成長率5％，優於市場預期的4.8％，也較去年第四季4.5％略增。其中代表新質生產力的裝備製造業、高技術製造業增加值年增8.9％、12.5％，比傳統製造業的6.1％要好。若再細分，工業機器人及積體電路等製造業表現更為優異，分別較去年同期成長33.2％及24.3％。\n\n可見大陸產業轉型升級進展順利，新質生產力已成為經濟成長新支柱。新質生產力成出口主力大陸2011年啟動十二五規劃，就開始推動製造業結構轉型，如今初步有成，接著將轉型重心移往出口結構，以「新三樣」產品為出口主力，希望在內外複雜情勢下，找到長期增長動能。結構調整必須付出成本與代價，譬如房地產、水泥、石化、鋼鐵等傳統產業，在轉型過程中被犧牲。\n\n但這不見得是壞事，只要轉型成功，效果顯而易見，第一季經濟成長數字就是證明。值得注意的是，隨著經濟、產業、出口等結構的優化，對外投資結構也跟著轉變，由國企主導模式轉向民企主導，民企布局以市場需求為主，強調生產效率、技術提升與供應鏈安全。隨著新質生產力全面推動，民企角色也變得愈加吃重。\n\n4月上旬，經濟學人智庫舉辦一場中國對外投資研討會，會後結論明確點出，民企將取代國企成為出海主力。轉變並不令人意外，在「中國走出去」戰略初期及「一帶一路」倡議高峰期，國企在政府主導下，憑藉雄厚資本與國家信用，廣泛在世界各地進行能源開發、港口建設與大宗物資布局。2012年中海油收購加拿大上市油氣公司尼克森、2016年中遠海運收購希臘最大港口管理局等，都是當時鮮明的案例。\n\n這些收購案背後有滿足國家戰略儲備與基礎設施需求的目標。隨著國際政治環境的轉變，西方國家對大陸國企背景的敏感度提升，這種由上而下的擴張模式，面臨嚴格的合規性挑戰與審查壓力。與此同時，大陸內部也經歷了全面性的結構調整，高科技民企崛起。\n\n多重因素交織下，民企開始填補國企留下的戰略空白。地緣風險中保持競爭力根據普華永道（pwc)最新發布的《2025年中國企業併購市場回顧與展望》，2025年陸企海外併購案共272件，其中民企發起比重達66％，已連續三年成為陸企海外併購最活躍主體，明顯高於國企的8％。安永發布的《2025年中國海外投資概覽》亦指出，若按交易件數來區分，2025年陸企海外併購集中於先進製造與運輸及科技、媒體娛樂與電信，其中以京東收購德國大型零售集團 Ceconomy、騰訊收購法國遊戲開發商育碧子公司最具代表性。\n\n面對此一趨勢，大陸決策高層需與時俱進，適時轉換思維並調整作法。長期以來，大陸對外投資政策重心與資源分配，往往優先向國企傾斜。面對地緣衝突升溫與全球供應鏈重組加速，國企優先的作法，不但無助陸企拓展海外市場，甚至可能會招致反效果。\n\n特別是各國對大陸國企海外併購，防禦心日重，將資源移轉到民企是務實的策略。民企海外投資的彈性與靈活度，將擁有更大的生存與擴張空間。以寧德時代為例，近年藉由在歐洲及印尼的海外投資布局，不僅讓自己更貼近全球汽車製造商，同時也規避掉部分貿易壁壘，維持全球電池龍頭地位。\n\n站在供應鏈安全角度，大陸中央支援民企出海，是分散市場風險的重要手段。除了可直接鏈結當地市場資源外，更可作為海外備援生產基地，避免斷鏈危機。若說國企出海是中國參與全球化的1.0版，側重於資源與基建，民企出海就是2.0版，強調市場需求與供應鏈安全。\n\n產業結構的調整與轉變，絕非僅是企業自身獲利的考量，更是大陸在地緣政治風險中保持競爭優勢的關鍵。也因為如此，未來如何在政策資源上，給予民企更多實質性幫助，將其海外布局視為國家戰略韌性的一環，將是北京重要的課題。"}, {"title": "社論／挺直脊梁審預算 別胡扯認同", "source": "中國時報 A02 焦點新聞", "cat": "社論與評論觀點", "priority": 0, "summary": "自從鄭麗文赴大陸訪問後，台灣原本存在的問題，尤其是軍購爭議，國民黨內部對此不但沒有共識，爭論不休，而民進黨更是把軍購案歸因於大陸因素。事實上，無論鄭麗文有沒有去大陸，軍購問題早已存在。原本就必須理性討論，正視主流民意的變化，朝野對話，尋求解決之道，而不是高舉美國巨棒，以霸凌民意為能事。", "full_text": "自從鄭麗文赴大陸訪問後，台灣原本存在的問題，尤其是軍購爭議，國民黨內部對此不但沒有共識，爭論不休，而民進黨更是把軍購案歸因於大陸因素。事實上，無論鄭麗文有沒有去大陸，軍購問題早已存在。原本就必須理性討論，正視主流民意的變化，朝野對話，尋求解決之道，而不是高舉美國巨棒，以霸凌民意為能事。\n\n美國誠信民眾擔憂民進黨自始有一個說法：鄭麗文的中國人認同，使得台灣內部降低敵我意識，藍白與北京共謀，阻止軍購，破壞國安。這是一個非常嚴重而荒謬的指控。最大的錯誤在於，軍購案跟民族認同一點關係都沒有。\n\n問題根源在於台灣老百姓早已非常厭惡美國的言而無信，甚至明著要錢；採購的軍備不按時程交貨，違背誠信原則。每一個老百姓都心知肚明，任何一家公司要採購，都必須列出採購清單，才能編列預算，採購還要訂合約，註明什麼時候交貨檢驗。\n\n而民進黨政府的軍購，採購什麼不清不楚，沒有清單，沒有預算細目，只會一直要求立法院通過。難怪學者笑它是「無菜單料理」。更誇張的是，台灣所買來的美國飛機乃至於飛彈，原始碼掌握在美國手裡，台灣完全沒有自主權。\n\n換言之，這些武器能不能使用，飛機能不能起飛，飛彈能不能射出去，根本不是控制在台灣手裡，而是美國直接掌握。那麼，買這些武器有什麼用？中共打來的時候，美國按住武器，你能防備嗎？\n\n就算當個看門狗，好歹也要有一點咬人的權利吧？而現在的軍購，沒有購買清單，只有賴總統忽然喊出1.25兆，然後強迫國會接受，強迫全民埋單。民間正在流傳一種說法：美國為什麼要錢要得那麼急？\n\n是不是想利用川普去北京之前，先把台灣能夠榨到的錢先榨乾了，到時候川普要怎麼「賣」，就無所顧忌了。民間擔憂，錢都給了，他把你賣了，你還毫無辦法。不如先把軍購握在手上當籌碼，等川習會後再說。\n\n這麼通俗而現實的民意，老百姓都想得到，各政黨怎麼會不懂呢？可是民進黨不回答這個問題，卻把實際且必須理性對待的事，歸諸於風馬牛不相及的「中國人認同」，就是要刻意模糊焦點。國民黨內當然也有不少「反共」人士，骨子裡和民進黨唱同調。\n\n事實上，中國人認同跟台灣人認同兩者根本不矛盾。過去有民意調查總喜歡在認同問題上作文章，把「你認同自己是中國人還是台灣人」當選項，但這根本是一個「白馬非馬」的問題。台灣人與中國人本來並不矛盾，白馬當然還是一匹馬。\n\n這正如今天在台北市做民調，問台北人說「你覺得自己是台北人還是台灣人」，大部分人會說自己是台北人，但這樣的結論可以說台北人不是台灣人嗎？沒有對立意義的名詞，刻意搞對立，得出這樣的結論有意義嗎？抹紅抹黑模糊焦點更何況，從鄭成功開台以「反清復明」為大志，到清朝大量移民認同唐山過台灣的原鄉意識；\n\n再到日本時代充滿反抗精神的文化協會、 農民組合運動、台灣民眾黨、工友總聯盟等，莫不充滿中國人意識。這是移民者對原鄉的精神歸依，也是對父祖之國的回報。乃至於光復後，台灣人馬上拋掉日本人強迫祭拜的天照大神，歡天喜地拿出祖先牌位，見證慎終追遠的信念。\n\n而今，為了政權一時的利益而想切割原鄉精神，那註定是無用的。畢竟政權是一時的，而中華民族文化認同卻是恆遠的。幾百年後，世間不知會輪換過幾個朝代，現在的執政黨早已灰飛煙滅，但中華文化認同終將永存。\n\n今天，軍購預算不好好編列，朝野協商不好好談，只會用抹紅抹黑的手段，把它變成「中國人認同」問題，根本就是故意模糊焦點。不檢討美國的言而無信，軍購項目符不符合戰略需求，更不追究美國原始碼不交給我國軍隊。這些事都不討論，一群人竟吵得像比賽誰更適合當美國小弟，這國會還有一點脊梁嗎？\n\n請聽聽台灣民間的聲音吧！軍購是國家政略與國防戰略問題，涉及對美外交和兩岸關係，也涉及國家財政和人民觀感，不是市場買菜。不論是買武器或賣武器的，都要好好坐下來談，拿出清單，理性討論，而不是漫天喊價、就地還價，不要威脅恐嚇，更不要再鬼扯淡了！"}];
 const DEPTS = {"社論與評論觀點": {"icon": "📝", "short": "社論"}, "國際經濟情勢": {"icon": "🌐", "short": "國際"}, "台灣總體經濟與數據": {"icon": "📊", "short": "總經"}, "台灣產業與投資動向": {"icon": "🏭", "short": "產業"}, "台灣政府與政策訊息": {"icon": "🏛️", "short": "政策"}};
 const CAT_ORDER = ["社論與評論觀點", "國際經濟情勢", "台灣總體經濟與數據", "台灣產業與投資動向", "台灣政府與政策訊息"];
+const HIGHLIGHTS = [{"label": "今日必看", "value": "20 則", "cat": ""}, {"label": "社論", "value": "12 則", "cat": "社論與評論觀點"}, {"label": "國際", "value": "42 則・16 必看", "cat": "國際經濟情勢"}, {"label": "總經", "value": "2 則・2 必看", "cat": "台灣總體經濟與數據"}, {"label": "產業", "value": "7 則・2 必看", "cat": "台灣產業與投資動向"}, {"label": "政策", "value": "9 則", "cat": "台灣政府與政策訊息"}];
 
+// 日期
 (function() {
   const now = new Date();
   const roc = now.getFullYear() - 1911;
   const days = ['日','一','二','三','四','五','六'];
-  document.getElementById('util-date').textContent = 
-    `民國${roc}年${now.getMonth()+1}月${now.getDate()}日 星期${days[now.getDay()]}`;
+  document.getElementById('util-date').textContent =
+    '民國' + roc + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 星期' + days[now.getDay()];
 })();
 
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── 導覽列 ──
 function buildNav() {
   const bar = document.getElementById('section-nav-inner');
   CAT_ORDER.forEach(cat => {
@@ -193,15 +366,24 @@ function buildNav() {
   document.getElementById('must-stat-btn').onclick = () => openCatView('must');
 }
 
+function setActiveNav(cat) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+}
+
+// ── 跑馬燈 ──
 function buildTicker() {
   const items = DATA.filter(i => i.priority === 1);
   const bar = document.getElementById('ticker-bar');
   if (!items.length) { bar.style.display = 'none'; return; }
+  const html = items.map((item, i) => {
+    const idx = DATA.indexOf(item);
+    return `<span class="t-item" onclick="openArticle(${idx})">${esc(item.title)}</span><span class="t-sep">／</span>`;
+  }).join('');
   const track = document.getElementById('ticker-track');
-  const html = items.map(item => `<span class="t-item" onclick="openArticle(${DATA.indexOf(item)})">${esc(item.title)}</span><span class="t-sep">／</span>`).join('');
-  track.innerHTML = html + html;
+  track.innerHTML = html + html; // 複製一份讓捲動無縫
 }
 
+// ── 頭條 ──
 function buildTopStory() {
   const wrap = document.getElementById('top-story-wrap');
   const top = DATA.find(i => i.priority === 1) || DATA[0];
@@ -209,102 +391,151 @@ function buildTopStory() {
   const idx = DATA.indexOf(top);
   wrap.innerHTML = `
     <div class="top-story" onclick="openArticle(${idx})">
-      <div class="${top.priority===1?'ts-red-bar':'ts-black-bar'}"></div>
+      ${top.priority===1 ? '<div class="ts-red-bar"></div>' : '<div class="ts-black-bar"></div>'}
       <div class="ts-meta">
         <span class="ts-cat">${esc(top.cat)}</span>
-        ${top.priority===1?'<span class="ts-badge">頭版要聞</span>':''}
+        ${top.priority===1 ? '<span class="ts-badge">頭版要聞</span>' : ''}
       </div>
       <h2 class="ts-title">${esc(top.title)}</h2>
       <p class="ts-summary">${esc(top.summary)}</p>
-      <div class="ts-footer"><span class="ts-src">${esc(top.source)}</span><span class="ts-more">閱讀全文 →</span></div>
+      <div class="ts-footer">
+        <span class="ts-src">${esc(top.source)}</span>
+        <span class="ts-more">閱讀全文 →</span>
+      </div>
     </div>`;
 }
 
+// ── 次要新聞 ──
 function buildSubNews() {
   const wrap = document.getElementById('sub-news-wrap');
   const items = DATA.slice(1, 8);
   if (!items.length) return;
-  const rows = items.map((item, i) => `
-    <div class="sub-row ${item.priority===1?'sub-must':''}" onclick="openArticle(${DATA.indexOf(item)})">
-      ${item.priority===1?'<div class="sub-dot-red"></div>':'<div class="sub-num">'+(i+1)+'</div>'}
-      <div class="sub-body">
-        <div class="sub-cat">${esc(item.cat)}</div>
-        <div class="sub-title">${esc(item.title)}</div>
-        <div class="sub-src">${esc(item.source)}</div>
-      </div>
-    </div>`).join('');
-  wrap.innerHTML = `<div class="sub-header">更多要聞</div><div class="sub-list">${rows}</div>`;
+  const rows = items.map((item, i) => {
+    const idx = DATA.indexOf(item);
+    return `
+      <div class="sub-row${item.priority===1?' sub-must':''}" onclick="openArticle(${idx})">
+        ${item.priority===1
+          ? '<div class="sub-dot-red"></div>'
+          : `<div class="sub-num">${i+1}</div>`}
+        <div class="sub-body">
+          <div class="sub-cat">${esc(item.cat)}</div>
+          <div class="sub-title">${esc(item.title)}</div>
+          <div class="sub-src">${esc(item.source)}</div>
+        </div>
+      </div>`;
+  }).join('');
+  wrap.innerHTML = `
+    <div class="sub-header">更多要聞</div>
+    <div class="sub-list">${rows}</div>`;
 }
 
+// ── 側欄：今日必看 ──
 function buildMustList() {
   const list = document.getElementById('must-list');
   const items = DATA.filter(i => i.priority === 1);
   if (!items.length) { document.getElementById('must-block').style.display='none'; return; }
   items.slice(0,8).forEach(item => {
+    const idx = DATA.indexOf(item);
     const el = document.createElement('div');
     el.className = 'must-item';
-    el.innerHTML = `<div class="mi-cat">${esc(item.cat)}</div><div class="mi-title">${esc(item.title)}</div><div class="mi-src">${esc(item.source)}</div>`;
-    el.onclick = () => openArticle(DATA.indexOf(item));
+    el.innerHTML = `
+      <div class="mi-cat">${esc(item.cat)}</div>
+      <div class="mi-title">${esc(item.title)}</div>
+      <div class="mi-src">${esc(item.source)}</div>`;
+    el.onclick = () => openArticle(idx);
     list.appendChild(el);
   });
 }
 
+// ── 側欄：分類總覽 ──
 function buildCatOverview() {
   const wrap = document.getElementById('cat-overview');
   CAT_ORDER.forEach(cat => {
-    const items = DATA.filter(i => i.cat===cat);
-    if (!items.length) return;
-    const must = items.filter(i => i.priority===1).length;
+    const cnt = DATA.filter(i => i.cat===cat).length;
+    if (!cnt) return;
+    const must = DATA.filter(i => i.cat===cat && i.priority===1).length;
+    const dept = DEPTS[cat] || {};
     const el = document.createElement('div');
     el.className = 'co-row';
-    el.innerHTML = `<span class="co-name">${esc((DEPTS[cat].icon||'')+' '+DEPTS[cat].short)}</span>
-      <span class="co-right"><span class="co-cnt">${items.length}</span>${must?`<span class="co-must">${must}必看</span>`:''}</span>`;
+    el.innerHTML = `
+      <span class="co-name">${esc((dept.icon||'')+' '+(dept.short||cat))}</span>
+      <span class="co-right">
+        <span class="co-cnt">${cnt}</span>
+        ${must ? `<span class="co-must">${must}必看</span>` : ''}
+      </span>`;
     el.onclick = () => openCatView(cat);
     wrap.appendChild(el);
   });
 }
 
+// ── 各分類新聞區塊 ──
 function buildAllSections() {
   const container = document.getElementById('all-section-inner');
   CAT_ORDER.forEach(cat => {
     const items = DATA.filter(i => i.cat===cat);
     if (!items.length) return;
+    const dept = DEPTS[cat] || {};
     const sec = document.createElement('div');
     sec.className = 'cat-section';
-    sec.innerHTML = `<div class="cs-header"><span class="cs-icon">${DEPTS[cat].icon}</span><span class="cs-title">${esc(cat)}</span>
-      <button class="cs-more" onclick="openCatView('${cat}')">查看全部 →</button></div><div class="cs-grid"></div>`;
+    sec.innerHTML = `
+      <div class="cs-header">
+        <span class="cs-icon">${dept.icon||''}</span>
+        <span class="cs-title">${esc(cat)}</span>
+        <span class="cs-count">${items.length} 則</span>
+        <button class="cs-more" onclick="event.stopPropagation();openCatView('${cat}')">查看全部 →</button>
+      </div>
+      <div class="cs-grid" id="csg-${cat.replace(/\W/g,'_')}"></div>`;
+    container.appendChild(sec);
     const grid = sec.querySelector('.cs-grid');
     items.slice(0,6).forEach((item, i) => {
+      const idx = DATA.indexOf(item);
       const card = document.createElement('div');
-      card.className = 'cs-card ' + (item.priority===1?'cs-must ':'') + (i===0?'cs-lead':'');
-      card.innerHTML = `${item.priority===1?'<div class="cs-red-stripe"></div>':''}
-        <div class="cs-card-cat">${esc(item.cat)}</div><div class="cs-card-title">${esc(item.title)}</div>
-        ${i===0?`<div class="cs-card-summary">${esc(item.summary)}</div>`:''}<div class="cs-card-src">${esc(item.source)}</div>`;
-      card.onclick = () => openArticle(DATA.indexOf(item));
+      card.className = 'cs-card' + (item.priority===1?' cs-must':'') + (i===0?' cs-lead':'');
+      card.innerHTML = `
+        ${item.priority===1 ? '<div class="cs-red-stripe"></div>' : ''}
+        <div class="cs-card-cat">${esc(item.cat)}</div>
+        <div class="cs-card-title">${esc(item.title)}</div>
+        ${i===0 ? `<div class="cs-card-summary">${esc(item.summary)}</div>` : ''}
+        <div class="cs-card-src">${esc(item.source)}</div>`;
+      card.onclick = () => openArticle(idx);
       grid.appendChild(card);
     });
-    container.appendChild(sec);
   });
 }
 
+// ── 分類頁 ──
 function openCatView(cat) {
   const isMust = cat==='must';
   const items = isMust ? DATA.filter(i=>i.priority===1) : DATA.filter(i=>i.cat===cat);
   document.getElementById('cat-view-title').textContent = isMust ? '頭版要聞' : cat;
   const list = document.getElementById('cat-list');
-  list.innerHTML = items.map(item => `
-    <div class="list-row ${item.priority===1?'list-must':''}" onclick="openArticle(${DATA.indexOf(item)})">
+  list.innerHTML = '';
+  items.forEach(item => {
+    const idx = DATA.indexOf(item);
+    const row = document.createElement('div');
+    row.className = 'list-row' + (item.priority===1?' list-must':'');
+    row.innerHTML = `
       <div class="lr-inner">
-        ${item.priority===1?'<div class="lr-red-bar"></div>':''}
-        <div class="lr-meta"><span class="lr-cat">${esc(item.cat)}</span>${item.priority===1?'<span class="lr-must-tag">頭版</span>':''}</div>
+        ${item.priority===1 ? '<div class="lr-red-bar"></div>' : ''}
+        <div class="lr-meta">
+          <span class="lr-cat">${esc(item.cat)}</span>
+          ${item.priority===1 ? '<span class="lr-must-tag">頭版</span>' : ''}
+        </div>
         <div class="lr-title">${esc(item.title)}</div>
         <div class="lr-summary">${esc(item.summary)}</div>
-        <div class="lr-footer"><span class="lr-src">${esc(item.source)}</span><span class="lr-cta">閱讀全文 →</span></div>
-      </div>
-    </div>`).join('');
+        <div class="lr-footer">
+          <span class="lr-src">${esc(item.source)}</span>
+          <span class="lr-cta">閱讀全文 →</span>
+        </div>
+      </div>`;
+    row.onclick = () => openArticle(idx);
+    list.appendChild(row);
+  });
   showView('cat-view');
+  setActiveNav(isMust ? 'all' : cat);
 }
 
+// ── 文章頁 ──
 function openArticle(idx) {
   const item = DATA[idx];
   const dept = DEPTS[item.cat] || {};
@@ -313,19 +544,57 @@ function openArticle(idx) {
   document.getElementById('art-title').textContent = item.title;
   document.getElementById('art-source').textContent = '來源：' + item.source;
   document.getElementById('art-summary').textContent = item.summary;
-  document.getElementById('art-body').innerHTML = (item.full_text || '尚未擷取到內文內容').split('\n\n').map(p => `<p>${esc(p.trim())}</p>`).join('');
+  document.getElementById('art-summary-block').style.display = item.summary ? 'block' : 'none';
+  document.getElementById('art-body').innerHTML =
+    (item.full_text || '尚未擷取到內文內容').split('\n\n').map(p => '<p>' + esc(p.trim()) + '</p>').join('');
+  const fromCat = currentView === 'cat-view';
+  document.getElementById('art-back-btn').onclick = fromCat ? () => showView('cat-view') : () => closeArticle();
   showView('article-view');
+  history.pushState({view:'article',idx}, '');
 }
 
+function closeArticle() {
+  if (history.state && history.state.view==='cat-view') showView('cat-view');
+  else goHome();
+}
+
+// ── View 管理 ──
+var currentView = 'home-view';
 function showView(id) {
-  ['home-view','cat-view','article-view'].forEach(v => document.getElementById(v).style.display = v===id?'block':'none');
-  ['masthead','section-nav','utility-bar'].forEach(v => document.getElementById(v).style.display = id==='home-view'?'block':'none');
+  ['home-view','cat-view','article-view'].forEach(v =>
+    document.getElementById(v).style.display = v===id ? 'block' : 'none');
+  document.getElementById('section-nav').style.display = id==='home-view' ? 'block' : 'none';
+  document.getElementById('masthead').style.display = id==='home-view' ? 'block' : 'none';
+  document.getElementById('utility-bar').style.display = id==='home-view' ? 'block' : 'none';
+  currentView = id;
   window.scrollTo(0,0);
 }
-function goHome() { showView('home-view'); }
+function goHome() {
+  showView('home-view');
+  setActiveNav('all');
+}
 
+window.addEventListener('popstate', () => {
+  if (currentView==='article-view') closeArticle();
+  else if (currentView==='cat-view') goHome();
+});
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') {
+    if (currentView==='article-view') closeArticle();
+    else if (currentView==='cat-view') goHome();
+  }
+});
+
+// ── 初始化（全部在 IIFE 內，確保 DOM 已就緒）──
 (function() {
-  buildNav(); buildTicker(); buildTopStory(); buildSubNews(); buildMustList(); buildCatOverview(); buildAllSections();
+  buildNav();
+  buildTicker();
+  buildTopStory();
+  buildSubNews();
+  buildMustList();
+  buildCatOverview();
+  buildAllSections();
+  showView('home-view');
 })();
 </script>
 </body>
